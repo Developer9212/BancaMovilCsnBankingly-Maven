@@ -16,7 +16,6 @@ import com.fenoreste.rest.dao.AccountsDAO;
 import com.github.cliftonlabs.json_simple.JsonObject;
 import java.util.ArrayList;
 import java.util.List;
-import javax.ws.rs.HeaderParam;
 import org.json.JSONObject;
 
 @Path("/Account")

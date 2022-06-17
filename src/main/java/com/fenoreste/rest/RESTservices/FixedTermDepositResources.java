@@ -14,6 +14,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import org.json.JSONObject;
+import com.github.cliftonlabs.json_simple.JsonObject;
 
 /**
  *
@@ -26,18 +27,18 @@ public class FixedTermDepositResources {
     @Path("/details/{productBankIdentifier}")
     @Produces({MediaType.APPLICATION_JSON + ";charset=utf-8"})
     public Response getfixedTermDeposit(@PathParam("productBankIdentifier") String productBankIdentifier) {
-        JSONObject Json_De_Error = new JSONObject();
-        FixedTermDepositDAO metodos = new FixedTermDepositDAO();
 
+        FixedTermDepositDAO metodos = new FixedTermDepositDAO();
+        JsonObject Json_De_Error = new JsonObject();
         if (!metodos.actividad_horario()) {
             Json_De_Error.put("ERROR", "VERIFIQUE SU HORARIO DE ACTIVIDAD FECHA,HORA O CONTACTE A SU PROVEEEDOR");
-
+            JSONObject json = new JSONObject();
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Json_De_Error).build();
         }
 
         String accountId = productBankIdentifier;
         DetallesInversionDTO info_cuenta = null;
-
+        System.out.println("aiiii");
         try {
             info_cuenta = metodos.getDetallesInversion(accountId);
             if (info_cuenta != null) {
