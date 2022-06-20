@@ -13,7 +13,6 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import org.json.JSONObject;
 import com.github.cliftonlabs.json_simple.JsonObject;
 
 /**
@@ -30,15 +29,15 @@ public class FixedTermDepositResources {
 
         FixedTermDepositDAO metodos = new FixedTermDepositDAO();
         JsonObject Json_De_Error = new JsonObject();
+        
         if (!metodos.actividad_horario()) {
             Json_De_Error.put("ERROR", "VERIFIQUE SU HORARIO DE ACTIVIDAD FECHA,HORA O CONTACTE A SU PROVEEEDOR");
-            JSONObject json = new JSONObject();
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Json_De_Error).build();
         }
 
         String accountId = productBankIdentifier;
         DetallesInversionDTO info_cuenta = null;
-        System.out.println("aiiii");
+        
         try {
             info_cuenta = metodos.getDetallesInversion(accountId);
             if (info_cuenta != null) {

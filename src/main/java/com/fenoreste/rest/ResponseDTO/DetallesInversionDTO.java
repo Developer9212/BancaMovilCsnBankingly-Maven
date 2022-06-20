@@ -25,7 +25,7 @@ public class DetallesInversionDTO {
     private String ProductBankIdentifier;
     private Double Rate;
     private Date RenewalDate;
-    private Date StartDate;
+    private String StartDate;
     private String Term;
     private String DebitProductBankIdentifier;
     private Integer FixedTermDepositType;
@@ -39,7 +39,7 @@ public class DetallesInversionDTO {
     public DetallesInversionDTO() {
     }
 
-    public DetallesInversionDTO(String CdpName, String CdpNumber, Double CurrentBalance, String DueDate, Double InterestEarned, Double InterestPaid, String InterestPayingAccount, Double OriginalAmount, String ProductBankIdentifier, Double Rate, Date RenewalDate, Date StartDate, String Term, String DebitProductBankIdentifier, Integer FixedTermDepositType, CatalogFixedTermDepositDTO PaymentMethod, Double TotalInterestAmount, CatalogFixedTermDepositDTO RenewalType, String InterestCreditProductBankIdentifier, String DepositCreditProductBankIdentifier, List<FixedTermDepositBeneficiaryDTO> FixedTermDepositBeneficiaries) {
+    public DetallesInversionDTO(String CdpName, String CdpNumber, Double CurrentBalance, String DueDate, Double InterestEarned, Double InterestPaid, String InterestPayingAccount, Double OriginalAmount, String ProductBankIdentifier, Double Rate, Date RenewalDate, String StartDate, String Term, String DebitProductBankIdentifier, Integer FixedTermDepositType, CatalogFixedTermDepositDTO PaymentMethod, Double TotalInterestAmount, CatalogFixedTermDepositDTO RenewalType, String InterestCreditProductBankIdentifier, String DepositCreditProductBankIdentifier, List<FixedTermDepositBeneficiaryDTO> FixedTermDepositBeneficiaries) {
         this.CdpName = CdpName;
         this.CdpNumber = CdpNumber;
         this.CurrentBalance = CurrentBalance;
@@ -151,11 +151,11 @@ public class DetallesInversionDTO {
         this.RenewalDate = RenewalDate;
     }
 
-    public Date getStartDate() {
+    public String getStartDate() {
         return StartDate;
     }
 
-    public void setStartDate(Date StartDate) {
+    public void setStartDate(String StartDate) {
         this.StartDate = StartDate;
     }
 

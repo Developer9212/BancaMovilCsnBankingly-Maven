@@ -55,6 +55,8 @@ public abstract class FacadeFixedTermDeposit<T> {
             FixedTermDepositBeneficiaryDTO datosBeneficiario = new FixedTermDepositBeneficiaryDTO();
             DocumentId documentId = new DocumentId();
             CatalogFixedTermDepositDTO catalog = new CatalogFixedTermDepositDTO();
+            //Formatear fecha
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
             fixedTermDeposit.setCdpName(producto.getNombre());
             fixedTermDeposit.setCdpNumber(producto.getIdproducto().toString());
@@ -73,7 +75,7 @@ public abstract class FacadeFixedTermDeposit<T> {
             fixedTermDeposit.setOriginalAmount(aux.getSaldo().doubleValue());
             fixedTermDeposit.setProductBankIdentifier(String.format("%06d", opa.getIdorigenp()) + "" + String.format("%05d", opa.getIdproducto()) + "" + String.format("%08d", opa.getIdauxiliar()));
             fixedTermDeposit.setRate(aux.getTasaio().doubleValue());
-            fixedTermDeposit.setStartDate(aux.getFechaactivacion());
+            fixedTermDeposit.setStartDate(sdf.format(aux.getFechaactivacion()));
             fixedTermDeposit.setTerm(String.valueOf(aux.getPlazo()));
             fixedTermDeposit.setDebitProductBankIdentifier(null);//PREGUNTAR
 
