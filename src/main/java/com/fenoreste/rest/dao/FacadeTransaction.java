@@ -100,6 +100,7 @@ public abstract class FacadeTransaction<T> {
         Tablas tb_spei_cuenta_comisiones = null;
         Double comisiones = 0.0;
         Double total_a_enviar = 0.0;
+        String total_pagar_hipotecario = "";
         //Si no es TDD pasa directo hasta aca
         //Si es una transferencia entre mis cuentas
         //if (identificadorTransferencia == 1 && retiro == false && banderaCSN == false) {
@@ -142,11 +143,14 @@ public abstract class FacadeTransaction<T> {
             if (util2.obtenerOrigen(em) == 30200) {
                 //Valido el producto para retiro
                 //Busco el producto configurado para retiros
-                messageBackend = validarTransferenciaCSN(transactionOWN, identificadorTransferencia, null);
-                System.out.println("");
+                messageBackend = validarTransferenciaCSN(transactionOWN, identificadorTransferencia, null);               
                 backendResponse.setBackendMessage(messageBackend);
-                banderaCSN = true;
-                System.out.println("mensageBakc:" + messageBackend);
+                banderaCSN = true;                
+                if(messageBackend.contains("_")){
+                    String[]messageBackend_hipotecario = messageBackend.split(":");
+                    total_pagar_hipotecario = messageBackend_hipotecario[1];
+                    System.out.println("total a pagar hipotecario es:"+total_pagar_hipotecario);
+                }
                 if (messageBackend.contains("TDD")) {
                     banderaTDD = true;
                 }
@@ -201,7 +205,11 @@ public abstract class FacadeTransaction<T> {
                 transaction.setCreditproductbankidentifier(transactionOWN.getCreditProductBankIdentifier());
                 transaction.setCreditproducttypeid(transactionOWN.getCreditProductTypeId());
                 transaction.setCreditcurrencyid(transactionOWN.getCreditCurrencyId());
-                transaction.setAmount(transactionOWN.getAmount());
+                if(!total_pagar_hipotecario.equals("")){
+                    transaction.setAmount(Double.parseDouble(total_pagar_hipotecario));
+                }else{
+                    transaction.setAmount(transactionOWN.getAmount());
+                }
                 transaction.setNotifyto(transactionOWN.getNotifyTo());
                 transaction.setNotificationchannelid(transactionOWN.getNotificationChannelId());
                 transaction.setDestinationname(transactionOWN.getDestinationName());
@@ -429,7 +437,7 @@ public abstract class FacadeTransaction<T> {
                     procesaDestino.setIdorigen(aDestino.getIdorigen());
                     procesaDestino.setIdgrupo(aDestino.getIdgrupo());
                     procesaDestino.setIdsocio(aDestino.getIdsocio());
-                    procesaDestino.setCargoabono(1);
+                    procesaDestino.setCargoabono(1);                   
                     procesaDestino.setMonto(transaction.getAmount());
                     procesaDestino.setIva(Double.parseDouble(aDestino.getIva().toString()));
                     procesaDestino.setTipo_amort(Integer.parseInt(String.valueOf(aDestino.getTipoamortizacion())));
@@ -463,8 +471,7 @@ public abstract class FacadeTransaction<T> {
                         if (backendResponse.getBackendMessage().contains("TDD")) {
                             tarjeta_origen = new TarjetaDeDebito().buscaTarjetaTDD(opaOrigen.getIdorigenp(), opaOrigen.getIdproducto(), opaOrigen.getIdauxiliar(), em);
                             //Realizo un retiro de la TDD
-                            bandera_retiro = new TarjetaDeDebito().retiroTDD(tarjeta_origen, procesaOrigen.getMonto());
-                            System.out.println("El retiro de la tdd fue:" + bandera_retiro);
+                            bandera_retiro = new TarjetaDeDebito().retiroTDD(tarjeta_origen, procesaOrigen.getMonto());                        
                             //bandera_retiro = true;
                             if (bandera_retiro) {//si se retiro de la tdd origen                             
                                 if (identificadorTransferencia == 2) {
@@ -487,16 +494,8 @@ public abstract class FacadeTransaction<T> {
                                                     total_procesados = 0;
                                                     System.out.println("La funcion saicoop no pudo distribuir el capital");
                                                 }
-
-                                                if (total_procesados > 0) {
-                                                    finish = true;
-                                                } else {
-                                                    //Si no se aplico el movimiento pero como ya se habia retirado de la TDD oirgen entonce se lo devolvemos
-                                                    //Tambien ya se deposito a TDD destino tercero entonces se le retira
-                                                    bandera_deposito_origen = new TarjetaDeDebito().depositoTDD(tarjeta_origen, procesaOrigen.getMonto());
-                                                    bandera_retiro = new TarjetaDeDebito().retiroTDD(tarjeta_destino, procesaOrigen.getMonto());
-                                                    backendResponse.setBackendMessage("NO SE PUDIERON PROCESAR LOS MOVIMIENTOS EN SAICOOP");
-                                                }
+                                                  finish = true;
+                                              
                                             } else {
                                                 bandera_deposito_origen = new TarjetaDeDebito().depositoTDD(tarjeta_origen, procesaOrigen.getMonto());
                                                 backendResponse.setBackendMessage("NO SE PUDO DEPOSITAR A LA TARJETA DE DEBITO DESTINO");
@@ -1484,8 +1483,7 @@ public abstract class FacadeTransaction<T> {
         try {
             boolean bOrigen = false;
             try {
-                Query query = em.createNativeQuery(cuentaOrigen, Auxiliares.class
-                );
+                Query query = em.createNativeQuery(cuentaOrigen, Auxiliares.class);
                 //Obtengo el producto origen
                 ctaOrigen = (Auxiliares) query.getSingleResult();
                 bOrigen = true;
@@ -1493,9 +1491,7 @@ public abstract class FacadeTransaction<T> {
                 System.out.println("Error cuando se intento validar el origen");
             }
             if (bOrigen) {
-
                 Double saldo = Double.parseDouble(ctaOrigen.getSaldo().toString());
-                System.out.println("Saldo:" + saldo);
                 if (util2.obtenerOrigen(em) == 30200) {
                     Tablas tablaProductoTDD = new TarjetaDeDebito().productoTddwebservice(em);
                     //Si el pago del prestamo se esta haciendo desde la TDD
@@ -1521,8 +1517,7 @@ public abstract class FacadeTransaction<T> {
                         ctaOrigen.getAuxiliaresPK().getIdproducto());
                 if (cuentasBankingly != null) {
                     //Busco descripcion del idproducto origen
-                    Productos prOrigen = em.find(Productos.class,
-                            ctaOrigen.getAuxiliaresPK().getIdproducto());
+                    Productos prOrigen = em.find(Productos.class,ctaOrigen.getAuxiliaresPK().getIdproducto());
                     //si el producto no es un prestamo            
                     if (prOrigen.getTipoproducto() == 0) {
                         //Verifico el estatus de la cuenta origen
@@ -1532,12 +1527,9 @@ public abstract class FacadeTransaction<T> {
                                 Auxiliares ctaDestino = null;
                                 try {
                                     //Busco la cuenta destino
-                                    Query queryDestino = em.createNativeQuery(cuentaDestino, Auxiliares.class
-                                    );
+                                    Query queryDestino = em.createNativeQuery(cuentaDestino, Auxiliares.class);
                                     ctaDestino = (Auxiliares) queryDestino.getSingleResult();
-                                    System.out.println("opaD:" + opaD.getIdproducto());
-                                    productoDestino = em.find(Productos.class,
-                                            opaD.getIdproducto());
+                                    productoDestino = em.find(Productos.class,opaD.getIdproducto());
                                     bDestino = true;
                                 } catch (Exception e) {
                                     System.out.println("Error al buscar cuenta destino:" + e.getMessage());
@@ -1545,8 +1537,7 @@ public abstract class FacadeTransaction<T> {
 
                                 if (bDestino) {
                                     //Busco el producto destino
-                                    productoDestino = em.find(Productos.class,
-                                            opaD.getIdproducto());
+                                    productoDestino = em.find(Productos.class,opaD.getIdproducto());
                                     //Valido que la cuenta destino este activa
                                     if (ctaDestino.getEstatus() == 2) {
                                         //Valido que cuenta destino pertenezca al mismo socio
@@ -1569,7 +1560,7 @@ public abstract class FacadeTransaction<T> {
                                         }
 
                                         if (validador_cuentas_destino) {
-                                            //Valido que el producto destino tercero sea un prestamo
+                                            //Me aseguro que el producto destino tercero sea un prestamo
                                             if (productoDestino.getTipoproducto() == 2) {
 
                                                 //valido el minimo o maximo para banca movil
@@ -1656,7 +1647,7 @@ public abstract class FacadeTransaction<T> {
                                                                                 Double se_puede_pagar = Double.parseDouble(String.valueOf(query_se_puede_aplicar.getSingleResult()));
 
                                                                                 if (monto >= se_puede_pagar) {
-                                                                                    message = message + "VALIDADO CON EXITO";
+                                                                                    message = message + "VALIDADO CON EXITO_TOTAL PAGAR:"+se_puede_pagar;
                                                                                 } else {
                                                                                     message = "PUEDES ADELANTAR :" + se_puede_pagar;
                                                                                 }
@@ -1723,7 +1714,6 @@ public abstract class FacadeTransaction<T> {
         } finally {
             em.close();
         }
-        System.out.println("el mensaje es:" + message);
 
         return message.toUpperCase();
     }
