@@ -339,7 +339,7 @@ public abstract class FacadeLoan<T> {
                 if (aux_d.getCargoabono() == 1) {
 
                     Timestamp ts = new Timestamp(f.getTime());
-                    converted = String.valueOf(convertToLocalDateTimeViaInstant(ts) + ":00.000Z");
+                    converted = String.valueOf(convertToLocalDateTimeViaInstant(ts) + ":00.00");
                     pago.setCapitalBalance(Double.parseDouble(lista_pagos[4].toString().replace(",", "")));
                     pago.setFeeNumber(aux_d.getTransaccion());
                     pago.setMovementType(2);
