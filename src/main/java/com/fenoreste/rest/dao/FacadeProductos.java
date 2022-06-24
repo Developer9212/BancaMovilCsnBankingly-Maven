@@ -346,8 +346,14 @@ public abstract class FacadeProductos<T> {
                 LocalDateTime localDate = LocalDateTime.parse(fechaServidorDB + " 00:00:00", dtf);
                 TablasPK tbEstados_cuentaPK = new TablasPK("bankingly_banca_movil", "total_estados_cuenta");
                 Tablas tbEstados_Cuenta = em.find(Tablas.class, tbEstados_cuentaPK);
+                
+                int total_estados = 0; 
+                if (productType == 4) {
+                    total_estados = 1;
+                }else {
+                    total_estados = Integer.parseInt(String.valueOf(tbEstados_Cuenta.getDato1()));
+                }
 
-                int total_estados = Integer.parseInt(String.valueOf(tbEstados_Cuenta.getDato1()));
                 for (int i = 0; i < total_estados; i++) {
                     System.out.println("siiiiiiiiiiiiiiiii:" + i);
                     ProductBankStatementDTO estadoCuenta = new ProductBankStatementDTO();
