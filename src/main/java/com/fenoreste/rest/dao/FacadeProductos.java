@@ -353,12 +353,26 @@ public abstract class FacadeProductos<T> {
                 }else {
                     total_estados = Integer.parseInt(String.valueOf(tbEstados_Cuenta.getDato1()));
                 }
-
+                
                 for (int i = 0; i < total_estados; i++) {
                     System.out.println("siiiiiiiiiiiiiiiii:" + i);
                     ProductBankStatementDTO estadoCuenta = new ProductBankStatementDTO();
                     ff = String.valueOf(localDate.plusMonths(-i));
                     fi = String.valueOf(localDate.plusMonths(-i - 1));
+                    
+                    //Fecha final de mes
+                    LocalDateTime fecha_fin =LocalDateTime.parse(ff);
+                    String fe_fin = String.valueOf(fecha_fin.plusDays(-1));
+                    ff = fe_fin;
+                    
+                    //Fechas solo del mes en curso para inversion
+                    if (productType == 4) {
+                        LocalDateTime fec_fin = LocalDateTime.parse(ff);
+                        ff = String.valueOf(fec_fin.plusMonths(+1));
+                        LocalDateTime fec_ini = LocalDateTime.parse(fi);
+                        fi = String.valueOf(fec_ini.plusMonths(+1));
+                    }
+                    System.out.println("FECHAS INICIO " + fi + " FECHA FIN " + ff);
 
                     //System.out.println("LocaDate:"+localDate);
                     System.out.println("yyyy/MM/dd HH:mm:ss-> " + dtf.format(LocalDateTime.now()));
@@ -502,6 +516,14 @@ public abstract class FacadeProductos<T> {
                     String cade = ruta();
                     //System.out.println("Cade:" + cade.replace("\\", "/"));
                     linea = linea.replace("/usr/local/saicoop/img_estado_cuenta_ahorros/", cade.replace("\\", "/"));
+                } else if (linea.contains("/usr/local/saicoop/img_estado_cuenta_dpfs_ind/")) {
+                    String cade = ruta();
+                    //System.out.println("Cadena:" + cade.replace("\\", "/"));
+                    linea = linea.replace("/usr/local/saicoop/img_estado_cuenta_dpfs_ind/", cade.replace("\\", "/"));
+                } else if (linea.contains("/usr/local/saicoop/img_estado_cuenta_prestamos/")) {
+                    String cade = ruta();
+                    //System.out.println("Cadena:" + cade.replace("\\", "/"));
+                    linea = linea.replace("/usr/local/saicoop/img_estado_cuenta_prestamos/", cade.replace("\\", "/"));
                 }
                 if (linea.contains(" & ")) {
                     //System.out.println("si tele");
