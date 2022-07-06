@@ -114,7 +114,8 @@ public abstract class FacadeLoan<T> {
             String consultaA = "SELECT * FROM amortizaciones WHERE idorigenp=" + opa.getIdorigenp()
                     + " AND idproducto=" + opa.getIdproducto()
                     + " AND idauxiliar=" + opa.getIdauxiliar()
-                    + " AND idorigenp+idproducto+idauxiliar+idamortizacion=" + feeNumber;
+                    + " AND idamortizacion=" + feeNumber;
+                    //+ " AND idorigenp+idproducto+idauxiliar+idamortizacion=" + feeNumber;
 
             System.out.println("La consulta es para la amortizacion es:" + consultaA);
             Query queryA = em.createNativeQuery(consultaA, Amortizaciones.class);
@@ -134,7 +135,7 @@ public abstract class FacadeLoan<T> {
 
             Loan_Fee_Status loanf = em.find(Loan_Fee_Status.class, loanfeests);
             Double abonoT = Double.parseDouble(amm.getAbono().toString()) + iovencido + imvencido;
-            String converted = String.valueOf(convertToLocalDateTimeViaInstant(amm.getVence()) + ":00.000Z");
+            String converted = String.valueOf(convertToLocalDateTimeViaInstant(amm.getVence()) + ":00"); //.000Z");
             loanFee = new LoanFee(
                     Double.parseDouble(aux.getSaldo().toString()),//Saldo o balance del prestamo principal
                     amm.getAmortizacionesPK().getIdorigenp() + amm.getAmortizacionesPK().getIdproducto() + amm.getAmortizacionesPK().getIdauxiliar() + amm.getAmortizacionesPK().getIdamortizacion(),
@@ -232,7 +233,7 @@ public abstract class FacadeLoan<T> {
                 }
                 SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
                 Date vence = sdf.parse(objetos[1].toString().replace("/", "-"));
-                String converted = String.valueOf(convertToLocalDateTimeViaInstant(vence) + ":00.000Z");
+                String converted = String.valueOf(convertToLocalDateTimeViaInstant(vence) + ":00"); //.000Z");
                 loanFeeDTO.setCapitalBalance(a.getSaldo().doubleValue());
                 loanFeeDTO.setFeeNumber(Integer.parseInt(objetos[0].toString()));
                 loanFeeDTO.setPrincipalAmount(abono);
