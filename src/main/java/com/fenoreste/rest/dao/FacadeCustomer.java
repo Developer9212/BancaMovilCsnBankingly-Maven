@@ -76,6 +76,7 @@ public abstract class FacadeCustomer<T> {
         } else if (clientType == 2) {
             IdentClientType = "rfc";
         }
+        System.out.println("Last name................................."+LastName);
 
         Persona persona = new Persona();
         String consulta = "";
@@ -358,11 +359,12 @@ public abstract class FacadeCustomer<T> {
 
      public String valida_caracteres_speciales(String cadena){
         cadena = cadena.toLowerCase();
+         System.out.println("Cadena original:"+cadena);
         for(int i=0;i<cadena.length();i++){
-            int ascii = cadena.charAt(i);
             char c = cadena.charAt(i);
+            System.out.println("el caracter es:"+c);
             if(cadena.charAt(i) == ' ' || Character.isLetter(c) || Character.isDigit(c)){               
-               
+                
                 switch(c){
                     case 'á':
                     cadena = cadena.replace(String.valueOf(c),"a");
@@ -371,7 +373,7 @@ public abstract class FacadeCustomer<T> {
                     cadena = cadena.replace(String.valueOf(c),"e");
                     break;
                     case 'í':
-                    cadena = cadena.replace(String.valueOf(c),"a");
+                    cadena = cadena.replace(String.valueOf(c),"i");
                     break;
                     case 'ó':
                     cadena = cadena.replace(String.valueOf(c),"o");
@@ -385,7 +387,9 @@ public abstract class FacadeCustomer<T> {
                 //áéíóúñ    
                 }                
             }else{
-               cadena = cadena.replace(String.valueOf(c),"");
+                if(c != '%'){//Modificado 31/05/2023 Wilmer                   
+                cadena = cadena.replace(String.valueOf(c),"");
+                }
             }
            
             //System.out.println("El caracter en la posicion "+i+"es:"+cadena.charAt(i)+" y su valor ascii es:"+ascii);

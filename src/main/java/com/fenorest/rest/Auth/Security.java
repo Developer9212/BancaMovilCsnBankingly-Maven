@@ -8,7 +8,6 @@ package com.fenorest.rest.Auth;
 import com.fenoreste.rest.Util.AbstractFacade;
 import java.io.IOException;
 import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
 import javax.persistence.Query;
 import sun.misc.BASE64Decoder;
 
@@ -71,7 +70,7 @@ public class Security {
             bandera=true;
         }
         } catch (Exception e) {
-            System.out.println("Error en status");
+            System.out.println("Error al obtener el usuario:"+e.getMessage());
         }
         //emf.close();
         return bandera;

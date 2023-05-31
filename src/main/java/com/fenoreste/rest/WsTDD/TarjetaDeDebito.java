@@ -64,7 +64,7 @@ public class TarjetaDeDebito {
                     + "         WHERE w.idorigenp = ? "
                     + "         AND w.idproducto = ?"
                     + "         AND w.idauxiliar = ?"
-                    + "          AND td.fecha_vencimiento > (select distinct fechatrabajo from origenes limit 1) ";
+                    + "          AND td.fecha_vencimiento > (select distinct fechatrabajo from origenes limit 1)";
             System.out.println("Consulta tarjeta:"+consulta);
             Query query = em.createNativeQuery(consulta, WsSiscoopFoliosTarjetas1.class);
             query.setParameter(1, idorigenp);
