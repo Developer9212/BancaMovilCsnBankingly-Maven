@@ -16,6 +16,7 @@ import com.fenoreste.rest.Util.UtilidadesGenerales;
 import com.fenoreste.rest.dao.TercerosDAO;
 import com.github.cliftonlabs.json_simple.JsonObject;
 import java.util.ArrayList;
+import java.util.Date;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -134,7 +135,7 @@ public class TercerosResources {
         }
         com.github.cliftonlabs.json_simple.JsonObject jsonR = new JsonObject();
         TercerosDAO dao = new TercerosDAO();
-        if (!dao.actividad_horario()) {
+        if (dao.actividad_horario()) {
             jsonR.put("ERROR", "VERIFIQUE SU HORARIO DE ACTIVIDAD FECHA,HORA O CONTACTE A SU PROVEEEDOR");
             return Response.status(Response.Status.BAD_REQUEST).entity(jsonR).build();
         }
@@ -161,10 +162,12 @@ public class TercerosResources {
     @Produces({MediaType.APPLICATION_JSON + ";charset=utf-8"})
     @Consumes({javax.ws.rs.core.MediaType.APPLICATION_JSON + ";charset=utf-8"})
     public Response altaTerceros(String cadena) {
+        System.out.println("Peticion tercero:"+cadena);
         JSONObject jsonRequest = new JSONObject(cadena);
         String productNumber_ = "";
         Integer productTypeId_ = 0;
         Integer thirdPartyProductType_ = 0;
+        String username  = "";
         //validamos que nuestro request este bien formado
         try {
             productNumber_ = jsonRequest.getString("productNumber");
@@ -174,7 +177,9 @@ public class TercerosResources {
             String documentNumber_ = productOwnerDocumentId.getString("documentNumber");
             String documentType_ = productOwnerDocumentId.getString("documentType");
             thirdPartyProductType_ = jsonRequest.getInt("thirdPartyProductType");
+            username = jsonRequest.getString("userName");
         } catch (Exception e) {
+            
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
         }
 
@@ -194,7 +199,7 @@ public class TercerosResources {
 
         userDocumentIdDTO documento = new userDocumentIdDTO();
         try {
-            ThirdPartyProductDTO dto = dao.cosultaProductosTerceros(productNumber_, productTypeId_, documento, thirdPartyProductType_);
+            ThirdPartyProductDTO dto = dao.cosultaProductosTerceros(productNumber_, productTypeId_, documento, thirdPartyProductType_,username);
             JsonObject third = new JsonObject();
             third.put("productOwnerAndCurrency", dto);
             return Response.status(Response.Status.OK).entity(third).build();

@@ -28,6 +28,7 @@ public class UtilidadesGenerales {
             String actividad = "SELECT sai_bankingly_servicio_activo_inactivo()";
             Query query = em.createNativeQuery(actividad);
             bandera = (boolean) query.getSingleResult();
+            
         } catch (Exception e) {
             System.out.println("Error al recuperar el tiempo de actividad:" + e.getMessage());
         }

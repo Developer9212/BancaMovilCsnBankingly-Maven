@@ -15,6 +15,7 @@ import com.fenoreste.rest.entidades.TablasPK;
 import com.fenoreste.rest.entidades.WsClabeActivacion;
 import com.fenoreste.rest.entidades.WsSiscoopFoliosTarjetasPK1;
 import com.fenoreste.rest.entidades.Banca_movil_usuarios;
+import com.fenoreste.rest.entidades.Banca_movil_usuarios_saicoop;
 import com.syc.ws.endpoint.siscoop.BalanceQueryResponseDto;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -46,22 +47,22 @@ public abstract class FacadeCustomer<T> {
 
             //Para persisitir desccomenta las lineas
             if (saveDatos(username, p)) {
-            client = new ClientByDocumentDTO();
-            client.setClientBankIdentifier(String.format("%06d", p.getPersonasPK().getIdorigen()) + "" + String.format("%02d", p.getPersonasPK().getIdgrupo()) + "" + String.format("%06d", p.getPersonasPK().getIdsocio()));
-            client.setClientName(p.getNombre() + " " + p.getAppaterno() + " " + p.getApmaterno());
-            client.setClientType(String.valueOf(clientType));
-            client.setDocumentId(p.getCurp());
+                client = new ClientByDocumentDTO();
+                client.setClientBankIdentifier(String.format("%06d", p.getPersonasPK().getIdorigen()) + "" + String.format("%02d", p.getPersonasPK().getIdgrupo()) + "" + String.format("%06d", p.getPersonasPK().getIdsocio()));
+                client.setClientName(p.getNombre() + " " + p.getAppaterno() + " " + p.getApmaterno());
+                client.setClientType(String.valueOf(clientType));
+                client.setDocumentId(p.getCurp());
             }
 
         } catch (Exception e) {
             System.out.println("Error leer socio:" + e.getMessage());
-            
+
         }
         return client;
     }
 
     //Metodo para saber si la personas realmente existe en la base de datos
-    public Persona BuscarPersona(int clientType, String documentId, String Name, String LastName, String Mail,String CellPhone) throws UnsupportedEncodingException, IOException {
+    public Persona BuscarPersona(int clientType, String documentId, String Name, String LastName, String Mail, String CellPhone) throws UnsupportedEncodingException, IOException {
         EntityManager em = AbstractFacade.conexion();//emf.createEntityManager()EntityManager em = emf.createEntityManager();        EntityManager em = emf.createEntityManager();
         String IdentClientType = "";
         /*Identificamos el tipo de cliente si es 
@@ -76,7 +77,7 @@ public abstract class FacadeCustomer<T> {
         } else if (clientType == 2) {
             IdentClientType = "rfc";
         }
-        System.out.println("Last name................................."+LastName);
+        System.out.println("Last name................................." + LastName);
 
         Persona persona = new Persona();
         String consulta = "";
@@ -87,14 +88,14 @@ public abstract class FacadeCustomer<T> {
                 + " AND UPPER(replace(appaterno,' ',''))||''||UPPER(replace(p.apmaterno,' ','')) LIKE ('%" + valida_caracteres_speciales(LastName.toUpperCase().trim()).replace(" ", "").toUpperCase() + "%')"
                 + " AND (CASE WHEN email IS NULL THEN '' ELSE trim(upper(email)) END)='" + Mail.toUpperCase().trim() + "'"
                 + " AND (CASE WHEN celular IS NULL THEN '' ELSE trim(celular) END)='" + CellPhone.trim() + "' AND idgrupo=10 LIMIT 1";
-        System.out.println("Consulta para busqueda de personas :"+consulta);
-        
+        System.out.println("Consulta para busqueda de personas :" + consulta);
+
         try {   //Se deberia buscar por telefono,celular,email pero Mitras solicito que solo sea x curp y nombre esta en prueba            
             Query query = em.createNativeQuery(consulta, Persona.class);
             persona = (Persona) query.getSingleResult();
         } catch (Exception e) {
-            System.out.println("Error al Buscar personas:" + e.getMessage());          
-        } 
+            System.out.println("Error al Buscar personas:" + e.getMessage());
+        }
         return persona;
     }
 
@@ -146,26 +147,26 @@ public abstract class FacadeCustomer<T> {
                         if (saldo >= Double.parseDouble(tb_producto_tdd.getDato2())) {
                             //S tiene el saldoque se encesita en la tdd
                             //Ahora verificamos que no se un socio bloqueado buscamos en la lista sopar
-                           if (!util.validacionSopar(a_tdd.getAuxiliaresPK().getIdorigenp(),a_tdd.getAuxiliaresPK().getIdproducto(),a_tdd.getAuxiliaresPK().getIdauxiliar(),2)) {
+                            if (!util.validacionSopar(a_tdd.getAuxiliaresPK().getIdorigenp(), a_tdd.getAuxiliaresPK().getIdproducto(), a_tdd.getAuxiliaresPK().getIdauxiliar(), 2)) {
                                 //Ahora verifico que el socio tenga clabe para SPEI 
                                 AuxiliaresPK clave_llave = new AuxiliaresPK(a_tdd.getAuxiliaresPK().getIdorigenp(), a_tdd.getAuxiliaresPK().getIdproducto(), a_tdd.getAuxiliaresPK().getIdauxiliar());
                                 Clabes_Interbancarias clabe_folio = em.find(Clabes_Interbancarias.class, clave_llave);
                                 if (clabe_folio != null) {
                                     if (clabe_folio.isActiva()) {
-                                        String cuenta = String.format("%06d", clabe_folio.getAux_pk().getIdorigenp()) + "" + String.format("%05d", clabe_folio.getAux_pk().getIdproducto()) + "" + String.format("%08d", clabe_folio.getAux_pk().getIdauxiliar());                                                                               
-                                        Tablas tb_activar_registra_cuenta_persona_fisica=util.busquedaTabla(em, "bankingly_banca_movil","activa_desactiva_registra_cuenta");
-                                        if(Integer.parseInt(tb_activar_registra_cuenta_persona_fisica.getDato1())==1){
-                                        JSONObject request = new JSONObject();
-                                        request.put("productBankIdentifier", cuenta);
-                                        Tablas tb_path = util.busquedaTabla(em, "bankingly_banca_movil", "registra_cuenta_spei");
-                                        HttpConsumo consumo = new HttpConsumo(tb_path.getDato2(), request.toString());
-                                        String respuesta_consumo = consumo.consumo();
-                                        JSONObject respuesta_registra_orden = new JSONObject(respuesta_consumo);                                        
-                                        bandera=true;
-                                        System.out.println("Respuesta registra orden:" + respuesta_registra_orden);
-                                        }else{
+                                        String cuenta = String.format("%06d", clabe_folio.getAux_pk().getIdorigenp()) + "" + String.format("%05d", clabe_folio.getAux_pk().getIdproducto()) + "" + String.format("%08d", clabe_folio.getAux_pk().getIdauxiliar());
+                                        Tablas tb_activar_registra_cuenta_persona_fisica = util.busquedaTabla(em, "bankingly_banca_movil", "activa_desactiva_registra_cuenta");
+                                        if (Integer.parseInt(tb_activar_registra_cuenta_persona_fisica.getDato1()) == 1) {
+                                            JSONObject request = new JSONObject();
+                                            request.put("productBankIdentifier", cuenta);
+                                            Tablas tb_path = util.busquedaTabla(em, "bankingly_banca_movil", "registra_cuenta_spei");
+                                            HttpConsumo consumo = new HttpConsumo(tb_path.getDato2(), request.toString());
+                                           String respuesta_consumo = consumo.consumo();
+                                            JSONObject respuesta_registra_orden = new JSONObject(respuesta_consumo);
                                             bandera = true;
-                                        }                                        
+                                            //System.out.println("Respuesta registra orden:" + respuesta_registra_orden);
+                                        } else {
+                                            bandera = true;
+                                        }
                                     } else {
                                         mensaje = "CLABE INTERBANCARIA INACTIVA";
                                     }
@@ -195,9 +196,8 @@ public abstract class FacadeCustomer<T> {
                         Query query = em.createNativeQuery(consulta_usuarios_banca);
                         count_usuarios = Integer.parseInt(query.getSingleResult().toString());
                     } catch (Exception e) {
-                    } */                   
-                        mensaje = "VALIDADO CON EXITO";
-                    
+                    } */
+                    mensaje = "VALIDADO CON EXITO";
 
                 }
             }
@@ -214,33 +214,49 @@ public abstract class FacadeCustomer<T> {
         EntityManager em = AbstractFacade.conexion();
         boolean bandera = false;
         try {
-            Banca_movil_usuarios userDB = new Banca_movil_usuarios();
-            userDB.setPersonasPK(p.getPersonasPK());
-            userDB.setAlias_usuario(username);
-            //Para insertar opa buscamos su producto configurado en tablas
-            Tablas tb = util.busquedaTabla(em, "bankingly_banca_movil", "producto_banca_movil");
-            String b_auxiliares = "SELECT * FROM auxiliares a WHERE "
-                    + "idorigen=" + p.getPersonasPK().getIdorigen()
-                    + " AND idgrupo=" + p.getPersonasPK().getIdgrupo()
-                    + " AND idsocio=" + p.getPersonasPK().getIdsocio()
-                    + " AND idproducto=" + Integer.parseInt(tb.getDato1()) + " AND estatus=0";
-
-            Query query_auxiliar = em.createNativeQuery(b_auxiliares, Auxiliares.class
-            );
-            Auxiliares a = (Auxiliares) query_auxiliar.getSingleResult();
-
             
-            userDB.setPersonasPK(p.getPersonasPK());
-            userDB.setEstatus(true);
-            userDB.setAlias_usuario(username);
-            userDB.setIdorigenp(a.getAuxiliaresPK().getIdorigenp());
-            userDB.setIdproducto(a.getAuxiliaresPK().getIdproducto());
-            userDB.setIdauxiliar(a.getAuxiliaresPK().getIdauxiliar());
-            em.getTransaction().begin();
-            em.merge(userDB);
-            em.getTransaction().commit();
-            bandera = true;
-            
+            String sql_alias = "SELECT * FROM banca_movil_usuarios WHERE idorigen="+p.getPersonasPK().getIdorigen()+" AND idgrupo="+p.getPersonasPK().getIdgrupo()+" AND idsocio="+p.getPersonasPK().getIdsocio()+" AND estatus=true limit 1";
+            Query query_alias = em.createNativeQuery(sql_alias,Banca_movil_usuarios_saicoop.class);
+            Banca_movil_usuarios_saicoop userDB =  userDB = (Banca_movil_usuarios_saicoop) query_alias.getSingleResult();
+                    
+            if (userDB != null) {
+                if (userDB.isEstatus()) {
+                    if (userDB.getAlias_usuario().equals(username)) {
+                        userDB.setPersonasPK(p.getPersonasPK());
+                        userDB.setAlias_usuario(username);
+                        //Para insertar opa buscamos su producto configurado en tablas
+                        Tablas tb = util.busquedaTabla(em, "bankingly_banca_movil", "producto_banca_movil");
+                        String b_auxiliares = "SELECT * FROM auxiliares a WHERE "
+                                + "idorigen=" + p.getPersonasPK().getIdorigen()
+                                + " AND idgrupo=" + p.getPersonasPK().getIdgrupo()
+                                + " AND idsocio=" + p.getPersonasPK().getIdsocio()
+                                + " AND idproducto=" + Integer.parseInt(tb.getDato1()) + " AND estatus=0";
+
+                        Query query_auxiliar = em.createNativeQuery(b_auxiliares, Auxiliares.class
+                        );
+                        Auxiliares a = (Auxiliares) query_auxiliar.getSingleResult();
+
+                        userDB.setPersonasPK(p.getPersonasPK());
+                        userDB.setEstatus(true);
+                        userDB.setAlias_usuario(username);
+                        userDB.setIdorigenp(a.getAuxiliaresPK().getIdorigenp());
+                        userDB.setIdproducto(a.getAuxiliaresPK().getIdproducto());
+                        userDB.setIdauxiliar(a.getAuxiliaresPK().getIdauxiliar());
+                        em.getTransaction().begin();
+                        em.merge(userDB);
+                        em.getTransaction().commit();
+                        bandera = true;
+                    } else {
+                        System.out.println("Lo registros en la base de datos no coinciden");
+                    }
+                } else {
+                    System.out.println("Estatus de usuario en base de datos es false");
+                }
+
+            } else {
+                System.out.println("No existe registro para socio:" + p.getPersonasPK());
+            }
+
         } catch (Exception e) {
             System.out.println("Error al persistir usuario:" + username + ":" + e.getMessage());
         }
@@ -288,7 +304,7 @@ public abstract class FacadeCustomer<T> {
                 if (bandera_existe) {
                     if (!estado.toUpperCase().contains("A")) {
                         clave.setActiva(false);
-                    }else{
+                    } else {
                         clave.setActiva(true);
                     }
                     clave.setEstado(estado);
@@ -297,8 +313,8 @@ public abstract class FacadeCustomer<T> {
                     clave.setClabe(cuenta);
                     if (!estado.toUpperCase().contains("A")) {
                         clave.setActiva(false);
-                    }else{
-                       clave.setActiva(true); 
+                    } else {
+                        clave.setActiva(true);
                     }
                     clave.setFecha_hora(hoy);
                     clave.setObservacion(observacion);
@@ -353,49 +369,49 @@ public abstract class FacadeCustomer<T> {
             }
         } catch (Exception e) {
             System.out.println("Error al verificar el horario de actividad");
-        } 
+        }
         return bandera_;
     }
 
-     public String valida_caracteres_speciales(String cadena){
+    public String valida_caracteres_speciales(String cadena) {
         cadena = cadena.toLowerCase();
-         System.out.println("Cadena original:"+cadena);
-        for(int i=0;i<cadena.length();i++){
+        System.out.println("Cadena original:" + cadena);
+        for (int i = 0; i < cadena.length(); i++) {
             char c = cadena.charAt(i);
-            System.out.println("el caracter es:"+c);
-            if(cadena.charAt(i) == ' ' || Character.isLetter(c) || Character.isDigit(c)){               
-                
-                switch(c){
+            System.out.println("el caracter es:" + c);
+            if (cadena.charAt(i) == ' ' || Character.isLetter(c) || Character.isDigit(c)) {
+
+                switch (c) {
                     case 'á':
-                    cadena = cadena.replace(String.valueOf(c),"a");
-                    break;
+                        cadena = cadena.replace(String.valueOf(c), "a");
+                        break;
                     case 'é':
-                    cadena = cadena.replace(String.valueOf(c),"e");
-                    break;
+                        cadena = cadena.replace(String.valueOf(c), "e");
+                        break;
                     case 'í':
-                    cadena = cadena.replace(String.valueOf(c),"i");
-                    break;
+                        cadena = cadena.replace(String.valueOf(c), "i");
+                        break;
                     case 'ó':
-                    cadena = cadena.replace(String.valueOf(c),"o");
-                    break;
+                        cadena = cadena.replace(String.valueOf(c), "o");
+                        break;
                     case 'ú':
-                    cadena = cadena.replace(String.valueOf(c),"u");
-                    break;
+                        cadena = cadena.replace(String.valueOf(c), "u");
+                        break;
                     /*case 'ñ':
                     cadena = cadena.replace(String.valueOf(c),"n");
                     break;*/
-                //áéíóúñ    
-                }                
-            }else{
-                if(c != '%'){//Modificado 31/05/2023 Wilmer                   
-                cadena = cadena.replace(String.valueOf(c),"");
+                    //áéíóúñ    
+                }
+            } else {
+                if (c != '%') {//Modificado 31/05/2023 Wilmer                   
+                    cadena = cadena.replace(String.valueOf(c), "");
                 }
             }
-           
+
             //System.out.println("El caracter en la posicion "+i+"es:"+cadena.charAt(i)+" y su valor ascii es:"+ascii);
         }
-        System.out.println("la cadena es:"+cadena.trim());
-        
+        System.out.println("la cadena es:" + cadena.trim());
+
         return cadena;
     }
 

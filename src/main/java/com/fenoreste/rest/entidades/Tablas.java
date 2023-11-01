@@ -24,7 +24,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class Tablas implements Serializable {
     
     @EmbeddedId
-    protected TablasPK tablasPK;
+    private TablasPK tablasPK;
     @Column(name = "nombre")
     private String nombre;
     @Column(name = "dato1")

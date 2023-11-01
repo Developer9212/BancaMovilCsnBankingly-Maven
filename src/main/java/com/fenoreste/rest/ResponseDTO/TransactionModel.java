@@ -50,6 +50,7 @@ public class TransactionModel {
     private int canal;
     private String ip;
     private String location;
+    private String username;
     
 
     public TransactionModel() {
@@ -360,6 +361,15 @@ public class TransactionModel {
         this.integrationParameters = integrationParameters;
     }
 
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+    
+    
     @Override
     public String toString() {
         return "TransactionToOwnAccountsDTO{" + "subTransactionTypeId=" + subTransactionTypeId + ", currencyId=" + currencyId + ", valueDate=" + valueDate + ", transactionTypeId=" + transactionTypeId + ", transactionStatusId=" + transactionStatusId + ", clientBankIdentifier=" + clientBankIdentifier + ", debitProductBankIdentifier=" + debitProductBankIdentifier + ", debitProductTypeId=" + debitProductTypeId + ", debitCurrencyId=" + debitCurrencyId + ", creditProductBankIdentifier=" + creditProductBankIdentifier + ", creditProductTypeId=" + creditProductTypeId + ", creditCurrencyId=" + creditCurrencyId + ", amount=" + amount + ", notifyTo=" + notifyTo + ", notificationChannelId=" + notificationChannelId + ", transactionId=" + transactionId + ", destinationDocumentId=" + destinationDocumentId + ", destinationName=" + destinationName + ", destinationBank=" + destinationBank + ", description=" + description + ", bankRoutingNumber=" + bankRoutingNumber + ", sourceName=" + sourceName + ", sourceBank=" + sourceBank + ", sourceDocumentId=" + sourceDocumentId + ", regulationAmountExceeded=" + regulationAmountExceeded + ", sourceFunds=" + sourceFunds + ", destinationFunds=" + destinationFunds + ", userDocumentId=" + userDocumentId + ", transactionCost=" + transactionCost + ", transactionCostCurrencyId=" + transactionCostCurrencyId + ", exchangeRate=" + exchangeRate + ", countryIntermediaryInstitution=" + countryIntermediaryInstitution + ", intermediaryInstitution=" + intermediaryInstitution + ", routeNumberIntermediaryInstitution=" + routeNumberIntermediaryInstitution + ", integrationParameters=" + integrationParameters + ", canal=" + canal + ", location=" + location + '}';

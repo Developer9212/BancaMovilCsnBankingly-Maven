@@ -17,6 +17,7 @@ import com.fenoreste.rest.entidades.Catalog_Status_Bankingly;
 import com.fenoreste.rest.entidades.Loan_Fee_Status;
 import java.math.BigDecimal;
 import java.sql.Timestamp;
+import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -366,7 +367,7 @@ public abstract class FacadeLoan<T> {
     }
 
     public FeesDueData RSFeesDueData(int o, int p, int a, int tipoamortizacion) {
-        EntityManager em = AbstractFacade.conexion();
+       EntityManager em = AbstractFacade.conexion();
         String sai_auxiliar = "SELECT * FROM sai_auxiliar(" + o + "," + p + "," + a + ",(SELECT date(fechatrabajo) FROM origenes limit 1))";
         FeesDueData FeesDueDataRS = null;
         try {
@@ -380,6 +381,7 @@ public abstract class FacadeLoan<T> {
                     + a + ","
                     + "(SELECT date(fechatrabajo) FROM origenes limit 1)" + ","
                     + tipoamortizacion + ",'" + sai + "')";
+            
 
             Double interestAmount = 0.0, OverDueAmount = 0.0, principalAmount = 0.0, othersAmount = 0.0, principalAmountTotal = 0.0, intereses_creciente_adelanto = 0.0;
             try {
@@ -389,25 +391,40 @@ public abstract class FacadeLoan<T> {
                 List lista_posiciones_cuanto_prestamo = Arrays.asList(partes_cuanto_prestamo);
 
                 if (!pocisiones_sai.get(13).toString().toUpperCase().equals("C")) {
-                    interestAmount = Double.parseDouble(String.valueOf(lista_posiciones_cuanto_prestamo.get(3)));
-                    othersAmount = Double.parseDouble(String.valueOf(lista_posiciones_cuanto_prestamo.get(4))) + Double.parseDouble(String.valueOf(lista_posiciones_cuanto_prestamo.get(6)));;
-                    OverDueAmount = Double.parseDouble(String.valueOf(lista_posiciones_cuanto_prestamo.get(5)));
+                    Double proximo_abono = Double.parseDouble(pocisiones_sai.get(11).toString());
+                    String funcion_restante = "select diferencia_ultimopago_tipoamort5("+o+","+p+","+a+","+proximo_abono+")";
+                    query_sai_bankingly_prestamo_cuanto = em.createNativeQuery(funcion_restante);
+                    Double a_pagar_hoy = Double.parseDouble(query_sai_bankingly_prestamo_cuanto.getSingleResult().toString());
+                     
+                    DecimalFormat decimalFormat = new DecimalFormat("0.00");
+                    
+                    interestAmount = (Double.parseDouble(String.valueOf(lista_posiciones_cuanto_prestamo.get(2)))+
+                                     Double.parseDouble(String.valueOf(lista_posiciones_cuanto_prestamo.get(3)))+
+                                     Double.parseDouble(String.valueOf(lista_posiciones_cuanto_prestamo.get(4)))+
+                                     Double.parseDouble(String.valueOf(lista_posiciones_cuanto_prestamo.get(5)))+
+                                     Double.parseDouble(String.valueOf(lista_posiciones_cuanto_prestamo.get(6)))+
+                                     Double.parseDouble(String.valueOf(lista_posiciones_cuanto_prestamo.get(8)))) - a_pagar_hoy;
+                    
+                            
+                     String formato = decimalFormat.format(interestAmount);
+                     interestAmount = Double.parseDouble(formato);
+                    //othersAmount = Double.parseDouble(String.valueOf(lista_posiciones_cuanto_prestamo.get(4))) + Double.parseDouble(String.valueOf(lista_posiciones_cuanto_prestamo.get(6)));;
+                    //OverDueAmount = Double.parseDouble(String.valueOf(lista_posiciones_cuanto_prestamo.get(5)));
                     principalAmount = Double.parseDouble(String.valueOf(lista_posiciones_cuanto_prestamo.get(2)));
 
-                    principalAmountTotal = interestAmount + othersAmount + OverDueAmount + principalAmount;
+                    principalAmountTotal = interestAmount; //+ othersAmount + OverDueAmount + principalAmount;//
                 }
             } catch (Exception e) {
 
             }
-
+            //total|montovencido|io|ivaio|im|ivaim||otro|0
             FeesDueDataRS = new FeesDueData();
-            FeesDueDataRS.setFeesDueInterestAmount(interestAmount);//interestAmount);(Solo interes mortios
-            FeesDueDataRS.setFeesDueOthersAmount(othersAmount);//(iva de io + iva de im)
-            FeesDueDataRS.setFeesDueOverdueAmount(OverDueAmount);//(moratorio
-            FeesDueDataRS.setFeesDuePrincipalAmount(principalAmount);//monto vencido);(
-            FeesDueDataRS.setFeesDueTotalAmount(principalAmountTotal);//principalAmount);(monto vencido)
+            FeesDueDataRS.setFeesDueInterestAmount(principalAmountTotal);//interestAmount);//interestAmount);(Solo interes moratorios) /aqui deberia ir posicion 4,5,6,8
+            FeesDueDataRS.setFeesDueOthersAmount(0.0);//(iva de io + iva de im)
+            FeesDueDataRS.setFeesDueOverdueAmount(0.0);//(moratorio
+            FeesDueDataRS.setFeesDuePrincipalAmount(0.0);//principalAmount);//monto vencido);(
+            FeesDueDataRS.setFeesDueTotalAmount(null);//principalAmountTotal);//principalAmount);(monto vencido)
 
-            System.out.println("Detalle vencido :" + FeesDueDataRS);
         } catch (Exception e) {
             System.out.println("Error en FeesDueData:" + e.getMessage());
 

@@ -15,6 +15,7 @@ import com.fenoreste.rest.Util.UtilidadesGenerales;
 import com.fenoreste.rest.dao.LoanDAO;
 import com.github.cliftonlabs.json_simple.JsonObject;
 import java.util.List;
+import javax.inject.Inject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -33,6 +34,8 @@ public class LoanResources {
     UtilidadesGenerales util = new UtilidadesGenerales();
     Utilidades util2 = new Utilidades();
 
+   
+
     @POST
     @Produces({MediaType.APPLICATION_JSON + ";charset=utf-8"})
     @Consumes({MediaType.APPLICATION_JSON + ";charset=utf-8"})
@@ -41,7 +44,8 @@ public class LoanResources {
         String productBankIdentifier = "";
         JsonObject Error = new JsonObject();
         LoanDAO dao = new LoanDAO();
-        if (!dao.actividad_horario()) {
+       
+       if (!dao.actividad_horario()) {
             Error.put("ERROR", "VERIFIQUE SU HORARIO DE ACTIVIDAD FECHA,HORA O CONTACTE A SU PROVEEEDOR");
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Error).build();
         }

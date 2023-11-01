@@ -106,7 +106,7 @@ public abstract class FacadeProductos<T> {
                 if (util2.obtenerOrigen(em) == 30200) {
                     if (ccb.getProductTypeId() != 4) {
                         Tablas producto_retiro = util2.busquedaTabla(em, "bankingly_banca_movil", "producto_retiro");
-                        if (a.getAuxiliaresPK().getIdproducto() == Integer.parseInt(producto_retiro.getDato1())) {
+                        if (a.getAuxiliaresPK().getIdproducto() == Integer.parseInt(producto_retiro.getDato1())){
                             canTransact = "3";
                         } else {
                             canTransact = "2";

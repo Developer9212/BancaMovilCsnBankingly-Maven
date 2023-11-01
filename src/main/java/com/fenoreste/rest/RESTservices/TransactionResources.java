@@ -12,10 +12,14 @@ import com.fenoreste.rest.ResponseDTO.TransactionModel;
 import com.fenoreste.rest.Util.Authorization;
 import com.fenoreste.rest.dao.TransactionDAO;
 import com.fenoreste.rest.ResponseDTO.VaucherDTO;
+import com.fenoreste.rest.entidades.Tablas;
+import com.fenoreste.rest.entidades.TablasPK;
+import com.fenoreste.rest.entidades.TerceroActivacion;
 import com.github.cliftonlabs.json_simple.JsonObject;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.text.Normalizer;
+import java.util.concurrent.TimeUnit;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -35,13 +39,14 @@ public class TransactionResources {
 
     //BasePath SPEI
     String basePath = "";
+    TransactionDAO dao = new TransactionDAO();
 
     @Path("/Insert")
     @POST
     @Produces({MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_JSON})
-    public Response insertTransaction(String cadena) throws IOException {        
-        System.out.println("Cadena insert transaccion peticion:"+cadena);
+    public Response insertTransaction(String cadena) throws IOException {
+        System.out.println("Cadena insert transaccion peticion:" + cadena);
         BackendOperationResultDTO backendOperationResult = new BackendOperationResultDTO();
         backendOperationResult.setBackendCode("2");
         backendOperationResult.setBackendMessage("Error en transaccion");
@@ -79,7 +84,7 @@ public class TransactionResources {
             DocumentIdTransaccionesDTO dto3 = new DocumentIdTransaccionesDTO();
             dto1.setDocumentNumber(destinationDocumentId.getString("documentNumber"));
             dto1.setDocumentType(destinationDocumentId.getString("documentType"));
-          
+
             dto.setSubTransactionTypeId(Integer.parseInt(insertTransaction.getString("subTransactionTypeId")));
             dto.setCurrencyId(insertTransaction.getString("currencyId"));
             dto.setValueDate(insertTransaction.getString("valueDate"));
@@ -117,7 +122,8 @@ public class TransactionResources {
             dto.setCanal(jsonRecibido.getInt("ChannelId"));
             dto.setIp(jsonRecibido.getString("ip"));
             dto.setLocation(jsonRecibido.getString("location"));
-            
+            dto.setUsername(jsonRecibido.getString("userName"));
+
         } catch (Exception e) {
             backendOperationResult.setBackendCode("2");
             backendOperationResult.setBackendMessage(e.getMessage());
@@ -136,10 +142,8 @@ public class TransactionResources {
         /*======================================================================
                 Si el request que nos llego es el correcto procedemos
           ======================================================================*/
-        TransactionDAO dao = new TransactionDAO();
-
         try {
-            if (!dao.actividad_horario()) {               
+            if (!dao.actividad_horario()) {
                 backendOperationResult.setBackendMessage("<html><body><b>VERIFIQUE SU HORARIO DE ACTIVIDAD FECHA,HORA O CONTACTE A SU PROVEEEDOR</b></body></html>");
             } else {
                 System.out.println("Accediendo a trasnferencias con subTransactionType=" + dto.getSubTransactionTypeId() + ",TransactionId:" + dto.getTransactionTypeId());
@@ -148,9 +152,16 @@ public class TransactionResources {
                 if (dto.getSubTransactionTypeId() == 1 && dto.getTransactionTypeId() == 1) {
                     backendOperationResult = dao.transferencias(dto, 1, null);
                 }
+
                 //Si subtransactionType es 2 y transactionType es 1: El tipo de transaccion es a terceros
                 if (dto.getSubTransactionTypeId() == 2 && dto.getTransactionTypeId() == 1) {
-                    backendOperationResult = dao.transferencias(dto, 2, null);
+                    //Descomentar cuando se le de su gana 
+                    String mensaje = validarTerceroOperar(dto.getCreditProductBankIdentifier(), dto.getUsername());
+                    //if (mensaje.toUpperCase().contains("EXITOSO")) {
+                        backendOperationResult = dao.transferencias(dto, 2, null);
+                    //} else {
+                       // backendOperationResult.setBackendMessage(mensaje);
+                    //}
                 }
                 //Si subtransactionType es 9 y transactionType es 6: El tipo de transaccion es es un pago a prestamos 
                 if (dto.getSubTransactionTypeId() == 9 && dto.getTransactionTypeId() == 6) {
@@ -158,12 +169,17 @@ public class TransactionResources {
                 }
                 //Si es un pago a prestamo tercero
                 if (dto.getSubTransactionTypeId() == 10 && dto.getTransactionTypeId() == 6) {
-                    backendOperationResult = dao.transferencias(dto, 4, null);
+                     String mensaje = validarTerceroOperar(dto.getCreditProductBankIdentifier(), dto.getUsername());
+                  //  if (mensaje.toUpperCase().contains("EXITOSO")) {
+                        backendOperationResult = dao.transferencias(dto, 4, null);
+                    //} else {
+                        backendOperationResult.setBackendMessage(mensaje);
+                   // }                    
                 }
                 //Si es una trasnferencia SPEI
                 if (dto.getSubTransactionTypeId() == 3 && dto.getTransactionTypeId() == 1) {
 
-                    if (!dao.actividad_horario_spei()) {                  
+                    if (!dao.actividad_horario_spei()) {
                         backendOperationResult.setBackendMessage("<html><body><b>Horario para envío de SPEI fuera de horario de servicio</b></body></html>");
                     } else {
                         //Consumimos mis servicios de SPEI que tengo en otro proyecto(CSN0)
@@ -185,7 +201,7 @@ public class TransactionResources {
             response_json_3.put("integrationProperties", null);
             response_json_3.put("backendCode", backendOperationResult.getBackendCode());
             response_json_3.put("backendMessage", backendOperationResult.getBackendMessage());
-            response_json_3.put("backendReference",backendOperationResult.getBackendReference());
+            response_json_3.put("backendReference", backendOperationResult.getBackendReference());
             response_json_3.put("isError", backendOperationResult.isIsError());
             response_json_3.put("transactionType", backendOperationResult.getTransactionIdenty());
 
@@ -240,14 +256,14 @@ public class TransactionResources {
         String folio = request_json.getString("folioOrigen");
         String estado = request_json.getString("estado");
         String causa = request_json.getString("causaDevolucion");
-         TransactionDAO dao = new TransactionDAO();
+        TransactionDAO dao = new TransactionDAO();
         if (!dao.actividad_horario_spei()) {
             JsonObject obje = new JsonObject();
             obje.put("mensaje", "VERIFIQUE SU HORARIO DE ACTIVIDAD FECHA,HORA O CONTACTE A SU PROVEEEDOR");
             return Response.ok(obje).build();
         }
 
-        String mensaje = dao.ejecutaOrdenSPEI(idorden, folio, estado, causa);       
+        String mensaje = dao.ejecutaOrdenSPEI(idorden, folio, estado, causa);
         JsonObject response = new JsonObject();
         response.put("mensaje", mensaje);
         return Response.ok(response).build();
@@ -276,6 +292,45 @@ public class TransactionResources {
             limpio = Normalizer.normalize(limpio, Normalizer.Form.NFC);
         }
         return limpio.toLowerCase();
+    }
+
+    private String validarTerceroOperar(String opa, String username) {
+        String mensaje = "";
+        try {
+            TerceroActivacion tercero = null;
+            TimeUnit timeDay = TimeUnit.DAYS;
+            TimeUnit timeHora = TimeUnit.HOURS;
+            TimeUnit timeMinutos = TimeUnit.MINUTES;
+
+            long diff = 0;
+            long differenceDay = 0;
+            long differenceHour = 0;
+            long differenceMinutos = 0;
+            Tablas tabla = null;
+            if (dao.validacionTerceroActivo(opa, username) != null) {
+                tercero = dao.validacionTerceroActivo(opa, username);
+                diff = dao.fechaServidorTimestamp().getTime() - tercero.getFecharegistro().getTime();
+                differenceDay = timeDay.convert(diff, TimeUnit.MILLISECONDS);
+                differenceHour = timeHora.convert(diff, TimeUnit.MILLISECONDS);
+                differenceMinutos = timeMinutos.convert(diff, TimeUnit.MILLISECONDS);
+                TablasPK pk = new TablasPK("bankingly_banca_movil", "timer_tercero_transaccion");
+                tabla = dao.busquedaTabla(pk);
+
+                System.out.println("El total de dias del registro tercero es: " + differenceDay + " el total de horas es: " + differenceHour + " el total de minutos es: " + differenceMinutos);
+                if (differenceMinutos > Integer.parseInt(tabla.getDato1())) {
+                    mensaje = "Exitoso";
+                } else {
+                    mensaje = "EL DESTINATARIO ESTARA ACTIVO EN: " + (Integer.parseInt(tabla.getDato1()) - differenceMinutos) + " Minutos";
+                }
+
+            } else {
+                mensaje = "DESTINATARIO NO IDENTIFICADO EN EL CORE";
+            }
+        } catch (Exception e) {
+            System.out.println("ERROR AL VALIDAR REGISTRO TERCERO:" + e.getMessage());
+        }
+        return mensaje;
+
     }
 
 }
