@@ -91,10 +91,10 @@ public class TarjetaDeDebito {
         System.out.println("Buscando el saldo para la tarjeta:"+tarjeta.getIdtarjeta());
         try {           
             if (tarjeta.getActiva()) { 
-                /*response.setAvailableAmount(200000);                     
+               /* response.setAvailableAmount(200000);                     
                 response.setCode(1);
-                response.setDescription("activa");
-                */
+                response.setDescription("activa");*/
+            
           response = conexionSiscoop().getSiscoop().getBalanceQuery(tarjeta.getIdtarjeta());
             } else {
                 response.setDescription("La tarjeta esta inactiva: " + tarjeta.getIdtarjeta());
@@ -116,7 +116,7 @@ public class TarjetaDeDebito {
                 /*doWithdrawalAccountResponse.setBalance(200);
                 doWithdrawalAccountResponse.setCode(1);
                 */
-                doWithdrawalAccountResponse = conexionSiscoop().getSiscoop().doWithdrawalAccount(tarjeta.getIdtarjeta(), monto);
+               doWithdrawalAccountResponse = conexionSiscoop().getSiscoop().doWithdrawalAccount(tarjeta.getIdtarjeta(), monto);
                 if (doWithdrawalAccountResponse.getCode() == 0) {
                     // 0 = Existe error
                     //retiro = false;
@@ -139,7 +139,8 @@ public class TarjetaDeDebito {
         boolean deposito = false;
         if (tarjeta.getActiva()) {
             try {                
-                loadBalanceResponse = conexionSiscoop().getSiscoop().loadBalance(tarjeta.getIdtarjeta(), monto);
+               loadBalanceResponse = conexionSiscoop().getSiscoop().loadBalance(tarjeta.getIdtarjeta(), monto);
+                //loadBalanceResponse.setCode(1);
                 if (loadBalanceResponse.getCode() == 0) {
                     deposito = false;
                 } else {

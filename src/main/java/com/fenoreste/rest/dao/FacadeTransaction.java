@@ -533,9 +533,12 @@ public abstract class FacadeTransaction<T> {
                                     //Verifico que el producto destino sea un prestamo 
                                     if (prDestino.getTipoproducto() == 2) {
                                         //Busco el tipo el tipo de amortizacion
-
                                         if (aDestino.getTipoamortizacion() == 5) {
                                             //Entra si es hipotecario
+                                            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                                            String fechaactivacionDestino = sdf.format(aDestino.getFechaactivacion()).substring(0, 10);
+                                            String fechaBase = fechaTr_.substring(0, 10);
+                                            System.out.println("FechaActivacion Modificado :" +fechaactivacionDestino.replace("\\/", "-") + ",fechaBase:" + fechaBase);
                                             String si_se_puede_aplicar = "select sai_bankingly_limite_adelanto (" + aDestino.getAuxiliaresPK().getIdorigenp() + ","
                                                     + "" + aDestino.getAuxiliaresPK().getIdproducto() + ","
                                                     + "" + aDestino.getAuxiliaresPK().getIdauxiliar() + ","
@@ -543,41 +546,51 @@ public abstract class FacadeTransaction<T> {
                                                     + transaction.getAmount() + ",NULL)";
                                             Query query_se_puede_aplicar = em.createNativeQuery(si_se_puede_aplicar);
                                             Double se_puede_pagar = Double.parseDouble(String.valueOf(query_se_puede_aplicar.getSingleResult()));
-
-                                            if (se_puede_pagar > 0) {
-                                                //Datos a procesar
-                                                try {
-                                                    consulta_datos_procesar = "SELECT sai_bankingly_aplica_transaccion('" + fechaTr_.substring(0, 10) + "'," + procesaOrigen.getIdusuario() + ",'" + procesaOrigen.getSesion() + "','" + procesaOrigen.getReferencia() + "')";
-                                                    procesa_movimiento = em.createNativeQuery(consulta_datos_procesar);
-                                                    total_procesados = Integer.parseInt(String.valueOf(procesa_movimiento.getSingleResult()));
-                                                } catch (Exception e) {
-                                                    total_procesados = 0;
-                                                    System.out.println("La funcion saicoop no pudo distribuir el capital:" + e.getMessage());
-                                                }
-
-                                                if (total_procesados > 0) {
-                                                    if (procesaOrigen.getMonto() > se_puede_pagar) {
-                                                        double totalDevolver = procesaOrigen.getMonto() - se_puede_pagar;
-                                                        System.out.println("El total que se cubrio fue de:" + se_puede_pagar + " y se devolvio al producto un total de: " + totalDevolver);
-                                                        bandera_deposito_origen = new TarjetaDeDebito().depositoTDD(tarjeta_origen, totalDevolver);
+                                            
+                                            System.out.println("FechaActivacion Modificando:"+fechaactivacionDestino.replace("\\/", "-")+", FechaBase:"+fechaBase);
+                                            if (!fechaactivacionDestino.replace("\\/","-").equals(fechaBase)) {
+                                                System.out.println("Accedio porque la fecha activacion es diferente a la fechaTrabajo");
+                                                if (se_puede_pagar > 0) {
+                                                    //Datos a procesar
+                                                    try {
+                                                        consulta_datos_procesar = "SELECT sai_bankingly_aplica_transaccion('" + fechaTr_.substring(0, 10) + "'," + procesaOrigen.getIdusuario() + ",'" + procesaOrigen.getSesion() + "','" + procesaOrigen.getReferencia() + "')";
+                                                        System.out.println("Procesando registros:" + consulta_datos_procesar);
+                                                        procesa_movimiento = em.createNativeQuery(consulta_datos_procesar);
+                                                        total_procesados = Integer.parseInt(String.valueOf(procesa_movimiento.getSingleResult()));
+                                                        System.out.println("Total procesados:" + total_procesados);
+                                                    } catch (Exception e) {
+                                                        total_procesados = 0;
+                                                        System.out.println("La funcion saicoop no pudo distribuir el capital:" + e.getMessage());
                                                     }
-                                                    finish = true;
+
+                                                    if (total_procesados > 0) {
+                                                        if (procesaOrigen.getMonto() > se_puede_pagar) {
+                                                            double totalDevolver = procesaOrigen.getMonto() - se_puede_pagar;
+                                                            System.out.println("El total que se cubrio fue de:" + se_puede_pagar + " y se devolvio al producto un total de: " + totalDevolver);
+                                                            bandera_deposito_origen = new TarjetaDeDebito().depositoTDD(tarjeta_origen, totalDevolver);
+                                                        }
+                                                        finish = true;
+                                                    } else {
+                                                        //Si no se aplico el movimiento pero como ya se habia retirado de la TDD entonce se lo devolvemos
+                                                        bandera_deposito_origen = new TarjetaDeDebito().depositoTDD(tarjeta_origen, procesaOrigen.getMonto());
+                                                        backendResponse.setBackendMessage("NO SE PUDO PROCESAR FUNCION EN SAICOOP");
+                                                    }
                                                 } else {
-                                                    //Si no se aplico el movimiento pero como ya se habia retirado de la TDD entonce se lo devolvemos
+                                                    //Si no se aplico el movimiento pero como ya se habia retirado de la TDD entonce se lo devolvemos                                                
                                                     bandera_deposito_origen = new TarjetaDeDebito().depositoTDD(tarjeta_origen, procesaOrigen.getMonto());
-                                                    backendResponse.setBackendMessage("NO SE PUDO PROCESAR FUNCION EN SAICOOP");
+                                                    backendResponse.setBackendMessage("MONTO ES MENOR A LO QUE SE PERMITE ADELANTAR \n"
+                                                            + "ADELANTO PERMITIDO:" + se_puede_pagar + "\n"
+                                                            + "PRDUCTO ESQUEMA HIPOTECARIO");
+
                                                 }
 
                                             } else {
-                                                //Si no se aplico el movimiento pero como ya se habia retirado de la TDD entonce se lo devolvemos                                                
-                                                bandera_deposito_origen = new TarjetaDeDebito().depositoTDD(tarjeta_origen, procesaOrigen.getMonto());
-                                                backendResponse.setBackendMessage("MONTO ES MENOR A LO QUE SE PERMITE ADELANTAR \n"
-                                                        + "ADELANTO PERMITIDO:" + se_puede_pagar + "\n"
-                                                        + "PRDUCTO ESQUEMA HIPOTECARIO");
+                                                backendResponse.setBackendMessage("SU FECHA DE ABONO DEBE SE POSTERIOR A LA FECHA DE ACTIVACION DE SU PRESTAMO");
                                             }
                                         } else {//Si es prestamo creciente
                                             //Datos a procesar
                                             consulta_datos_procesar = "SELECT sai_bankingly_aplica_transaccion('" + fechaTr_.substring(0, 10) + "'," + procesaOrigen.getIdusuario() + ",'" + procesaOrigen.getSesion() + "','" + procesaOrigen.getReferencia() + "')";
+                                            System.out.println("Procesando registros:" + consulta_datos_procesar);
                                             //Proceso
                                             procesa_movimiento = em.createNativeQuery(consulta_datos_procesar);
                                             //Obtengo el total de procesados
@@ -669,7 +682,9 @@ public abstract class FacadeTransaction<T> {
                                         } catch (Exception e) {
                                             total_procesados = 0;
                                         }
-
+                                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
+                                        String fechaactivacionDestino = sdf.format(aDestino.getFechaactivacion()).substring(0, 10);
+                                        String fechaBase = fechaTr_.substring(0, 10);
                                         String si_se_puede_aplicar = "select sai_bankingly_limite_adelanto (" + aDestino.getAuxiliaresPK().getIdorigenp() + ","
                                                 + "" + aDestino.getAuxiliaresPK().getIdproducto() + ","
                                                 + "" + aDestino.getAuxiliaresPK().getIdauxiliar() + ","
@@ -678,20 +693,35 @@ public abstract class FacadeTransaction<T> {
                                         Query query_se_puede_aplicar = em.createNativeQuery(si_se_puede_aplicar);
                                         Double se_puede_pagar = Double.parseDouble(String.valueOf(query_se_puede_aplicar.getSingleResult()));
 
-                                        if (total_procesados > 0) {
-                                            if (procesaOrigen.getMonto() > se_puede_pagar) {
-                                                double totalDevolver = procesaOrigen.getMonto() - se_puede_pagar;
-                                                double modificar = aOrigen.getSaldo().doubleValue() + totalDevolver;
-                                                System.out.println("Se aplico al prestamo un total de :" + se_puede_pagar + " se devolvio al producto un total de:" + totalDevolver);
-                                                em.getTransaction().begin();
-                                                int v = em.createNativeQuery("UPDATE auxiliares SET saldo=" + modificar + " WHERE idorigenp=" + opaOrigen.getIdorigenp() + " AND idproducto=" + opaOrigen.getIdproducto() + " AND idauxiliar=" + opaOrigen.getIdauxiliar()).executeUpdate();
-                                                em.getTransaction().commit();
+                                        if (se_puede_pagar > 0) {
+                                            System.out.println("Fecha activacion Modificando :"+fechaactivacionDestino.replace("\\/","-") +" ,FechaBase:"+fechaBase);
+                                            if (!fechaactivacionDestino.replace("\\/","-").equals(fechaBase)) {
+                                                if (total_procesados > 0) {
+                                                    if (procesaOrigen.getMonto() > se_puede_pagar) {
+                                                        double totalDevolver = procesaOrigen.getMonto() - se_puede_pagar;
+                                                        double modificar = aOrigen.getSaldo().doubleValue() + totalDevolver;
+                                                        System.out.println("Se aplico al prestamo un total de :" + se_puede_pagar + " se devolvio al producto un total de:" + totalDevolver);
+                                                        em.getTransaction().begin();
+                                                        int v = em.createNativeQuery("UPDATE auxiliares SET saldo=" + modificar + " WHERE idorigenp=" + opaOrigen.getIdorigenp() + " AND idproducto=" + opaOrigen.getIdproducto() + " AND idauxiliar=" + opaOrigen.getIdauxiliar()).executeUpdate();
+                                                        em.getTransaction().commit();
+                                                    }
+                                                    finish = true;
+                                                } else {
+                                                    //Si no se aplico el movimiento pero como ya se habia retirado de la TDD entonce se lo devolvemos
+                                                    backendResponse.setBackendMessage("NO SE PUDO PROCESAR FUNCION EN SAICOOP");
+                                                }
+
+                                            } else {
+                                                backendResponse.setBackendMessage("SU FECHA DE ABONO DEBE SE POSTERIOR A LA FECHA DE ACTIVACION DE SU PRESTAMO");
                                             }
-                                            finish = true;
                                         } else {
-                                            //Si no se aplico el movimiento pero como ya se habia retirado de la TDD entonce se lo devolvemos
-                                            backendResponse.setBackendMessage("NO SE PUDO PROCESAR FUNCION EN SAICOOP");
+                                            //Si no se aplico el movimiento pero como ya se habia retirado de la TDD entonce se lo devolvemos                                                
+                                            bandera_deposito_origen = new TarjetaDeDebito().depositoTDD(tarjeta_origen, procesaOrigen.getMonto());
+                                            backendResponse.setBackendMessage("MONTO ES MENOR A LO QUE SE PERMITE ADELANTAR \n"
+                                                    + "ADELANTO PERMITIDO:" + se_puede_pagar + "\n"
+                                                    + "PRDUCTO ESQUEMA HIPOTECARIO");
                                         }
+
                                     } else {//Si es prestamo creciente
                                         //Datos a procesar
                                         consulta_datos_procesar = "SELECT sai_bankingly_aplica_transaccion('" + fechaTr_.substring(0, 10) + "'," + procesaOrigen.getIdusuario() + ",'" + procesaOrigen.getSesion() + "','" + procesaOrigen.getReferencia() + "')";
@@ -701,7 +731,7 @@ public abstract class FacadeTransaction<T> {
                                         total_procesados = Integer.parseInt(String.valueOf(procesa_movimiento.getSingleResult()));
                                         //Si la operacion se aplico de manera correcta lo dejamos asi es decir total de procesados mayor a 0
                                         if (total_procesados > 0) {
-                                            System.out.println("Los moviemientos se procesaron de manera correcta");
+                                            System.out.println("Los movimientos se procesaron de manera correcta");
                                             finish = true;
                                         } else {
                                             //Si no se aplico el movimiento pero como ya se habia retirado de la TDD entonce se lo devolvemos
@@ -1064,34 +1094,34 @@ public abstract class FacadeTransaction<T> {
                                                                 String productos_deposito[] = tbDeposito.getDato2().split("\\|");
 
                                                                 List list_deposito = Arrays.asList(productos_deposito);
-                                                                 int validado = 0;
+                                                                int validado = 0;
                                                                 for (int i = 0; i < list_deposito.size(); i++) {
                                                                     System.out.println("prod pos " + i + ":" + list_deposito.get(i));
                                                                     if (ctaDestino.getAuxiliaresPK().getIdproducto() == Integer.parseInt(String.valueOf(list_deposito.get(i)))) {
-                                                                         tbDeposito = util2.busquedaTabla(em, "ahorro_pat_multiplo_compromiso", "111");
+                                                                        tbDeposito = util2.busquedaTabla(em, "ahorro_pat_multiplo_compromiso", "111");
                                                                         int prod_patrimonial = Integer.parseInt(tbDeposito.getTablasPK().getIdelemento());
-                                                                       if (ctaDestino.getAuxiliaresPK().getIdproducto() == prod_patrimonial) {                                                                            
+                                                                        if (ctaDestino.getAuxiliaresPK().getIdproducto() == prod_patrimonial) {
                                                                             if (monto % Double.parseDouble(tbDeposito.getDato1()) == 0) {
-                                                                                 banderaProductosDeposito = true;
+                                                                                banderaProductosDeposito = true;
                                                                             } else {
-                                                                               validado = 1;
-                                                                               banderaProductosDeposito = false;
+                                                                                validado = 1;
+                                                                                banderaProductosDeposito = false;
                                                                             }
                                                                         } else {
                                                                             banderaProductosDeposito = true;
                                                                         }
-                                                                       
+
                                                                     }
                                                                 }
                                                                 if (banderaProductosDeposito) {
                                                                     message = message + " VALIDADO CON EXITO";
                                                                 } else {
-                                                                    if(validado == 1){
-                                                                     message = "TU MONTO A TRANSFERIR NO ES MULTIPLO DE:"+tbDeposito.getDato1();
-                                                                    }else{
-                                                                      message = "PRODUCTO NO CONFIGURADO PARA RECIBIR DEPOSITOS";
-                                                                    }                                                                    
-                                                                    
+                                                                    if (validado == 1) {
+                                                                        message = "TU MONTO A TRANSFERIR NO ES MULTIPLO DE:" + tbDeposito.getDato1();
+                                                                    } else {
+                                                                        message = "PRODUCTO NO CONFIGURADO PARA RECIBIR DEPOSITOS";
+                                                                    }
+
                                                                 }
                                                             } else {
                                                                 message = "GRUPO NO CONFIGURADO PARA DEPOSITOS";
@@ -1255,7 +1285,7 @@ public abstract class FacadeTransaction<T> {
                                                             Tablas tbRetiro = util2.busquedaTabla(em, "bankingly_banca_movil", "grupo_deposito");
                                                             String cadena[] = tbRetiro.getDato1().split("\\|");
                                                             List list = Arrays.asList(cadena);
-                                                           int validado = 0;
+                                                            int validado = 0;
                                                             for (int i = 0; i < list.size(); i++) {
                                                                 if (ctaOrigen.getIdgrupo() == Integer.parseInt(String.valueOf(list.get(i)))) {
                                                                     banderaGrupo = true;
@@ -1269,12 +1299,12 @@ public abstract class FacadeTransaction<T> {
                                                                     if (ctaDestino.getAuxiliaresPK().getIdproducto() == Integer.parseInt(String.valueOf(list_deposito.get(i)))) {
                                                                         tbDeposito = util2.busquedaTabla(em, "ahorro_pat_multiplo_compromiso", "111");
                                                                         int prod_patrimonial = Integer.parseInt(tbDeposito.getTablasPK().getIdelemento());
-                                                                        if (ctaDestino.getAuxiliaresPK().getIdproducto() == prod_patrimonial) {                                                                            
+                                                                        if (ctaDestino.getAuxiliaresPK().getIdproducto() == prod_patrimonial) {
                                                                             if (monto % Double.parseDouble(tbDeposito.getDato1()) == 0) {
-                                                                                 banderaProductosDeposito = true;
+                                                                                banderaProductosDeposito = true;
                                                                             } else {
                                                                                 validado = 1;
-                                                                               banderaProductosDeposito = false;
+                                                                                banderaProductosDeposito = false;
                                                                             }
                                                                         } else {
                                                                             banderaProductosDeposito = true;
@@ -1439,9 +1469,9 @@ public abstract class FacadeTransaction<T> {
                                                                     }
 
                                                                 } else {
-                                                                    if(validado == 1){
-                                                                       message="TU MONTO A TRANSFERIR NO ES MULTIPLO DE:"+tbDeposito.getDato1();
-                                                                    }else{
+                                                                    if (validado == 1) {
+                                                                        message = "TU MONTO A TRANSFERIR NO ES MULTIPLO DE:" + tbDeposito.getDato1();
+                                                                    } else {
                                                                         message = "PRODUCTO NO CONFIGURADO PARA RECIBIR DEPOSITOS";
                                                                     }
                                                                 }
