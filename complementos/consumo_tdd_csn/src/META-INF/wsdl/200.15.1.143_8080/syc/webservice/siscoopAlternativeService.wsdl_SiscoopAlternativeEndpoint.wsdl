@@ -1,0 +1,736 @@
+<?xml version='1.0' encoding='UTF-8'?><wsdl:definitions name="SiscoopAlternativeEndpoint" targetNamespace="http://siscoop.endpoint.ws.syc.com/" xmlns:ns1="http://siscoop.endpoint.ws.syc.com/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <wsdl:types>
+<xs:schema attributeFormDefault="unqualified" elementFormDefault="unqualified" targetNamespace="http://siscoop.endpoint.ws.syc.com/" xmlns:tns="http://siscoop.endpoint.ws.syc.com/" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+<xs:element name="AddressDto">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="code" type="xs:int"/>
+<xs:element minOccurs="0" name="description" type="xs:string"/>
+<xs:element minOccurs="0" name="tarjeta" type="xs:string"/>
+<xs:element minOccurs="0" name="nombre" type="xs:string"/>
+<xs:element minOccurs="0" name="direccion" type="xs:string"/>
+<xs:element minOccurs="0" name="direccion2" type="xs:string"/>
+<xs:element minOccurs="0" name="colonia" type="xs:string"/>
+<xs:element minOccurs="0" name="localidad" type="xs:string"/>
+<xs:element minOccurs="0" name="estado" type="xs:string"/>
+<xs:element minOccurs="0" name="cp" type="xs:string"/>
+<xs:element minOccurs="0" name="telefono" type="xs:string"/>
+<xs:element minOccurs="0" name="telefono2" type="xs:string"/>
+<xs:element minOccurs="0" name="telefono3" type="xs:string"/>
+<xs:element minOccurs="0" name="rfc" type="xs:string"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="BalanceQueryResponseDto" type="tns:BalanceQueryResponseDto"/>
+<xs:element name="BasicAuthRespDto">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="code" type="xs:int"/>
+<xs:element minOccurs="0" name="description" type="xs:string"/>
+<xs:element minOccurs="0" name="authorization" type="xs:string"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="BasicResponseDto" type="tns:BasicResponse"/>
+<xs:element name="CardAssignmentResponseDto">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="code" type="xs:int"/>
+<xs:element minOccurs="0" name="description" type="xs:string"/>
+<xs:element minOccurs="0" name="authorization" type="xs:string"/>
+<xs:element minOccurs="0" name="pan" type="xs:string"/>
+<xs:element minOccurs="0" name="cardholderName" type="xs:string"/>
+<xs:element minOccurs="0" name="expiryDate" type="xs:string"/>
+<xs:element minOccurs="0" name="status" type="xs:string"/>
+<xs:element minOccurs="0" name="type" type="xs:string"/>
+<xs:element minOccurs="0" name="issueDate" type="xs:string"/>
+<xs:element minOccurs="0" name="currentTime" type="xs:string"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="IndividualLimitsDto" type="tns:IndividualLimitsDto"/>
+<xs:element name="InfoClientRequest">
+<xs:complexType>
+<xs:sequence>
+<xs:element minOccurs="0" name="cuenta" type="xs:string"/>
+<xs:element minOccurs="0" name="nombreLargo" type="xs:string"/>
+<xs:element minOccurs="0" name="nombreCorto" type="xs:string"/>
+<xs:element minOccurs="0" name="direccion" type="xs:string"/>
+<xs:element minOccurs="0" name="colonia" type="xs:string"/>
+<xs:element minOccurs="0" name="entidadFederativa" type="xs:string"/>
+<xs:element minOccurs="0" name="codigoPostal" type="xs:string"/>
+<xs:element minOccurs="0" name="rfc" type="xs:string"/>
+<xs:element minOccurs="0" name="telefono" type="xs:string"/>
+<xs:element minOccurs="0" name="telefono2" type="xs:string"/>
+<xs:element minOccurs="0" name="sucursal" type="xs:string"/>
+<xs:element minOccurs="0" name="producto" type="xs:string"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="LoadBalanceDto">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="authorization" type="xs:string"/>
+<xs:element name="code" type="xs:int"/>
+<xs:element name="description" type="xs:string"/>
+<xs:element name="balance" type="xs:double"/>
+<xs:element name="currentBalance" type="xs:double"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="TransactionsListResponseDto">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="code" type="xs:int"/>
+<xs:element minOccurs="0" name="description" type="xs:string"/>
+<xs:element maxOccurs="unbounded" minOccurs="0" name="lastestTransactions" nillable="true" type="tns:TransactionDto"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+<xs:element name="activateCard" type="tns:activateCard"/>
+<xs:element name="activateCardResponse" type="tns:activateCardResponse"/>
+<xs:element name="asignaNIP" type="tns:asignaNIP"/>
+<xs:element name="asignaNIPResponse" type="tns:asignaNIPResponse"/>
+<xs:element name="assignmentAccount" type="tns:assignmentAccount"/>
+<xs:element name="assignmentAccountResponse" type="tns:assignmentAccountResponse"/>
+<xs:element name="cardLock" type="tns:cardLock"/>
+<xs:element name="cardLockResponse" type="tns:cardLockResponse"/>
+<xs:element name="deleteIndividualLimits" type="tns:deleteIndividualLimits"/>
+<xs:element name="deleteIndividualLimitsResponse" type="tns:deleteIndividualLimitsResponse"/>
+<xs:element name="doWithdrawalAccount" type="tns:doWithdrawalAccount"/>
+<xs:element name="doWithdrawalAccountResponse" type="tns:doWithdrawalAccountResponse"/>
+<xs:element name="getBalanceQuery" type="tns:getBalanceQuery"/>
+<xs:element name="getBalanceQueryResponse" type="tns:getBalanceQueryResponse"/>
+<xs:element name="getCardholderInformation" type="tns:getCardholderInformation"/>
+<xs:element name="getCardholderInformationResponse" type="tns:getCardholderInformationResponse"/>
+<xs:element name="getLastestTransactions" type="tns:getLastestTransactions"/>
+<xs:element name="getLastestTransactionsResponse" type="tns:getLastestTransactionsResponse"/>
+<xs:element name="loadBalance" type="tns:loadBalance"/>
+<xs:element name="loadBalanceResponse" type="tns:loadBalanceResponse"/>
+<xs:element name="saveInformationClientBitMatch" type="tns:saveInformationClientBitMatch"/>
+<xs:element name="saveInformationClientBitMatchResponse" type="tns:saveInformationClientBitMatchResponse"/>
+<xs:element name="stockCardReplacement" type="tns:stockCardReplacement"/>
+<xs:element name="stockCardReplacementResponse" type="tns:stockCardReplacementResponse"/>
+<xs:element name="temporaryLock" type="tns:temporaryLock"/>
+<xs:element name="temporaryLockResponse" type="tns:temporaryLockResponse"/>
+<xs:element name="updateDemographicData" type="tns:updateDemographicData"/>
+<xs:element name="updateDemographicDataResponse" type="tns:updateDemographicDataResponse"/>
+<xs:element name="updateIndividualLimits" type="tns:updateIndividualLimits"/>
+<xs:element name="updateIndividualLimitsResponse" type="tns:updateIndividualLimitsResponse"/>
+<xs:complexType name="stockCardReplacement">
+<xs:sequence>
+<xs:element minOccurs="0" name="arg0" type="xs:string"/>
+<xs:element minOccurs="0" name="arg1" type="xs:string"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="stockCardReplacementResponse">
+<xs:sequence>
+<xs:element minOccurs="0" name="return">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="code" type="xs:int"/>
+<xs:element minOccurs="0" name="description" type="xs:string"/>
+<xs:element minOccurs="0" name="authorization" type="xs:string"/>
+<xs:element minOccurs="0" name="pan" type="xs:string"/>
+<xs:element minOccurs="0" name="cardholderName" type="xs:string"/>
+<xs:element minOccurs="0" name="expiryDate" type="xs:string"/>
+<xs:element minOccurs="0" name="status" type="xs:string"/>
+<xs:element minOccurs="0" name="type" type="xs:string"/>
+<xs:element minOccurs="0" name="issueDate" type="xs:string"/>
+<xs:element minOccurs="0" name="currentTime" type="xs:string"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="assignmentAccount">
+<xs:sequence>
+<xs:element minOccurs="0" name="pan" type="xs:string"/>
+<xs:element minOccurs="0" name="clientInfo">
+<xs:complexType>
+<xs:sequence>
+<xs:element minOccurs="0" name="cuenta" type="xs:string"/>
+<xs:element minOccurs="0" name="nombreLargo" type="xs:string"/>
+<xs:element minOccurs="0" name="nombreCorto" type="xs:string"/>
+<xs:element minOccurs="0" name="direccion" type="xs:string"/>
+<xs:element minOccurs="0" name="colonia" type="xs:string"/>
+<xs:element minOccurs="0" name="entidadFederativa" type="xs:string"/>
+<xs:element minOccurs="0" name="codigoPostal" type="xs:string"/>
+<xs:element minOccurs="0" name="rfc" type="xs:string"/>
+<xs:element minOccurs="0" name="telefono" type="xs:string"/>
+<xs:element minOccurs="0" name="telefono2" type="xs:string"/>
+<xs:element minOccurs="0" name="sucursal" type="xs:string"/>
+<xs:element minOccurs="0" name="producto" type="xs:string"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="assignmentAccountResponse">
+<xs:sequence>
+<xs:element minOccurs="0" name="return">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="code" type="xs:int"/>
+<xs:element minOccurs="0" name="description" type="xs:string"/>
+<xs:element minOccurs="0" name="authorization" type="xs:string"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="asignaNIP">
+<xs:sequence>
+<xs:element minOccurs="0" name="arg0" type="tns:nipRequest"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="nipRequest">
+<xs:sequence>
+<xs:element minOccurs="0" name="numeroTarjeta" type="xs:string"/>
+<xs:element minOccurs="0" name="nip" type="xs:string"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="asignaNIPResponse">
+<xs:sequence>
+<xs:element minOccurs="0" name="return" type="tns:BasicResponse"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="BasicResponse">
+<xs:sequence>
+<xs:element name="codigo" type="xs:int"/>
+<xs:element minOccurs="0" name="descripcion" type="xs:string"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="cardLock">
+<xs:sequence>
+<xs:element minOccurs="0" name="pan" type="xs:string"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="cardLockResponse">
+<xs:sequence>
+<xs:element minOccurs="0" name="return">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="code" type="xs:int"/>
+<xs:element minOccurs="0" name="description" type="xs:string"/>
+<xs:element minOccurs="0" name="authorization" type="xs:string"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="doWithdrawalAccount">
+<xs:sequence>
+<xs:element minOccurs="0" name="pan" type="xs:string"/>
+<xs:element name="amount" type="xs:double"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="doWithdrawalAccountResponse">
+<xs:sequence>
+<xs:element minOccurs="0" name="return">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="authorization" type="xs:string"/>
+<xs:element name="code" type="xs:int"/>
+<xs:element name="description" type="xs:string"/>
+<xs:element name="balance" type="xs:double"/>
+<xs:element name="currentBalance" type="xs:double"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="deleteIndividualLimits">
+<xs:sequence>
+<xs:element minOccurs="0" name="arg0" type="xs:string"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="deleteIndividualLimitsResponse">
+<xs:sequence>
+<xs:element minOccurs="0" name="return">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="code" type="xs:int"/>
+<xs:element minOccurs="0" name="description" type="xs:string"/>
+<xs:element minOccurs="0" name="authorization" type="xs:string"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="getLastestTransactions">
+<xs:sequence>
+<xs:element minOccurs="0" name="pan" type="xs:string"/>
+<xs:element name="numMaxOfRows" type="xs:int"/>
+<xs:element name="operationType" type="xs:int"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="getLastestTransactionsResponse">
+<xs:sequence>
+<xs:element minOccurs="0" name="return">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="code" type="xs:int"/>
+<xs:element minOccurs="0" name="description" type="xs:string"/>
+<xs:element maxOccurs="unbounded" minOccurs="0" name="lastestTransactions" nillable="true" type="tns:TransactionDto"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="TransactionDto">
+<xs:sequence>
+<xs:element minOccurs="0" name="pan" type="xs:string"/>
+<xs:element minOccurs="0" name="conceptDescription" type="xs:string"/>
+<xs:element name="respCode" type="xs:int"/>
+<xs:element minOccurs="0" name="respCodeDescription" type="xs:string"/>
+<xs:element name="amount" type="xs:double"/>
+<xs:element minOccurs="0" name="authorization" type="xs:string"/>
+<xs:element minOccurs="0" name="trxCode" type="xs:string"/>
+<xs:element minOccurs="0" name="trxDescription" type="xs:string"/>
+<xs:element minOccurs="0" name="acceptorName" type="xs:string"/>
+<xs:element minOccurs="0" name="transactionDate" type="xs:string"/>
+<xs:element minOccurs="0" name="reference" type="xs:string"/>
+<xs:element name="availableBalance" type="xs:double"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="activateCard">
+<xs:sequence>
+<xs:element minOccurs="0" name="arg0" type="xs:string"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="activateCardResponse">
+<xs:sequence>
+<xs:element minOccurs="0" name="return">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="code" type="xs:int"/>
+<xs:element minOccurs="0" name="description" type="xs:string"/>
+<xs:element minOccurs="0" name="authorization" type="xs:string"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="updateIndividualLimits">
+<xs:sequence>
+<xs:element minOccurs="0" name="arg0" type="xs:string"/>
+<xs:element minOccurs="0" name="arg1" type="tns:IndividualLimitsDto"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="IndividualLimitsDto">
+<xs:sequence>
+<xs:element name="maxWithdrawalAmount" type="xs:double"/>
+<xs:element name="maxWithdrawalNumber" type="xs:int"/>
+<xs:element name="maxBuysAmount" type="xs:double"/>
+<xs:element name="maxBuysNumber" type="xs:int"/>
+<xs:element name="maxWithdrawalAmountInt" type="xs:double"/>
+<xs:element name="maxWithdrawalNumberInt" type="xs:int"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="updateIndividualLimitsResponse">
+<xs:sequence>
+<xs:element minOccurs="0" name="return">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="code" type="xs:int"/>
+<xs:element minOccurs="0" name="description" type="xs:string"/>
+<xs:element minOccurs="0" name="authorization" type="xs:string"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="getCardholderInformation">
+<xs:sequence>
+<xs:element minOccurs="0" name="pan" type="xs:string"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="getCardholderInformationResponse">
+<xs:sequence>
+<xs:element minOccurs="0" name="return">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="code" type="xs:int"/>
+<xs:element minOccurs="0" name="description" type="xs:string"/>
+<xs:element minOccurs="0" name="tarjeta" type="xs:string"/>
+<xs:element minOccurs="0" name="nombre" type="xs:string"/>
+<xs:element minOccurs="0" name="direccion" type="xs:string"/>
+<xs:element minOccurs="0" name="direccion2" type="xs:string"/>
+<xs:element minOccurs="0" name="colonia" type="xs:string"/>
+<xs:element minOccurs="0" name="localidad" type="xs:string"/>
+<xs:element minOccurs="0" name="estado" type="xs:string"/>
+<xs:element minOccurs="0" name="cp" type="xs:string"/>
+<xs:element minOccurs="0" name="telefono" type="xs:string"/>
+<xs:element minOccurs="0" name="telefono2" type="xs:string"/>
+<xs:element minOccurs="0" name="telefono3" type="xs:string"/>
+<xs:element minOccurs="0" name="rfc" type="xs:string"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="loadBalance">
+<xs:sequence>
+<xs:element minOccurs="0" name="pan" type="xs:string"/>
+<xs:element name="amount" type="xs:double"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="loadBalanceResponse">
+<xs:sequence>
+<xs:element minOccurs="0" name="return">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="authorization" type="xs:string"/>
+<xs:element name="code" type="xs:int"/>
+<xs:element name="description" type="xs:string"/>
+<xs:element name="balance" type="xs:double"/>
+<xs:element name="currentBalance" type="xs:double"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="temporaryLock">
+<xs:sequence>
+<xs:element minOccurs="0" name="pan" type="xs:string"/>
+<xs:element name="operationType" type="xs:int"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="temporaryLockResponse">
+<xs:sequence>
+<xs:element minOccurs="0" name="return">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="code" type="xs:int"/>
+<xs:element minOccurs="0" name="description" type="xs:string"/>
+<xs:element minOccurs="0" name="authorization" type="xs:string"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="saveInformationClientBitMatch">
+<xs:sequence>
+<xs:element minOccurs="0" name="arg0">
+<xs:complexType>
+<xs:sequence>
+<xs:element minOccurs="0" name="cuenta" type="xs:string"/>
+<xs:element minOccurs="0" name="nombreLargo" type="xs:string"/>
+<xs:element minOccurs="0" name="nombreCorto" type="xs:string"/>
+<xs:element minOccurs="0" name="direccion" type="xs:string"/>
+<xs:element minOccurs="0" name="colonia" type="xs:string"/>
+<xs:element minOccurs="0" name="entidadFederativa" type="xs:string"/>
+<xs:element minOccurs="0" name="codigoPostal" type="xs:string"/>
+<xs:element minOccurs="0" name="rfc" type="xs:string"/>
+<xs:element minOccurs="0" name="telefono" type="xs:string"/>
+<xs:element minOccurs="0" name="telefono2" type="xs:string"/>
+<xs:element minOccurs="0" name="sucursal" type="xs:string"/>
+<xs:element minOccurs="0" name="producto" type="xs:string"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="saveInformationClientBitMatchResponse">
+<xs:sequence>
+<xs:element minOccurs="0" name="return">
+<xs:complexType>
+<xs:sequence>
+<xs:element name="code" type="xs:int"/>
+<xs:element minOccurs="0" name="description" type="xs:string"/>
+<xs:element minOccurs="0" name="authorization" type="xs:string"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="updateDemographicData">
+<xs:sequence>
+<xs:element minOccurs="0" name="pan" type="xs:string"/>
+<xs:element minOccurs="0" name="cardinfo">
+<xs:complexType>
+<xs:sequence>
+<xs:element minOccurs="0" name="name" type="xs:string"/>
+<xs:element minOccurs="0" name="shortName" type="xs:string"/>
+<xs:element minOccurs="0" name="email" type="xs:string"/>
+<xs:element minOccurs="0" name="address" type="xs:string"/>
+<xs:element minOccurs="0" name="colony" type="xs:string"/>
+<xs:element minOccurs="0" name="zipCode" type="xs:string"/>
+<xs:element minOccurs="0" name="municipality" type="xs:string"/>
+<xs:element minOccurs="0" name="city" type="xs:string"/>
+<xs:element minOccurs="0" name="state" type="xs:string"/>
+<xs:element minOccurs="0" name="rfc" type="xs:string"/>
+<xs:element minOccurs="0" name="homePhone" type="xs:string"/>
+<xs:element minOccurs="0" name="cellPhone" type="xs:string"/>
+<xs:element minOccurs="0" name="workPhone" type="xs:string"/>
+</xs:sequence>
+</xs:complexType>
+</xs:element>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="updateDemographicDataResponse">
+<xs:sequence>
+<xs:element minOccurs="0" name="return" type="tns:BasicDataResponse"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="BasicDataResponse">
+<xs:sequence>
+<xs:element name="codigo" type="xs:int"/>
+<xs:element minOccurs="0" name="descripcion" type="xs:string"/>
+<xs:element minOccurs="0" name="date" type="xs:string"/>
+<xs:element minOccurs="0" name="time" type="xs:string"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="getBalanceQuery">
+<xs:sequence>
+<xs:element minOccurs="0" name="arg0" type="xs:string"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="getBalanceQueryResponse">
+<xs:sequence>
+<xs:element minOccurs="0" name="return" type="tns:BalanceQueryResponseDto"/>
+</xs:sequence>
+</xs:complexType>
+<xs:complexType name="BalanceQueryResponseDto">
+<xs:sequence>
+<xs:element name="code" type="xs:int"/>
+<xs:element minOccurs="0" name="description" type="xs:string"/>
+<xs:element name="availableAmount" type="xs:double"/>
+</xs:sequence>
+</xs:complexType>
+<xs:element name="Exception" type="tns:Exception"/>
+<xs:complexType name="Exception">
+<xs:sequence>
+<xs:element minOccurs="0" name="message" type="xs:string"/>
+</xs:sequence>
+</xs:complexType>
+</xs:schema>
+  </wsdl:types>
+  <wsdl:message name="saveInformationClientBitMatch">
+    <wsdl:part element="ns1:saveInformationClientBitMatch" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="assignmentAccount">
+    <wsdl:part element="ns1:assignmentAccount" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="loadBalanceResponse">
+    <wsdl:part element="ns1:loadBalanceResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="doWithdrawalAccountResponse">
+    <wsdl:part element="ns1:doWithdrawalAccountResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="assignmentAccountResponse">
+    <wsdl:part element="ns1:assignmentAccountResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="loadBalance">
+    <wsdl:part element="ns1:loadBalance" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="temporaryLock">
+    <wsdl:part element="ns1:temporaryLock" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="deleteIndividualLimits">
+    <wsdl:part element="ns1:deleteIndividualLimits" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getBalanceQueryResponse">
+    <wsdl:part element="ns1:getBalanceQueryResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getCardholderInformation">
+    <wsdl:part element="ns1:getCardholderInformation" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="activateCardResponse">
+    <wsdl:part element="ns1:activateCardResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="temporaryLockResponse">
+    <wsdl:part element="ns1:temporaryLockResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="deleteIndividualLimitsResponse">
+    <wsdl:part element="ns1:deleteIndividualLimitsResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getLastestTransactionsResponse">
+    <wsdl:part element="ns1:getLastestTransactionsResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="doWithdrawalAccount">
+    <wsdl:part element="ns1:doWithdrawalAccount" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="Exception">
+    <wsdl:part element="ns1:Exception" name="Exception">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="updateIndividualLimitsResponse">
+    <wsdl:part element="ns1:updateIndividualLimitsResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="stockCardReplacement">
+    <wsdl:part element="ns1:stockCardReplacement" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="updateIndividualLimits">
+    <wsdl:part element="ns1:updateIndividualLimits" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getBalanceQuery">
+    <wsdl:part element="ns1:getBalanceQuery" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="updateDemographicData">
+    <wsdl:part element="ns1:updateDemographicData" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getLastestTransactions">
+    <wsdl:part element="ns1:getLastestTransactions" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="activateCard">
+    <wsdl:part element="ns1:activateCard" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="asignaNIP">
+    <wsdl:part element="ns1:asignaNIP" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="asignaNIPResponse">
+    <wsdl:part element="ns1:asignaNIPResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="updateDemographicDataResponse">
+    <wsdl:part element="ns1:updateDemographicDataResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="stockCardReplacementResponse">
+    <wsdl:part element="ns1:stockCardReplacementResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="cardLock">
+    <wsdl:part element="ns1:cardLock" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="saveInformationClientBitMatchResponse">
+    <wsdl:part element="ns1:saveInformationClientBitMatchResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="getCardholderInformationResponse">
+    <wsdl:part element="ns1:getCardholderInformationResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:message name="cardLockResponse">
+    <wsdl:part element="ns1:cardLockResponse" name="parameters">
+    </wsdl:part>
+  </wsdl:message>
+  <wsdl:portType name="SiscoopAlternativeEndpoint">
+    <wsdl:operation name="stockCardReplacement">
+      <wsdl:input message="ns1:stockCardReplacement" name="stockCardReplacement">
+    </wsdl:input>
+      <wsdl:output message="ns1:stockCardReplacementResponse" name="stockCardReplacementResponse">
+    </wsdl:output>
+      <wsdl:fault message="ns1:Exception" name="Exception">
+    </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="assignmentAccount">
+      <wsdl:input message="ns1:assignmentAccount" name="assignmentAccount">
+    </wsdl:input>
+      <wsdl:output message="ns1:assignmentAccountResponse" name="assignmentAccountResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="asignaNIP">
+      <wsdl:input message="ns1:asignaNIP" name="asignaNIP">
+    </wsdl:input>
+      <wsdl:output message="ns1:asignaNIPResponse" name="asignaNIPResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="cardLock">
+      <wsdl:input message="ns1:cardLock" name="cardLock">
+    </wsdl:input>
+      <wsdl:output message="ns1:cardLockResponse" name="cardLockResponse">
+    </wsdl:output>
+      <wsdl:fault message="ns1:Exception" name="Exception">
+    </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="doWithdrawalAccount">
+      <wsdl:input message="ns1:doWithdrawalAccount" name="doWithdrawalAccount">
+    </wsdl:input>
+      <wsdl:output message="ns1:doWithdrawalAccountResponse" name="doWithdrawalAccountResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="deleteIndividualLimits">
+      <wsdl:input message="ns1:deleteIndividualLimits" name="deleteIndividualLimits">
+    </wsdl:input>
+      <wsdl:output message="ns1:deleteIndividualLimitsResponse" name="deleteIndividualLimitsResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getLastestTransactions">
+      <wsdl:input message="ns1:getLastestTransactions" name="getLastestTransactions">
+    </wsdl:input>
+      <wsdl:output message="ns1:getLastestTransactionsResponse" name="getLastestTransactionsResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="activateCard">
+      <wsdl:input message="ns1:activateCard" name="activateCard">
+    </wsdl:input>
+      <wsdl:output message="ns1:activateCardResponse" name="activateCardResponse">
+    </wsdl:output>
+      <wsdl:fault message="ns1:Exception" name="Exception">
+    </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="updateIndividualLimits">
+      <wsdl:input message="ns1:updateIndividualLimits" name="updateIndividualLimits">
+    </wsdl:input>
+      <wsdl:output message="ns1:updateIndividualLimitsResponse" name="updateIndividualLimitsResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getCardholderInformation">
+      <wsdl:input message="ns1:getCardholderInformation" name="getCardholderInformation">
+    </wsdl:input>
+      <wsdl:output message="ns1:getCardholderInformationResponse" name="getCardholderInformationResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="loadBalance">
+      <wsdl:input message="ns1:loadBalance" name="loadBalance">
+    </wsdl:input>
+      <wsdl:output message="ns1:loadBalanceResponse" name="loadBalanceResponse">
+    </wsdl:output>
+      <wsdl:fault message="ns1:Exception" name="Exception">
+    </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="temporaryLock">
+      <wsdl:input message="ns1:temporaryLock" name="temporaryLock">
+    </wsdl:input>
+      <wsdl:output message="ns1:temporaryLockResponse" name="temporaryLockResponse">
+    </wsdl:output>
+      <wsdl:fault message="ns1:Exception" name="Exception">
+    </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="saveInformationClientBitMatch">
+      <wsdl:input message="ns1:saveInformationClientBitMatch" name="saveInformationClientBitMatch">
+    </wsdl:input>
+      <wsdl:output message="ns1:saveInformationClientBitMatchResponse" name="saveInformationClientBitMatchResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="updateDemographicData">
+      <wsdl:input message="ns1:updateDemographicData" name="updateDemographicData">
+    </wsdl:input>
+      <wsdl:output message="ns1:updateDemographicDataResponse" name="updateDemographicDataResponse">
+    </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getBalanceQuery">
+      <wsdl:input message="ns1:getBalanceQuery" name="getBalanceQuery">
+    </wsdl:input>
+      <wsdl:output message="ns1:getBalanceQueryResponse" name="getBalanceQueryResponse">
+    </wsdl:output>
+    </wsdl:operation>
+  </wsdl:portType>
+</wsdl:definitions>

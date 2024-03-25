@@ -1,0 +1,6 @@
+
+Nota
+
+
+En el proyecto de Banca movil que esta desarrollado con Maven no fue posible integrar consumo de las TDD por lo tanto
+se utilizo un cliente externo lo cual solo se anexo como dependencia al proyecto original ojo solo para Csn

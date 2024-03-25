@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<catalog xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog" prefer="system">
+    <system systemId="http://200.15.1.143:8080/syc/webservice/siscoopAlternativeService/?wsdl" uri="xml-resources/web-service-references/WsClient/wsdl/200.15.1.143_8080/syc/webservice/siscoopAlternativeService/.wsdl"/>
+    <system systemId="http://200.15.1.143:8080/syc/webservice/siscoopAlternativeService?wsdl=SiscoopAlternativeEndpoint.wsdl" uri="xml-resources/web-service-references/WsClient/wsdl/200.15.1.143_8080/syc/webservice/siscoopAlternativeService.wsdl_SiscoopAlternativeEndpoint.wsdl"/>
+</catalog>

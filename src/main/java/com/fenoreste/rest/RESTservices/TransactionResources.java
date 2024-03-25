@@ -12,13 +12,18 @@ import com.fenoreste.rest.ResponseDTO.TransactionModel;
 import com.fenoreste.rest.Util.Authorization;
 import com.fenoreste.rest.dao.TransactionDAO;
 import com.fenoreste.rest.ResponseDTO.VaucherDTO;
+import com.fenoreste.rest.dao.EntradaMovsDAO;
+import com.fenoreste.rest.entidades.MovimientoEntrada;
 import com.fenoreste.rest.entidades.Tablas;
 import com.fenoreste.rest.entidades.TablasPK;
 import com.fenoreste.rest.entidades.TerceroActivacion;
 import com.github.cliftonlabs.json_simple.JsonObject;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.sql.Timestamp;
 import java.text.Normalizer;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.concurrent.TimeUnit;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
@@ -40,6 +45,7 @@ public class TransactionResources {
     //BasePath SPEI
     String basePath = "";
     TransactionDAO dao = new TransactionDAO();
+    EntradaMovsDAO daoMovs = new EntradaMovsDAO();
 
     @Path("/Insert")
     @POST
@@ -148,54 +154,119 @@ public class TransactionResources {
             } else {
                 System.out.println("Accediendo a trasnferencias con subTransactionType=" + dto.getSubTransactionTypeId() + ",TransactionId:" + dto.getTransactionTypeId());
 
-                //Si subtransactionType es 1 y transactionType es 1: El tipo de transaccion es es entre mis cuentas
-                if (dto.getSubTransactionTypeId() == 1 && dto.getTransactionTypeId() == 1) {
-                    backendOperationResult = dao.transferencias(dto, 1, null);
-                }
+                //Vamos a buscar la transaccion con el id
+                MovimientoEntrada mov = new MovimientoEntrada();
+                mov.setTransactionid(dto.getTransactionId());
+                mov.setSubtransactiontypeid(dto.getSubTransactionTypeId());
+                mov.setValuedate(fechaParser(dto.getValueDate()));
+                mov.setTransactiontypeid(dto.getTransactionTypeId());
+                mov.setTransactionstatusid(dto.getTransactionStatusId());
+                mov.setClientbankidentifier(dto.getClientBankIdentifier());
+                mov.setDebitproductbankidentifier(dto.getDebitProductBankIdentifier());
+                mov.setDebitproducttypeid(dto.getDebitProductTypeId());
+                mov.setCreditproductbankidentifier(dto.getCreditProductBankIdentifier());
+                mov.setCreditproducttypeid(dto.getCreditProductTypeId());
+                mov.setAmount(new BigDecimal(dto.getAmount()));
+                mov.setDestinationname(dto.getDestinationName());
+                mov.setDestinationbank(dto.getDestinationBank());
+                mov.setDescription(dto.getDescription());
 
-                //Si subtransactionType es 2 y transactionType es 1: El tipo de transaccion es a terceros
-                if (dto.getSubTransactionTypeId() == 2 && dto.getTransactionTypeId() == 1) {
-                    //Descomentar cuando se le de su gana 
-                    String mensaje = validarTerceroOperar(dto.getCreditProductBankIdentifier(), dto.getUsername());
-                    //if (mensaje.toUpperCase().contains("EXITOSO")) {
-                        backendOperationResult = dao.transferencias(dto, 2, null);
-                    //} else {
-                       // backendOperationResult.setBackendMessage(mensaje);
-                    //}
-                }
-                //Si subtransactionType es 9 y transactionType es 6: El tipo de transaccion es es un pago a prestamos 
-                if (dto.getSubTransactionTypeId() == 9 && dto.getTransactionTypeId() == 6) {
-                    backendOperationResult = dao.transferencias(dto, 3, null);
-                }
-                //Si es un pago a prestamo tercero
-                if (dto.getSubTransactionTypeId() == 10 && dto.getTransactionTypeId() == 6) {
-                     String mensaje = validarTerceroOperar(dto.getCreditProductBankIdentifier(), dto.getUsername());
-                  //  if (mensaje.toUpperCase().contains("EXITOSO")) {
-                        backendOperationResult = dao.transferencias(dto, 4, null);
-                    //} else {
-                        backendOperationResult.setBackendMessage(mensaje);
-                   // }                    
-                }
-                //Si es una trasnferencia SPEI
-                if (dto.getSubTransactionTypeId() == 3 && dto.getTransactionTypeId() == 1) {
-
-                    if (!dao.actividad_horario_spei()) {
-                        backendOperationResult.setBackendMessage("<html><body><b>Horario para envío de SPEI fuera de horario de servicio</b></body></html>");
+                //Vamos a buscar la transaccion con el id
+                boolean bandera = false;
+                boolean existeMov = daoMovs.buscarPorId(mov);
+                if (!existeMov) {
+                    MovimientoEntrada modeloEntidad = daoMovs.buscarUltimoMovimiento(mov);
+                    //daoMovs.guardar(mov);
+                    if (modeloEntidad.getTransactionid() != null) {
+                        //convertimos la fecha 
+                        System.out.println("No existe id transaccion.......");
+                        Date hoy = fechaParser(dto.getValueDate());
+                        if (modeloEntidad.getValuedate().toGMTString().substring(0, 11).equals(hoy.toGMTString().substring(0, 11))) {
+                            System.out.println("Transaccion en la misma fecha");
+                            TimeUnit timeHora = TimeUnit.HOURS;
+                            TimeUnit timeMinutos = TimeUnit.MINUTES;
+                            TimeUnit timeSegundos = TimeUnit.SECONDS;
+                            long diff = 0;
+                            long differenceHour = 0;
+                            long differenceMinutos = 0;
+                            long differenceSegundos = 0;
+                            diff = hoy.getTime() - modeloEntidad.getValuedate().getTime();
+                            differenceHour = timeHora.convert(diff, TimeUnit.MILLISECONDS);
+                            differenceMinutos = timeMinutos.convert(diff, TimeUnit.MILLISECONDS);
+                            differenceSegundos = timeSegundos.convert(diff, TimeUnit.MILLISECONDS);
+                            System.out.println("total hora:" + differenceHour + ",Total Minuto:" + differenceMinutos + ",total segundos:" + differenceSegundos + " de la ultima transaccion...");
+                            if (differenceHour == 0 && differenceMinutos == 0 && differenceSegundos >= 2) {
+                                System.out.println("Ya pasaron 2 o mas segundos de tu ultima transaccion.....");
+                                daoMovs.guardar(mov);
+                                bandera = true;
+                            } else {
+                                System.out.println("Error tu ultima transaccion fue hace 2 segundos");
+                                backendOperationResult.setBackendMessage("<HTML>Tienes una transaccion con menos de 2 segundos.</HTML>");
+                            }
+                        } else {
+                            bandera = true;
+                            daoMovs.guardar(mov);
+                        }
                     } else {
-                        //Consumimos mis servicios de SPEI que tengo en otro proyecto(CSN0)
-                        RequestDataOrdenPagoDTO ordenReque = new RequestDataOrdenPagoDTO();
-                        ordenReque.setClienteClabe(dto.getDebitProductBankIdentifier());//Opa origen como cuenta clabe en el metodo spei se busca la clave
-                        ordenReque.setConceptoPago(dto.getDescription());
-                        ordenReque.setCuentaBeneficiario(dto.getCreditProductBankIdentifier());//La clabe del beneficiario
-                        ordenReque.setInstitucionContraparte(dto.getDestinationBank());
-                        ordenReque.setMonto(dto.getAmount());
-                        ordenReque.setNombreBeneficiario(dto.getDestinationName());
-                        ordenReque.setRfcCurpBeneficiario(dto.getDestinationDocumentId().getDocumentNumber());
-                        ordenReque.setOrdernante(dto.getClientBankIdentifier());
-
-                        backendOperationResult = dao.transferencias(dto, 5, ordenReque);
+                        System.out.println("No existe la transaccion la vamos a guardar.................");
+                        daoMovs.guardar(mov);
+                        bandera = true;
+                    }
+                } else {
+                    System.out.println("Este id:"+dto.getTransactionId() +" ya existe en el core.....");
+                    backendOperationResult.setBackendMessage("<HTML>EL IDENTIFICADOR DE TRANSACCION YA ESTA REGISTRADO </HTML> ");
+                }
+                
+                if (bandera) {
+                    //Si subtransactionType es 1 y transactionType es 1: El tipo de transaccion es es entre mis cuentas
+                    if (dto.getSubTransactionTypeId() == 1 && dto.getTransactionTypeId() == 1) {
+                        backendOperationResult = dao.transferencias(dto, 1, null);
                     }
 
+                    //Si subtransactionType es 2 y transactionType es 1: El tipo de transaccion es a terceros
+                    if (dto.getSubTransactionTypeId() == 2 && dto.getTransactionTypeId() == 1) {
+                        //Descomentar cuando se le de su gana 
+                        String mensaje = validarTerceroOperar(dto.getCreditProductBankIdentifier(), dto.getUsername());
+                        //if (mensaje.toUpperCase().contains("EXITOSO")) {
+                        backendOperationResult = dao.transferencias(dto, 2, null);
+                        //} else {
+                        // backendOperationResult.setBackendMessage(mensaje);
+                        //}
+                    }
+                    //Si subtransactionType es 9 y transactionType es 6: El tipo de transaccion es es un pago a prestamos 
+                    if (dto.getSubTransactionTypeId() == 9 && dto.getTransactionTypeId() == 6) {
+                        backendOperationResult = dao.transferencias(dto, 3, null);
+                    }
+                    //Si es un pago a prestamo tercero
+                    if (dto.getSubTransactionTypeId() == 10 && dto.getTransactionTypeId() == 6) {
+                        String mensaje = validarTerceroOperar(dto.getCreditProductBankIdentifier(), dto.getUsername());
+                        //  if (mensaje.toUpperCase().contains("EXITOSO")) {
+                        backendOperationResult = dao.transferencias(dto, 4, null);
+                        //} else {
+                        backendOperationResult.setBackendMessage(mensaje);
+                        // }                    
+                    }
+                    //Si es una trasnferencia SPEI
+                    if (dto.getSubTransactionTypeId() == 3 && dto.getTransactionTypeId() == 1) {
+
+                        if (!dao.actividad_horario_spei()) {
+                            backendOperationResult.setBackendMessage("<html><body><b>Horario para envío de SPEI fuera de horario de servicio</b></body></html>");
+                        } else {
+                            //Consumimos mis servicios de SPEI que tengo en otro proyecto(CSN0)
+                            RequestDataOrdenPagoDTO ordenReque = new RequestDataOrdenPagoDTO();
+                            ordenReque.setClienteClabe(dto.getDebitProductBankIdentifier());//Opa origen como cuenta clabe en el metodo spei se busca la clave
+                            ordenReque.setConceptoPago(dto.getDescription());
+                            ordenReque.setCuentaBeneficiario(dto.getCreditProductBankIdentifier());//La clabe del beneficiario
+                            ordenReque.setInstitucionContraparte(dto.getDestinationBank());
+                            ordenReque.setMonto(dto.getAmount());
+                            ordenReque.setNombreBeneficiario(dto.getDestinationName());
+                            ordenReque.setRfcCurpBeneficiario(dto.getDestinationDocumentId().getDocumentNumber());
+                            ordenReque.setOrdernante(dto.getClientBankIdentifier());
+
+                            backendOperationResult = dao.transferencias(dto, 5, ordenReque);
+                        }
+
+                    }
                 }
             }
             response_json_3.put("integrationProperties", null);
@@ -228,7 +299,8 @@ public class TransactionResources {
     @Path("/Voucher")
     @Produces({MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_JSON})
-    public VaucherDTO voucher(String cadena) {
+    public VaucherDTO voucher(String cadena
+    ) {
         JSONObject request = new JSONObject(cadena);
         String idTransaccion = "";
         VaucherDTO voucherDTO;
@@ -250,7 +322,8 @@ public class TransactionResources {
     @Path("/ejecutaSpei")
     @Produces({MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_JSON})
-    public Response ejecutarOrdenSPei(String cadena) {
+    public Response ejecutarOrdenSPei(String cadena
+    ) {
         JSONObject request_json = new JSONObject(cadena);
         int idorden = request_json.getInt("id");
         String folio = request_json.getString("folioOrigen");
@@ -331,6 +404,17 @@ public class TransactionResources {
         }
         return mensaje;
 
+    }
+
+    private Date fechaParser(String fecha) {
+        Date fechaR = null;
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+            fechaR = sdf.parse(fecha);
+        } catch (Exception e) {
+            System.out.println("Error al formaear fecha:" + e.getMessage());
+        }
+        return fechaR;
     }
 
 }

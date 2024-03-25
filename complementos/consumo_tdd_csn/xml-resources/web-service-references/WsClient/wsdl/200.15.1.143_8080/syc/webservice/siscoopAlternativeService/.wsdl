@@ -1,0 +1,162 @@
+<?xml version='1.0' encoding='UTF-8'?><wsdl:definitions name="SiscoopAlternativeEndpointImplService" targetNamespace="http://impl.siscoop.endpoint.ws.syc.com/" xmlns:ns1="http://siscoop.endpoint.ws.syc.com/" xmlns:ns2="http://schemas.xmlsoap.org/soap/http" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:tns="http://impl.siscoop.endpoint.ws.syc.com/" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <wsdl:import location="http://200.15.1.143:8080/syc/webservice/siscoopAlternativeService?wsdl=SiscoopAlternativeEndpoint.wsdl" namespace="http://siscoop.endpoint.ws.syc.com/">
+    </wsdl:import>
+  <wsdl:binding name="SiscoopAlternativeEndpointImplServiceSoapBinding" type="ns1:SiscoopAlternativeEndpoint">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="stockCardReplacement">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="stockCardReplacement">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="stockCardReplacementResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="Exception">
+        <soap:fault name="Exception" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="asignaNIP">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="asignaNIP">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="asignaNIPResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="assignmentAccount">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="assignmentAccount">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="assignmentAccountResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="cardLock">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="cardLock">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="cardLockResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="Exception">
+        <soap:fault name="Exception" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="deleteIndividualLimits">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="deleteIndividualLimits">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="deleteIndividualLimitsResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="doWithdrawalAccount">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="doWithdrawalAccount">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="doWithdrawalAccountResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="activateCard">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="activateCard">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="activateCardResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="Exception">
+        <soap:fault name="Exception" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="getLastestTransactions">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="getLastestTransactions">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="getLastestTransactionsResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="updateIndividualLimits">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="updateIndividualLimits">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="updateIndividualLimitsResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getCardholderInformation">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="getCardholderInformation">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="getCardholderInformationResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="loadBalance">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="loadBalance">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="loadBalanceResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="Exception">
+        <soap:fault name="Exception" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="temporaryLock">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="temporaryLock">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="temporaryLockResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="Exception">
+        <soap:fault name="Exception" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="saveInformationClientBitMatch">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="saveInformationClientBitMatch">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="saveInformationClientBitMatchResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="updateDemographicData">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="updateDemographicData">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="updateDemographicDataResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+    <wsdl:operation name="getBalanceQuery">
+      <soap:operation soapAction="" style="document"/>
+      <wsdl:input name="getBalanceQuery">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="getBalanceQueryResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="SiscoopAlternativeEndpointImplService">
+    <wsdl:port binding="tns:SiscoopAlternativeEndpointImplServiceSoapBinding" name="SiscoopAlternativeEndpointImplPort">
+      <soap:address location="http://200.15.1.143:8080/syc/webservice/siscoopAlternativeService"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>

@@ -24,6 +24,7 @@ public class Transferencias implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
+    private BigDecimal transactionid;
     private Integer subtransactiontypeid;
     private String currencyid;
     private String valuedate;
@@ -38,8 +39,7 @@ public class Transferencias implements Serializable {
     private String creditcurrencyid;
     private Double amount;
     private String notifyto;
-    private Integer notificationchannelid;
-    private BigDecimal transactionid;
+    private Integer notificationchannelid;    
     private String destinationname;
     private String destinationbank;
     private String description;

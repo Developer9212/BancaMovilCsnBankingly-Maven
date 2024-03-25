@@ -156,14 +156,18 @@ public abstract class FacadeCustomer<T> {
                                         String cuenta = String.format("%06d", clabe_folio.getAux_pk().getIdorigenp()) + "" + String.format("%05d", clabe_folio.getAux_pk().getIdproducto()) + "" + String.format("%08d", clabe_folio.getAux_pk().getIdauxiliar());
                                         Tablas tb_activar_registra_cuenta_persona_fisica = util.busquedaTabla(em, "bankingly_banca_movil", "activa_desactiva_registra_cuenta");
                                         if (Integer.parseInt(tb_activar_registra_cuenta_persona_fisica.getDato1()) == 1) {
+                                            System.out.println("Registrando persona fisica");
                                             JSONObject request = new JSONObject();
                                             request.put("productBankIdentifier", cuenta);
+                                            System.out.println("Peticion inserta persona fisica:"+request);
                                             Tablas tb_path = util.busquedaTabla(em, "bankingly_banca_movil", "registra_cuenta_spei");
+                                            System.out.println("Http endpoint:"+tb_path.getDato2());
                                             HttpConsumo consumo = new HttpConsumo(tb_path.getDato2(), request.toString());
                                            String respuesta_consumo = consumo.consumo();
                                             JSONObject respuesta_registra_orden = new JSONObject(respuesta_consumo);
                                             bandera = true;
-                                            //System.out.println("Respuesta registra orden:" + respuesta_registra_orden);
+                                            
+                                           System.out.println("Respuesta registra persona fisica:" + respuesta_registra_orden);
                                         } else {
                                             bandera = true;
                                         }
