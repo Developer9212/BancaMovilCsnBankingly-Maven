@@ -91,10 +91,10 @@ public class TarjetaDeDebito {
         System.out.println("Buscando el saldo para la tarjeta:"+tarjeta.getIdtarjeta());
         try {           
             if (tarjeta.getActiva()) { 
-               /* response.setAvailableAmount(200000);                     
+            /*    response.setAvailableAmount(200000);                     
                 response.setCode(1);
-                response.setDescription("activa");*/
-            
+                response.setDescription("activa");
+          */  
           response = conexionSiscoop().getSiscoop().getBalanceQuery(tarjeta.getIdtarjeta());
             } else {
                 response.setDescription("La tarjeta esta inactiva: " + tarjeta.getIdtarjeta());

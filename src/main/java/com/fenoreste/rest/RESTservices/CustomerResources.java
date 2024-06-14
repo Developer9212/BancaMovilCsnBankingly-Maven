@@ -68,6 +68,8 @@ public class CustomerResources {
         String UserName = JsonRequest_.getString("userName");
         CustomerDAO metodos = new CustomerDAO();
         
+        System.out.println("Cadena peticion busqueda personas:"+cadenaJson);
+        
         String mensaje_error="";
         if (!metodos.actividad_horario()) {
             JsonError_.put("ERROR", "VERIFIQUE SU HORARIO DE ACTIVIDAD FECHA,HORA O CONTACTE A SU PROVEEDOR");
@@ -77,7 +79,7 @@ public class CustomerResources {
             Persona persona = null;
             try {
                 //Buscamos a la persona con los datos que se esta enviando
-                persona = metodos.BuscarPersona(ClientType, DocumentId, Name, LastName, Mail,CellPhone);
+                persona = metodos.BuscarPersona(ClientType, DocumentId, Name, LastName, Mail,CellPhone,Phone);
                 
             } catch (Exception e) {
                 mensaje_error="Persona no existe";

@@ -197,7 +197,7 @@ public abstract class FacadeTerceros<T> {
                         email = tercero.getBeneficiaryemail();
                     } catch (Exception ex) {
                         bandera = false;
-                        System.out.println("Error al buscar el tercero en el archivo bakingly:" + ex.getMessage());
+                        System.out.println("Error al buscar el tercero en el archivo bankingly:" + ex.getMessage());
                     }
 
                     if (!email.equals("")) {
@@ -228,7 +228,7 @@ public abstract class FacadeTerceros<T> {
                     dto.setCorrespondentBank(corresponsalBank);
 
                     //Vamos a guardar el producto tercero para saber la fecha en la que se dio de alta
-                    //insertarTerceroActivado(productNumber, bandera,username );
+                    insertarTerceroActivado(productNumber, bandera,username );
                 }
             }
 

@@ -29,7 +29,7 @@ import com.fenoreste.rest.entidades.Tablas;
 import com.fenoreste.rest.entidades.TablasPK;
 import com.fenoreste.rest.entidades.TerceroActivacion;
 import com.fenoreste.rest.entidades.TerceroActivacionPK;
-import com.fenoreste.rest.entidades.Transferencias;
+import com.fenoreste.rest.entidades.Transferencia;
 import com.fenoreste.rest.entidades.WsSiscoopFoliosTarjetas1;
 import com.fenoreste.rest.entidades.WsSiscoopFoliosTarjetasPK1;
 import com.itextpdf.html2pdf.ConverterProperties;
@@ -192,7 +192,7 @@ public abstract class FacadeTransaction<T> {
 
         try {
             if (backendResponse.getBackendMessage().toUpperCase().contains("EXITO")) {
-                Transferencias transaction = new Transferencias();
+                Transferencia transaction = new Transferencia();
                 //Si la valicadion se realizo de manera corracta preparo una tabla ttabla historial
                 transaction.setTransactionid(new BigDecimal(transactionOWN.getTransactionId()));
                 transaction.setSubtransactiontypeid(transactionOWN.getSubTransactionTypeId());
@@ -533,12 +533,14 @@ public abstract class FacadeTransaction<T> {
                                     //Verifico que el producto destino sea un prestamo 
                                     if (prDestino.getTipoproducto() == 2) {
                                         //Busco el tipo el tipo de amortizacion
+                                        System.out.println("tipooooooooooooooooooooooooooooooooooooooooooooo");
                                         if (aDestino.getTipoamortizacion() == 5) {
                                             //Entra si es hipotecario
+                                            System.out.println("DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD");
                                             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
                                             String fechaactivacionDestino = sdf.format(aDestino.getFechaactivacion()).substring(0, 10);
                                             String fechaBase = fechaTr_.substring(0, 10);
-                                            System.out.println("FechaActivacion Modificado :" +fechaactivacionDestino.replace("\\/", "-") + ",fechaBase:" + fechaBase);
+                                            System.out.println("FechaActivacion Modificado:" +fechaactivacionDestino.replace("\\/", "-") + ",fechaBase:" + fechaBase);
                                             String si_se_puede_aplicar = "select sai_bankingly_limite_adelanto (" + aDestino.getAuxiliaresPK().getIdorigenp() + ","
                                                     + "" + aDestino.getAuxiliaresPK().getIdproducto() + ","
                                                     + "" + aDestino.getAuxiliaresPK().getIdauxiliar() + ","
@@ -546,9 +548,9 @@ public abstract class FacadeTransaction<T> {
                                                     + transaction.getAmount() + ",NULL)";
                                             Query query_se_puede_aplicar = em.createNativeQuery(si_se_puede_aplicar);
                                             Double se_puede_pagar = Double.parseDouble(String.valueOf(query_se_puede_aplicar.getSingleResult()));
-                                            
-                                            System.out.println("FechaActivacion Modificando:"+fechaactivacionDestino.replace("\\/", "-")+", FechaBase:"+fechaBase);
-                                            if (!fechaactivacionDestino.replace("\\/","-").equals(fechaBase)) {
+                                            System.out.println("Fecha Activacion base:"+fechaactivacionDestino+",Fecha origenes Base:"+fechaBase);
+                                            System.out.println("FechaActivacion Modificando:"+fechaactivacionDestino.replace("-", "/")+", FechaBase:"+fechaBase.replace("-","/"));
+                                            if (!fechaactivacionDestino.replace("-","/").equals(fechaBase.replace("-", "/"))) {
                                                 System.out.println("Accedio porque la fecha activacion es diferente a la fechaTrabajo");
                                                 if (se_puede_pagar > 0) {
                                                     //Datos a procesar
@@ -674,14 +676,8 @@ public abstract class FacadeTransaction<T> {
                                     //Busco el tipo el tipo de amortizacion
 
                                     if (aDestino.getTipoamortizacion() == 5) {
-                                        //Datos a procesar
-                                        try {
-                                            consulta_datos_procesar = "SELECT sai_bankingly_aplica_transaccion('" + fechaTr_.substring(0, 10) + "'," + procesaOrigen.getIdusuario() + ",'" + procesaOrigen.getSesion() + "','" + procesaOrigen.getReferencia() + "')";
-                                            procesa_movimiento = em.createNativeQuery(consulta_datos_procesar);
-                                            total_procesados = Integer.parseInt(String.valueOf(procesa_movimiento.getSingleResult()));
-                                        } catch (Exception e) {
-                                            total_procesados = 0;
-                                        }
+                                       
+                                        
                                         SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
                                         String fechaactivacionDestino = sdf.format(aDestino.getFechaactivacion()).substring(0, 10);
                                         String fechaBase = fechaTr_.substring(0, 10);
@@ -692,10 +688,22 @@ public abstract class FacadeTransaction<T> {
                                                 + transaction.getAmount() + ",NULL)";
                                         Query query_se_puede_aplicar = em.createNativeQuery(si_se_puede_aplicar);
                                         Double se_puede_pagar = Double.parseDouble(String.valueOf(query_se_puede_aplicar.getSingleResult()));
-
+                                        System.out.println("Fecha Activacion base:"+fechaactivacionDestino+",Fecha origenes Base:"+fechaBase);
+                                        System.out.println("FechaActivacion Modificando:"+fechaactivacionDestino.replace("-", "/")+", FechaBase:"+fechaBase.replace("-","/"));
+                                       
                                         if (se_puede_pagar > 0) {
                                             System.out.println("Fecha activacion Modificando :"+fechaactivacionDestino.replace("\\/","-") +" ,FechaBase:"+fechaBase);
-                                            if (!fechaactivacionDestino.replace("\\/","-").equals(fechaBase)) {
+                                            if (!fechaactivacionDestino.replace("-","/").equals(fechaBase.replace("-", "/"))) {
+                                                
+                                                 //Datos a procesar
+                                        try {
+                                            consulta_datos_procesar = "SELECT sai_bankingly_aplica_transaccion('" + fechaTr_.substring(0, 10) + "'," + procesaOrigen.getIdusuario() + ",'" + procesaOrigen.getSesion() + "','" + procesaOrigen.getReferencia() + "')";
+                                            procesa_movimiento = em.createNativeQuery(consulta_datos_procesar);
+                                            total_procesados = Integer.parseInt(String.valueOf(procesa_movimiento.getSingleResult()));
+                                        } catch (Exception e) {
+                                            total_procesados = 0;
+                                        }
+                                        
                                                 if (total_procesados > 0) {
                                                     if (procesaOrigen.getMonto() > se_puede_pagar) {
                                                         double totalDevolver = procesaOrigen.getMonto() - se_puede_pagar;

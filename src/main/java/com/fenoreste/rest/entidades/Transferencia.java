@@ -12,6 +12,8 @@ import javax.persistence.Cacheable;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 /**
  *
@@ -20,7 +22,7 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "transferencias_bankingly")
 @Cacheable(false)
-public class Transferencias implements Serializable {
+public class Transferencia implements Serializable {
 
     private static final long serialVersionUID = 1L;
     @Id
@@ -52,6 +54,7 @@ public class Transferencias implements Serializable {
     private Double transactioncost;
     private String transactioncostcurrencyid;
     private Double exchangerate;
+     @Temporal(TemporalType.TIMESTAMP)
     private Date fechaejecucion;
     private String destinationdocumentid_documentnumber;
     private String destinationdocumentid_documenttype;
@@ -64,7 +67,7 @@ public class Transferencias implements Serializable {
     private String poliza;
     private Integer idorden;
     
-    public Transferencias() {
+    public Transferencia() {
     }
 
     public Integer getSubtransactiontypeid() {
@@ -378,6 +381,11 @@ public class Transferencias implements Serializable {
 
     public void setLocation(String location) {
         this.location = location;
+    }
+
+    @Override
+    public String toString() {
+        return "Transferencia{" + "transactionid=" + transactionid + ", subtransactiontypeid=" + subtransactiontypeid + ", currencyid=" + currencyid + ", valuedate=" + valuedate + ", transactiontypeid=" + transactiontypeid + ", transactionstatusid=" + transactionstatusid + ", clientbankidentifier=" + clientbankidentifier + ", debitproductbankidentifier=" + debitproductbankidentifier + ", debitproducttypeid=" + debitproducttypeid + ", debitcurrencyid=" + debitcurrencyid + ", creditproductbankidentifier=" + creditproductbankidentifier + ", creditproducttypeid=" + creditproducttypeid + ", creditcurrencyid=" + creditcurrencyid + ", amount=" + amount + ", notifyto=" + notifyto + ", notificationchannelid=" + notificationchannelid + ", destinationname=" + destinationname + ", destinationbank=" + destinationbank + ", description=" + description + ", bankroutingnumber=" + bankroutingnumber + ", sourcename=" + sourcename + ", sourcebank=" + sourcebank + ", regulationamountexceeded=" + regulationamountexceeded + ", sourcefunds=" + sourcefunds + ", destinationfunds=" + destinationfunds + ", transactioncost=" + transactioncost + ", transactioncostcurrencyid=" + transactioncostcurrencyid + ", exchangerate=" + exchangerate + ", fechaejecucion=" + fechaejecucion + ", destinationdocumentid_documentnumber=" + destinationdocumentid_documentnumber + ", destinationdocumentid_documenttype=" + destinationdocumentid_documenttype + ", sourcedocumentid_documentnumber=" + sourcedocumentid_documentnumber + ", sourcedocumentid_documenttype=" + sourcedocumentid_documenttype + ", userdocumentid_documentnumber=" + userdocumentid_documentnumber + ", userdocumentid_documenttype=" + userdocumentid_documenttype + ", ip=" + ip + ", location=" + location + ", poliza=" + poliza + ", idorden=" + idorden + '}';
     }
 
 }

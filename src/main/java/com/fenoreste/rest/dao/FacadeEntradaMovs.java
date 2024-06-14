@@ -13,6 +13,7 @@ import com.fenoreste.rest.Util.UtilidadesGenerales;
 import com.fenoreste.rest.entidades.Auxiliares;
 import com.fenoreste.rest.entidades.AuxiliaresPK;
 import com.fenoreste.rest.entidades.MovimientoEntrada;
+import com.fenoreste.rest.entidades.Transferencia;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
@@ -29,49 +30,20 @@ public abstract class FacadeEntradaMovs<T> {
 
     }
 
-    public boolean guardar(MovimientoEntrada mov) {
-        boolean bandera = false;
+   
+
+    public Transferencia buscarUltimoMovimiento(String ogs) {
+        Transferencia movimiento = new Transferencia();
+        System.out.println("Ogs:"+ogs);
         try {
             EntityManager em = AbstractFacade.conexion();
-            em.getTransaction().begin();
-            em.persist(mov);
-            em.getTransaction().commit();
-            em.clear();
-            em.close();
-            bandera = true;
-        } catch (Exception e) {
-            System.out.println("Error al persistir el movimiento:" + e.getMessage());
-        }
-        return bandera;
-    }
-
-    public MovimientoEntrada buscarUltimoMovimiento(MovimientoEntrada mov) {
-        MovimientoEntrada movimiento = new MovimientoEntrada();
-        try {
-            EntityManager em = AbstractFacade.conexion();
-            String sql = "SELECT * FROM movimientos_entrada_bankingly WHERE clientbankidentifier='" + mov.getClientbankidentifier() + "' ORDER BY valuedate DESC LIMIT 1";
-            Query query = em.createNativeQuery(sql, MovimientoEntrada.class);
-            movimiento = (MovimientoEntrada) query.getSingleResult();
-
+            String sql = "SELECT * FROM transferencias_bankingly WHERE clientbankidentifier='" + ogs + "' ORDER BY fechaejecucion DESC LIMIT 1";
+            Query query = em.createNativeQuery(sql, Transferencia.class);
+            movimiento = (Transferencia) query.getSingleResult();
+            System.out.println("Ultimo Movimiento recuperado:"+movimiento);
         } catch (Exception e) {
             System.out.println("Error al buscar movimiento:" + e.getMessage());
         }
         return movimiento;
-    }
-
-    public boolean buscarPorId(MovimientoEntrada mov) {
-        boolean bandera = false;
-        try {
-            EntityManager em = AbstractFacade.conexion();
-            //Primero buscamos registro por ID 
-            MovimientoEntrada movimiento = em.find(MovimientoEntrada.class, mov.getTransactionid());
-            if (movimiento != null) {
-                System.out.println("Ya existe el movimiento con el id:" + mov.getTransactionid());
-                bandera = true;
-            }
-        } catch (Exception e) {
-            System.out.println("Error al buscar movimiento por id:" + e.getMessage());
-        }
-        return bandera;
     }
 }

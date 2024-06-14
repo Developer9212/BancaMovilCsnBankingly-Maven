@@ -17,6 +17,7 @@ import com.fenoreste.rest.entidades.MovimientoEntrada;
 import com.fenoreste.rest.entidades.Tablas;
 import com.fenoreste.rest.entidades.TablasPK;
 import com.fenoreste.rest.entidades.TerceroActivacion;
+import com.fenoreste.rest.entidades.Transferencia;
 import com.github.cliftonlabs.json_simple.JsonObject;
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -173,16 +174,15 @@ public class TransactionResources {
 
                 //Vamos a buscar la transaccion con el id
                 boolean bandera = false;
-                boolean existeMov = daoMovs.buscarPorId(mov);
-                if (!existeMov) {
-                    MovimientoEntrada modeloEntidad = daoMovs.buscarUltimoMovimiento(mov);
+                
+               
+                    Transferencia transferencia = daoMovs.buscarUltimoMovimiento(dto.getClientBankIdentifier());
                     //daoMovs.guardar(mov);
-                    if (modeloEntidad.getTransactionid() != null) {
+                    if (transferencia.getTransactionid() != null) {
                         //convertimos la fecha 
-                        System.out.println("No existe id transaccion.......");
-                        Date hoy = fechaParser(dto.getValueDate());
-                        if (modeloEntidad.getValuedate().toGMTString().substring(0, 11).equals(hoy.toGMTString().substring(0, 11))) {
-                            System.out.println("Transaccion en la misma fecha");
+                        Date hoy = new Date();//fechaParser(dto.getValueDate());
+                        if (transferencia.getFechaejecucion().toGMTString().substring(0, 11).equals(hoy.toGMTString().substring(0, 11))) {
+                            System.out.println("Transaccion en la misma fecha mov.:" + transferencia.getFechaejecucion().toGMTString().substring(0, 11) + ",hoy:" + hoy.toGMTString().substring(0, 11));
                             TimeUnit timeHora = TimeUnit.HOURS;
                             TimeUnit timeMinutos = TimeUnit.MINUTES;
                             TimeUnit timeSegundos = TimeUnit.SECONDS;
@@ -190,33 +190,30 @@ public class TransactionResources {
                             long differenceHour = 0;
                             long differenceMinutos = 0;
                             long differenceSegundos = 0;
-                            diff = hoy.getTime() - modeloEntidad.getValuedate().getTime();
-                            differenceHour = timeHora.convert(diff, TimeUnit.MILLISECONDS);
+                            System.out.println("Hora actual:" + hoy);
+                            System.out.println("Hora ultimo mov:"+ transferencia.getFechaejecucion());
+                            diff = hoy.getTime() - transferencia.getFechaejecucion().getTime();
+                            differenceHour = timeHora.convert(diff, TimeUnit.MILLISECONDS);                            
                             differenceMinutos = timeMinutos.convert(diff, TimeUnit.MILLISECONDS);
                             differenceSegundos = timeSegundos.convert(diff, TimeUnit.MILLISECONDS);
                             System.out.println("total hora:" + differenceHour + ",Total Minuto:" + differenceMinutos + ",total segundos:" + differenceSegundos + " de la ultima transaccion...");
-                            if (differenceHour == 0 && differenceMinutos == 0 && differenceSegundos >= 2) {
+                            if (differenceHour > 0 || differenceMinutos > 0 || differenceSegundos > 4) {
                                 System.out.println("Ya pasaron 2 o mas segundos de tu ultima transaccion.....");
-                                daoMovs.guardar(mov);
                                 bandera = true;
                             } else {
-                                System.out.println("Error tu ultima transaccion fue hace 2 segundos");
+                                System.out.println("Error tu ultima transaccion fue hace 4 segundos");
                                 backendOperationResult.setBackendMessage("<HTML>Tienes una transaccion con menos de 2 segundos.</HTML>");
                             }
                         } else {
                             bandera = true;
-                            daoMovs.guardar(mov);
                         }
                     } else {
-                        System.out.println("No existe la transaccion la vamos a guardar.................");
-                        daoMovs.guardar(mov);
+                        System.out.println("Primera transferencia.................");
+                      
                         bandera = true;
                     }
-                } else {
-                    System.out.println("Este id:"+dto.getTransactionId() +" ya existe en el core.....");
-                    backendOperationResult.setBackendMessage("<HTML>EL IDENTIFICADOR DE TRANSACCION YA ESTA REGISTRADO </HTML> ");
-                }
                 
+
                 if (bandera) {
                     //Si subtransactionType es 1 y transactionType es 1: El tipo de transaccion es es entre mis cuentas
                     if (dto.getSubTransactionTypeId() == 1 && dto.getTransactionTypeId() == 1) {

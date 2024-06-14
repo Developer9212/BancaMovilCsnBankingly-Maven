@@ -6,14 +6,15 @@
 package com.fenoreste.rest.dao;
 
 import com.fenoreste.rest.entidades.MovimientoEntrada;
+import com.fenoreste.rest.entidades.Transferencia;
 
 /**
  *
  * @author wilmer
  */
-public class EntradaMovsDAO extends FacadeEntradaMovs<MovimientoEntrada>{
+public class EntradaMovsDAO extends FacadeEntradaMovs<Transferencia>{
 	 
     public EntradaMovsDAO() {
-		    super(MovimientoEntrada.class);		  
+		    super(Transferencia.class);		  
      } 
 }

@@ -62,7 +62,7 @@ public abstract class FacadeCustomer<T> {
     }
 
     //Metodo para saber si la personas realmente existe en la base de datos
-    public Persona BuscarPersona(int clientType, String documentId, String Name, String LastName, String Mail, String CellPhone) throws UnsupportedEncodingException, IOException {
+    public Persona BuscarPersona(int clientType, String documentId, String Name, String LastName, String Mail, String CellPhone,String Phone) throws UnsupportedEncodingException, IOException {
         EntityManager em = AbstractFacade.conexion();//emf.createEntityManager()EntityManager em = emf.createEntityManager();        EntityManager em = emf.createEntityManager();
         String IdentClientType = "";
         /*Identificamos el tipo de cliente si es 
@@ -87,7 +87,8 @@ public abstract class FacadeCustomer<T> {
                 + " AND UPPER(REPLACE(p.nombre,' ',''))='" + valida_caracteres_speciales(Name.toUpperCase().replace(" ", "").trim()).toUpperCase() + "'"
                 + " AND UPPER(replace(appaterno,' ',''))||''||UPPER(replace(p.apmaterno,' ','')) LIKE ('%" + valida_caracteres_speciales(LastName.toUpperCase().trim()).replace(" ", "").toUpperCase() + "%')"
                 + " AND (CASE WHEN email IS NULL THEN '' ELSE trim(upper(email)) END)='" + Mail.toUpperCase().trim() + "'"
-                + " AND (CASE WHEN celular IS NULL THEN '' ELSE trim(celular) END)='" + CellPhone.trim() + "' AND idgrupo=10 LIMIT 1";
+                + " AND (CASE WHEN celular IS NULL THEN '' ELSE trim(celular) END)='" + CellPhone.trim() + "'"
+                + " AND (CASE WHEN telefono IS NULL THEN '' ELSE trim(telefono) END)='" + Phone + "' AND idgrupo=10 LIMIT 1";
         System.out.println("Consulta para busqueda de personas :" + consulta);
 
         try {   //Se deberia buscar por telefono,celular,email pero Mitras solicito que solo sea x curp y nombre esta en prueba            
