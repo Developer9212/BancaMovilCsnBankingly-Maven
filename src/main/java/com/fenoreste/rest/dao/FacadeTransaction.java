@@ -494,7 +494,7 @@ public abstract class FacadeTransaction<T> {
                                                     total_procesados = Integer.parseInt(String.valueOf(procesa_movimiento.getSingleResult()));
                                                 } catch (Exception e) {
                                                     total_procesados = 0;
-                                                    System.out.println("La funcion saicoop no pudo distribuir el capital");
+                                                    System.out.println("La funcion saicoop no pudo distribuir el capital2");
                                                 }
                                                 finish = true;
 
@@ -551,7 +551,7 @@ public abstract class FacadeTransaction<T> {
                                             System.out.println("Fecha Activacion base:"+fechaactivacionDestino+",Fecha origenes Base:"+fechaBase);
                                             System.out.println("FechaActivacion Modificando:"+fechaactivacionDestino.replace("-", "/")+", FechaBase:"+fechaBase.replace("-","/"));
                                             if (!fechaactivacionDestino.replace("-","/").equals(fechaBase.replace("-", "/"))) {
-                                                System.out.println("Accedio porque la fecha activacion es diferente a la fechaTrabajo");
+                                                System.out.println("Accedio porque la fecha activacion es diferente a la fechaTrabajo1");
                                                 if (se_puede_pagar > 0) {
                                                     //Datos a procesar
                                                     try {
@@ -562,7 +562,7 @@ public abstract class FacadeTransaction<T> {
                                                         System.out.println("Total procesados:" + total_procesados);
                                                     } catch (Exception e) {
                                                         total_procesados = 0;
-                                                        System.out.println("La funcion saicoop no pudo distribuir el capital:" + e.getMessage());
+                                                        System.out.println("La funcion saicoop no pudo distribuir el capital3:" + e.getMessage());
                                                     }
 
                                                     if (total_procesados > 0) {
@@ -647,7 +647,7 @@ public abstract class FacadeTransaction<T> {
                                                 total_procesados = Integer.parseInt(String.valueOf(procesa_movimiento.getSingleResult()));
                                             } catch (Exception e) {
                                                 total_procesados = 0;
-                                                System.out.println("La funcion saicoop no pudo distribuir el capital");
+                                                System.out.println("La funcion saicoop no pudo distribuir el capital1");
                                             }
 
                                             if (total_procesados > 0) {

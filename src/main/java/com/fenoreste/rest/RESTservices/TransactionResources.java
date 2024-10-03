@@ -150,7 +150,7 @@ public class TransactionResources {
                 Si el request que nos llego es el correcto procedemos
           ======================================================================*/
         try {
-            if (!dao.actividad_horario()) {
+             if (!dao.actividad_horario()) {
                 backendOperationResult.setBackendMessage("<html><body><b>VERIFIQUE SU HORARIO DE ACTIVIDAD FECHA,HORA O CONTACTE A SU PROVEEEDOR</b></body></html>");
             } else {
                 System.out.println("Accediendo a trasnferencias con subTransactionType=" + dto.getSubTransactionTypeId() + ",TransactionId:" + dto.getTransactionTypeId());
@@ -220,7 +220,7 @@ public class TransactionResources {
                         backendOperationResult = dao.transferencias(dto, 1, null);
                     }
 
-                    //Si subtransactionType es 2 y transactionType es 1: El tipo de transaccion es a terceros
+                    //Si subtransactionType es 2 y transactionType es 1: El tipo de transaccion es a terceros  dentro de la entidad
                     if (dto.getSubTransactionTypeId() == 2 && dto.getTransactionTypeId() == 1) {
                         //Descomentar cuando se le de su gana 
                         String mensaje = validarTerceroOperar(dto.getCreditProductBankIdentifier(), dto.getUsername());
@@ -234,7 +234,7 @@ public class TransactionResources {
                     if (dto.getSubTransactionTypeId() == 9 && dto.getTransactionTypeId() == 6) {
                         backendOperationResult = dao.transferencias(dto, 3, null);
                     }
-                    //Si es un pago a prestamo tercero
+                    //Si es un pago a prestamo tercero 
                     if (dto.getSubTransactionTypeId() == 10 && dto.getTransactionTypeId() == 6) {
                         String mensaje = validarTerceroOperar(dto.getCreditProductBankIdentifier(), dto.getUsername());
                         //  if (mensaje.toUpperCase().contains("EXITOSO")) {
@@ -265,7 +265,7 @@ public class TransactionResources {
 
                     }
                 }
-            }
+            }  
             response_json_3.put("integrationProperties", null);
             response_json_3.put("backendCode", backendOperationResult.getBackendCode());
             response_json_3.put("backendMessage", backendOperationResult.getBackendMessage());

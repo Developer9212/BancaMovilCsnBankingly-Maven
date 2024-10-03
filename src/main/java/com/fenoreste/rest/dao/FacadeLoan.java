@@ -30,6 +30,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
+import java.util.TimeZone;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
@@ -718,6 +719,20 @@ public abstract class FacadeLoan<T> {
             em.close();
         }
         return bandera_;
+    }
+    
+    public static void main(String[] args) {
+         TimeZone.setDefault(TimeZone.getTimeZone("America/Mexico_City"));
+        EntityManager em = AbstractFacade.conexion();
+       
+            String sql = "SELECT date(fechatrabajo) from origenes limit 1";
+            
+               Query querys = em.createNativeQuery(sql);
+                String r = querys.getSingleResult().toString();
+                
+                System.out.println("RRRR:"+r);
+                System.out.println("Date:"+new Date());
+        
     }
 
 }

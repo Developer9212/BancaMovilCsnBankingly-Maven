@@ -107,14 +107,14 @@ public class UtilidadesGenerales {
             }
              
             Tablas tb_sopar = busquedaTabla(em, "bankingly_banca_movil", "sopar");
-            String consulta_sopar = "SELECT count(*) FROM sopar WHERE idorigen=" + idorigen + " AND idgrupo=" + idgrupo + " AND idsocio=" + idsocio + " AND tipo='" + tb_sopar.getDato2() + "'";
+            String consulta_sopar = "SELECT CASE WHEN count(*) > 0 THEN count(*) ELSE 0 END FROM sopar WHERE idorigen=" + idorigen + " AND idgrupo=" + idgrupo + " AND idsocio=" + idsocio + " AND tipo='" + tb_sopar.getDato2() + "'";
             Query query_sopar = em.createNativeQuery(consulta_sopar);
             int count_sopar = Integer.parseInt(String.valueOf(query_sopar.getSingleResult()));
             if(count_sopar>0){
                 bandera_sopar=true;
             }
         } catch (Exception e) {
-            System.out.println("Error al generar validacione en tabla sopar:"+e.getMessage());
+            System.out.println("Error al generar validaciones en tabla sopar:"+e.getMessage());
         }
         em.close();
         return bandera_sopar;
