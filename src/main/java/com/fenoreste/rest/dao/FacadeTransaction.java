@@ -1972,6 +1972,10 @@ public abstract class FacadeTransaction<T> {
             request.put("beneficiario", orden.getNombreBeneficiario());
             request.put("rfcCurpBeneficiario", orden.getRfcCurpBeneficiario());
             request.put("cuentaBeneficiario", orden.getCuentaBeneficiario());
+            request.put("latitud", orden.getLatitud());
+            request.put("longitud",orden.getLongitud());
+            
+            
 
             //Busco la tabla para el proyecto SPEI 
             TablasPK urlTablaPK = new TablasPK("bankingly_banca_movil", "speipath");

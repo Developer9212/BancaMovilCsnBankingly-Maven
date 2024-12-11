@@ -259,6 +259,9 @@ public class TransactionResources {
                             ordenReque.setNombreBeneficiario(dto.getDestinationName());
                             ordenReque.setRfcCurpBeneficiario(dto.getDestinationDocumentId().getDocumentNumber());
                             ordenReque.setOrdernante(dto.getClientBankIdentifier());
+                            String[] location = dto.getLocation().split(",");
+                            ordenReque.setLongitud(location[1]);
+                            ordenReque.setLatitud(location[0]);
 
                             backendOperationResult = dao.transferencias(dto, 5, ordenReque);
                         }

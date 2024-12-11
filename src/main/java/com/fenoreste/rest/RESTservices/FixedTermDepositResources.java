@@ -5,6 +5,7 @@
  */
 package com.fenoreste.rest.RESTservices;
 
+import com.fenoreste.rest.Request.FixedTermMethodPaymentDTO;
 import com.fenoreste.rest.ResponseDTO.DetallesInversionDTO;
 import com.fenoreste.rest.dao.FixedTermDepositDAO;
 import javax.ws.rs.GET;
@@ -14,6 +15,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import com.github.cliftonlabs.json_simple.JsonObject;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.POST;
 
 /**
  *
@@ -50,5 +53,39 @@ public class FixedTermDepositResources {
             return Response.status(Response.Status.BAD_REQUEST).entity(Json_De_Error).build();
         }
     }
+    
+    
+    @POST
+    @Path("/depositTermMethodsPayment")
+    @Produces({MediaType.APPLICATION_JSON + ";charset=utf-8"})
+    @Consumes({MediaType.APPLICATION_JSON + ";charset=utf-8"})
+    public Response methodPayment(FixedTermMethodPaymentDTO request) {
+
+        FixedTermDepositDAO metodos = new FixedTermDepositDAO();
+        JsonObject Json_De_Error = new JsonObject();
+        
+        if (!metodos.actividad_horario()) {
+            Json_De_Error.put("ERROR", "VERIFIQUE SU HORARIO DE ACTIVIDAD FECHA,HORA O CONTACTE A SU PROVEEEDOR");
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Json_De_Error).build();
+        }
+   return null;
+        
+        /*
+        
+        try {
+            info_cuenta = metodos.getDetallesInversion(accountId);
+            if (info_cuenta != null) {
+                return Response.status(Response.Status.OK).entity(info_cuenta).build();
+            } else {
+                Json_De_Error.put("Error", "ERROR PRODUCTO NO ENCONTRADO");
+                return Response.status(Response.Status.BAD_REQUEST).entity(Json_De_Error).build();
+            }
+        } catch (Exception e) {
+            return Response.status(Response.Status.BAD_REQUEST).entity(Json_De_Error).build();
+        }*/
+    }
+    
+    
+    
 
 }

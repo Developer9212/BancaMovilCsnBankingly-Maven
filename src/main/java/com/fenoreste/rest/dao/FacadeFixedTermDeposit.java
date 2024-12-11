@@ -6,10 +6,12 @@
 package com.fenoreste.rest.dao;
 
 import com.fenoreste.rest.DTO.OpaDTO;
+import com.fenoreste.rest.Request.FixedTermMethodPaymentDTO;
 import com.fenoreste.rest.ResponseDTO.CatalogFixedTermDepositDTO;
 import com.fenoreste.rest.ResponseDTO.DetallesInversionDTO;
 import com.fenoreste.rest.ResponseDTO.DocumentId;
 import com.fenoreste.rest.ResponseDTO.FixedTermDepositBeneficiaryDTO;
+import com.fenoreste.rest.ResponseDTO.FixedTermMethodPaymentResponseDTO;
 import com.fenoreste.rest.Util.AbstractFacade;
 import com.fenoreste.rest.Util.Utilidades;
 import com.fenoreste.rest.Util.UtilidadesGenerales;
@@ -107,6 +109,14 @@ public abstract class FacadeFixedTermDeposit<T> {
         }
 
         return fixedTermDeposit;
+    }
+    
+    
+    
+    public FixedTermMethodPaymentResponseDTO metodosPago(FixedTermMethodPaymentDTO peticion){
+        
+        return null;
+        
     }
 
     public String intervalo(Date fecha, int numeroDias) {

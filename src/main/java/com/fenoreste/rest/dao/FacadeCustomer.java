@@ -161,7 +161,9 @@ public abstract class FacadeCustomer<T> {
                                             JSONObject request = new JSONObject();
                                             request.put("productBankIdentifier", cuenta);
                                             System.out.println("Peticion inserta persona fisica:"+request);
+                                            
                                             Tablas tb_path = util.busquedaTabla(em, "bankingly_banca_movil", "registra_cuenta_spei");
+                                            
                                             System.out.println("Http endpoint:"+tb_path.getDato2());
                                             HttpConsumo consumo = new HttpConsumo(tb_path.getDato2(), request.toString());
                                            String respuesta_consumo = consumo.consumo();

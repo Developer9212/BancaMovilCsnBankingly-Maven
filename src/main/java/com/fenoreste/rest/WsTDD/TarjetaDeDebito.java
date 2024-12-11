@@ -54,7 +54,7 @@ public class TarjetaDeDebito {
     }
 
     public WsSiscoopFoliosTarjetas1 buscaTarjetaTDD(int idorigenp, int idproducto, int idauxiliar, EntityManager em) {
-        System.out.println("Buscando idtarjeta...");
+        System.out.println("Buscando idtarjeta:"+idorigenp+",idproducto:"+idproducto+","+idauxiliar);
         WsSiscoopFoliosTarjetasPK1 foliosPK1 = new WsSiscoopFoliosTarjetasPK1(idorigenp, idproducto, idauxiliar);
         WsSiscoopFoliosTarjetas1 wsSiscoopFoliosTarjetas = new WsSiscoopFoliosTarjetas1();
         try {

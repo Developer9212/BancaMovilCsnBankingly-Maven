@@ -18,11 +18,13 @@ public class RequestDataOrdenPagoDTO {
     String conceptoPago;
     String cuentaBeneficiario;
     String ordernante;
+    String longitud;
+    String latitud;
 
     public RequestDataOrdenPagoDTO() {
     }
 
-    public RequestDataOrdenPagoDTO(String clienteClabe, Double monto, String institucionContraparte, String nombreBeneficiario, String rfcCurpBeneficiario, String conceptoPago, String cuentaBeneficiario, String ordernante) {
+    public RequestDataOrdenPagoDTO(String clienteClabe, Double monto, String institucionContraparte, String nombreBeneficiario, String rfcCurpBeneficiario, String conceptoPago, String cuentaBeneficiario, String ordernante, String longitud, String latitud) {
         this.clienteClabe = clienteClabe;
         this.monto = monto;
         this.institucionContraparte = institucionContraparte;
@@ -31,6 +33,8 @@ public class RequestDataOrdenPagoDTO {
         this.conceptoPago = conceptoPago;
         this.cuentaBeneficiario = cuentaBeneficiario;
         this.ordernante = ordernante;
+        this.longitud = longitud;
+        this.latitud = latitud;
     }
 
     public String getClienteClabe() {
@@ -97,11 +101,27 @@ public class RequestDataOrdenPagoDTO {
         this.ordernante = ordernante;
     }
 
+    public String getLongitud() {
+        return longitud;
+    }
+
+    public void setLongitud(String longitud) {
+        this.longitud = longitud;
+    }
+
+    public String getLatitud() {
+        return latitud;
+    }
+
+    public void setLatitud(String latitud) {
+        this.latitud = latitud;
+    }
+
     @Override
     public String toString() {
-        return "RequestDataOrdenPagoDTO{" + "clienteClabe=" + clienteClabe + ", monto=" + monto + ", institucionContraparte=" + institucionContraparte + ", nombreBeneficiario=" + nombreBeneficiario + ", rfcCurpBeneficiario=" + rfcCurpBeneficiario + ", conceptoPago=" + conceptoPago + ", cuentaBeneficiario=" + cuentaBeneficiario + ", ordernante=" + ordernante + '}';
+        return "RequestDataOrdenPagoDTO{" + "clienteClabe=" + clienteClabe + ", monto=" + monto + ", institucionContraparte=" + institucionContraparte + ", nombreBeneficiario=" + nombreBeneficiario + ", rfcCurpBeneficiario=" + rfcCurpBeneficiario + ", conceptoPago=" + conceptoPago + ", cuentaBeneficiario=" + cuentaBeneficiario + ", ordernante=" + ordernante + ", longitud=" + longitud + ", latitud=" + latitud + '}';
     }
-    
+     
     
     
 }

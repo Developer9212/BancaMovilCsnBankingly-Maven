@@ -28,6 +28,7 @@ public class HttpConsumo{
     public String consumo() {
         String salida = "";
         try {
+            System.out.println("Json Request PFisica:"+jsonRequest);
             URL url_privada = new URL(url);
             //Se genera la conexion
             HttpURLConnection conn = (HttpURLConnection) url_privada.openConnection();
