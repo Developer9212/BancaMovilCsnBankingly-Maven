@@ -13,7 +13,7 @@ import com.fenoreste.rest.entidades.AuxiliaresD;
 import com.fenoreste.rest.entidades.Persona;
 import com.fenoreste.rest.entidades.PersonasPK;
 import com.fenoreste.rest.entidades.Productos;
-import com.fenoreste.rest.entidades.Tablas;
+import com.fenoreste.rest.entidades.Tabla;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import javax.persistence.EntityManager;
@@ -36,7 +36,7 @@ public class PreparaSMS {
         //consulto en tablas si existe la url del script de san nicolas para envio de mensajes
         try {
 
-            Tablas tablasUrlSMS = util.busquedaTabla(em, "bankingly_banca_movil", "liga_envio_mensajes");
+            Tabla tablasUrlSMS = util.busquedaTabla(em, "bankingly_banca_movil", "liga_envio_mensajes");
             OpaDTO opa_origen = util2.opa(debitAccount);
 
             OpaDTO opa_destino = null;
@@ -69,7 +69,7 @@ public class PreparaSMS {
                 OgsDTO ogs = util2.ogs(numeroSocio);
                 PersonasPK personaPK = new PersonasPK(ogs.getIdorigen(), ogs.getIdgrupo(), ogs.getIdsocio());
                 Persona p = em.find(Persona.class, personaPK);
-                Tablas tablaContenidoSMS = null;
+                Tabla tablaContenidoSMS = null;
                 String contenidoSMS = "";
                 String auth_origen = String.valueOf(ad_origen.getTransaccion());//ad_origen.getIdorigenc() + "" + ad_origen.getPeriodo() + "" + ad_origen.getIdtipo() + "" + ad_origen.getIdpoliza();
                 //Se identifica para transferencias a cuentas propias
@@ -128,12 +128,12 @@ public class PreparaSMS {
     }
 
     public String enviaSMSOrdenSpei(EntityManager em, String ogss, int idorden, String estado, String folio, String causaDevolucion) {
-        Tablas tablasUrlSMS = util.busquedaTabla(em, "bankingly_banca_movil", "liga_envio_mensajes");
+        Tabla tablasUrlSMS = util.busquedaTabla(em, "bankingly_banca_movil", "liga_envio_mensajes");
         OgsDTO ogs = util2.ogs(ogss);
         PersonasPK personaPK = new PersonasPK(ogs.getIdorigen(), ogs.getIdgrupo(), ogs.getIdsocio());
         Persona p = em.find(Persona.class, personaPK);
         System.out.println("Pago orden SPEI");
-        Tablas tablaContenidoSMS = util.busquedaTabla(em, "bankingly_banca_movil", "sms_actualizacion_estado_spei");
+        Tabla tablaContenidoSMS = util.busquedaTabla(em, "bankingly_banca_movil", "sms_actualizacion_estado_spei");
         System.out.println("tabla contenido sms:" + tablaContenidoSMS);
         String contenidoSMS = contenidoOrdenSPEI(tablaContenidoSMS.getDato2(), idorden, estado, folio, causaDevolucion);
         System.out.println("El contenido de tu mensaje es:" + contenidoSMS);
@@ -144,12 +144,12 @@ public class PreparaSMS {
     }
     
     public String enviaSMSNotificaEstadoCuenta(EntityManager em, String ogss, String cuenta,String estado,String observaciones) {
-        Tablas tablasUrlSMS = util.busquedaTabla(em, "bankingly_banca_movil", "liga_envio_mensajes");
+        Tabla tablasUrlSMS = util.busquedaTabla(em, "bankingly_banca_movil", "liga_envio_mensajes");
         OgsDTO ogs = util2.ogs(ogss);
         PersonasPK personaPK = new PersonasPK(ogs.getIdorigen(), ogs.getIdgrupo(), ogs.getIdsocio());
         Persona p = em.find(Persona.class, personaPK);
         System.out.println("Pago orden SPEI");
-        Tablas tablaContenidoSMS = util.busquedaTabla(em, "bankingly_banca_movil", "sms_notifica_creacion_cuenta");
+        Tabla tablaContenidoSMS = util.busquedaTabla(em, "bankingly_banca_movil", "sms_notifica_creacion_cuenta");
         System.out.println("tabla contenido sms:" + tablaContenidoSMS);
         String contenidoSMS = contenidoNotificaEstadoCuenta(tablaContenidoSMS.getDato2(), cuenta, estado,observaciones);
         System.out.println("El contenido de tu mensaje es:" + contenidoSMS);        
@@ -159,8 +159,8 @@ public class PreparaSMS {
     }
     
     public String enviarTokenAltaTerceros(EntityManager em,String numero,String token){         
-         Tablas tablasUrlSMS = util.busquedaTabla(em, "bankingly_banca_movil", "liga_envio_mensajes");
-         Tablas tb_contenido_sms_token = util.busquedaTabla(em,"bankingly_banca_movil","sms_token");
+         Tabla tablasUrlSMS = util.busquedaTabla(em, "bankingly_banca_movil", "liga_envio_mensajes");
+         Tabla tb_contenido_sms_token = util.busquedaTabla(em,"bankingly_banca_movil","sms_token");
          String contenido = tb_contenido_sms_token.getDato2().replace("@@token@@", token);
          String respuesta_sms = sendSMS.enviarSMS(tablasUrlSMS.getDato2(), numero,contenido);
          System.out.println("Respuesta :"+respuesta_sms);

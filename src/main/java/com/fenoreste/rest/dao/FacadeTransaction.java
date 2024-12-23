@@ -25,8 +25,8 @@ import com.fenoreste.rest.entidades.Polizas;
 import com.fenoreste.rest.entidades.Productos_bankingly;
 import com.fenoreste.rest.entidades.Procesa_pago_movimientos;
 import com.fenoreste.rest.entidades.Productos;
-import com.fenoreste.rest.entidades.Tablas;
-import com.fenoreste.rest.entidades.TablasPK;
+import com.fenoreste.rest.entidades.Tabla;
+import com.fenoreste.rest.entidades.TablaPK;
 import com.fenoreste.rest.entidades.TerceroActivacion;
 import com.fenoreste.rest.entidades.TerceroActivacionPK;
 import com.fenoreste.rest.entidades.Transferencia;
@@ -98,8 +98,8 @@ public abstract class FacadeTransaction<T> {
         banderaCSN = false;
         boolean banderaTDD = false;
 
-        Tablas tb_spei_cuenta = null;
-        Tablas tb_spei_cuenta_comisiones = null;
+        Tabla tb_spei_cuenta = null;
+        Tabla tb_spei_cuenta_comisiones = null;
         Double comisiones = 0.0;
         Double total_a_enviar = 0.0;
         String total_pagar_hipotecario = "";
@@ -269,8 +269,8 @@ public abstract class FacadeTransaction<T> {
                 String fechaTr_ = String.valueOf(fechaTrabajo_.getSingleResult());
 
                 //Buscamos el usuario para la banca movil para la tabla de datos a procesar y para las polizas
-                TablasPK idusuarioPK = new TablasPK("bankingly_banca_movil", "usuario_banca_movil");
-                Tablas tbUsuario_ = em.find(Tablas.class, idusuarioPK);
+                TablaPK idusuarioPK = new TablaPK("bankingly_banca_movil", "usuario_banca_movil");
+                Tabla tbUsuario_ = em.find(Tabla.class, idusuarioPK);
 
                 //Conviento a DateTime la fecha de trabajo
                 DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
@@ -290,11 +290,11 @@ public abstract class FacadeTransaction<T> {
                 //Si es un spei lo identifico porque aqui va a una cuenta contable
 
                 if (identificadorTransferencia == 5) {//tipo de orden SPEI
-                    Tablas tb_usuario_spei = util2.busquedaTabla(em, "bankingly_banca_movil", "usuario_spei");
+                    Tabla tb_usuario_spei = util2.busquedaTabla(em, "bankingly_banca_movil", "usuario_spei");
 
                     //Tablas pra cuenta del iva de comisiones spei
                     //Busco la cuenta spei en tablas solo para comisiones                    
-                    Tablas tb_spei_cuenta_comisiones_iva = util2.busquedaTabla(em, "bankingly_banca_movil", "cuenta_spei_comisiones_iva");
+                    Tabla tb_spei_cuenta_comisiones_iva = util2.busquedaTabla(em, "bankingly_banca_movil", "cuenta_spei_comisiones_iva");
 
                     Double iva_comisiones = Double.parseDouble(tb_spei_cuenta_comisiones.getDato2()) * 0.16;
 
@@ -870,12 +870,12 @@ public abstract class FacadeTransaction<T> {
                     if (util2.obtenerOrigen(em) == 30200) {
                         PreparaSMS envio_sms = new PreparaSMS();
                         //Verfico si esta activo el permitir enviar sms
-                        Tablas tb_sms_activo = util2.busquedaTabla(em, "bankingly_banca_movil", "smsactivo");
+                        Tabla tb_sms_activo = util2.busquedaTabla(em, "bankingly_banca_movil", "smsactivo");
                         System.out.println("Tablas sms:" + tb_sms_activo.getTablasPK());
 
                         if (Integer.parseInt(tb_sms_activo.getDato1()) == 1) {
                             //Obtengo el minimo para enviar el SMS
-                            Tablas tb_minimo_sms = util2.busquedaTabla(em, "bankingly_banca_movil", "monto_minimo_sms");
+                            Tabla tb_minimo_sms = util2.busquedaTabla(em, "bankingly_banca_movil", "monto_minimo_sms");
 
                             if (transaction.getAmount() >= Double.parseDouble(tb_minimo_sms.getDato1())) {
                                 if (identificadorTransferencia == 1) {
@@ -1020,7 +1020,7 @@ public abstract class FacadeTransaction<T> {
             if (bOrigen) {
                 Double saldo = Double.parseDouble(ctaOrigen.getSaldo().toString());
                 if (util2.obtenerOrigen(em) == 30200) {
-                    Tablas tablaProductoTDD = new TarjetaDeDebito().productoTddwebservice(em);
+                    Tabla tablaProductoTDD = new TarjetaDeDebito().productoTddwebservice(em);
                     if (ctaOrigen.getAuxiliaresPK().getIdproducto() == Integer.parseInt(tablaProductoTDD.getDato1())) {
                         //Si es la TDD               
                         WsSiscoopFoliosTarjetasPK1 foliosPK = new WsSiscoopFoliosTarjetasPK1(ctaOrigen.getAuxiliaresPK().getIdorigenp(), ctaOrigen.getAuxiliaresPK().getIdproducto(), ctaOrigen.getAuxiliaresPK().getIdauxiliar());
@@ -1083,10 +1083,10 @@ public abstract class FacadeTransaction<T> {
                                                     //Valido que la cuenta origen para CSN esat un grupo de retiro configurado
                                                     if (util2.obtenerOrigen(em) == 30200) {
                                                         //Buscamos que el producto origen pertenezca al grupo de retiro
-                                                        Tablas tb = util2.busquedaTabla(em, "bankingly_banca_movil", "grupo_retiro");
+                                                        Tabla tb = util2.busquedaTabla(em, "bankingly_banca_movil", "grupo_retiro");
                                                         if (ctaOrigen.getIdgrupo() == Integer.parseInt(tb.getDato1())) {
                                                             //Ahora verifico que el destino perteneneza al grupo de depositos
-                                                            Tablas tbRetiro = util2.busquedaTabla(em, "bankingly_banca_movil", "grupo_deposito");
+                                                            Tabla tbRetiro = util2.busquedaTabla(em, "bankingly_banca_movil", "grupo_deposito");
                                                             String cadena[] = tbRetiro.getDato1().split("\\|");
 
                                                             List list = Arrays.asList(cadena);
@@ -1097,7 +1097,7 @@ public abstract class FacadeTransaction<T> {
                                                             }
                                                             if (banderaGrupo) {
                                                                 //valido que el producto acepte depositos
-                                                                Tablas tbDeposito = util2.busquedaTabla(em, "bankingly_banca_movil", "productos_deposito");
+                                                                Tabla tbDeposito = util2.busquedaTabla(em, "bankingly_banca_movil", "productos_deposito");
                                                                 System.out.println("tabla Productos deposito:" + tbDeposito.getDato2());
                                                                 String productos_deposito[] = tbDeposito.getDato2().split("\\|");
 
@@ -1216,7 +1216,7 @@ public abstract class FacadeTransaction<T> {
                 System.out.println("Error al buscar producto origen:" + e.getMessage());
                 bOrigen = false;
             }
-            Tablas tablaProductoTDD = null;
+            Tabla tablaProductoTDD = null;
             if (bOrigen) {
                 Double saldo = Double.parseDouble(ctaOrigen.getSaldo().toString());
                 if (util2.obtenerOrigen(em) == 30200) {
@@ -1286,11 +1286,11 @@ public abstract class FacadeTransaction<T> {
                                                             message = message + " A TERCERO TDD ";
                                                         }
                                                         //Buscamos que el producto origen pertenezca al grupo de retiro
-                                                        Tablas tb = util2.busquedaTabla(em, "bankingly_banca_movil", "grupo_retiro");
+                                                        Tabla tb = util2.busquedaTabla(em, "bankingly_banca_movil", "grupo_retiro");
 
                                                         if (ctaOrigen.getIdgrupo() == Integer.parseInt(tb.getDato1())) {
                                                             //Ahora verifico que el destino perteneneza al grupo de depositos
-                                                            Tablas tbRetiro = util2.busquedaTabla(em, "bankingly_banca_movil", "grupo_deposito");
+                                                            Tabla tbRetiro = util2.busquedaTabla(em, "bankingly_banca_movil", "grupo_deposito");
                                                             String cadena[] = tbRetiro.getDato1().split("\\|");
                                                             List list = Arrays.asList(cadena);
                                                             int validado = 0;
@@ -1300,7 +1300,7 @@ public abstract class FacadeTransaction<T> {
                                                                 }
                                                             }
                                                             if (banderaGrupo) {
-                                                                Tablas tbDeposito = util2.busquedaTabla(em, "bankingly_banca_movil", "productos_deposito");
+                                                                Tabla tbDeposito = util2.busquedaTabla(em, "bankingly_banca_movil", "productos_deposito");
                                                                 String productos_deposito[] = tbDeposito.getDato2().split("\\|");
                                                                 List list_deposito = Arrays.asList(productos_deposito);
                                                                 for (int i = 0; i < list_deposito.size(); i++) {
@@ -1322,13 +1322,13 @@ public abstract class FacadeTransaction<T> {
                                                                 if (banderaProductosDeposito) {
                                                                     if (ctaDestino.getIdgrupo() == 20 || ctaDestino.getIdgrupo() == 25) {
                                                                         //Deposito en pesos mexicanos menores
-                                                                        Tablas tb_menores_permitido_diario = util2.busquedaTabla(em, "bankingly_banca_movil", "total_deposito_diario_menores");
+                                                                        Tabla tb_menores_permitido_diario = util2.busquedaTabla(em, "bankingly_banca_movil", "total_deposito_diario_menores");
                                                                         //Total en udis
-                                                                        Tablas tb_menores_udis_mensual = util2.busquedaTabla(em, "bankingly_banca_movil", "total_udis_mensual_menores");
+                                                                        Tabla tb_menores_udis_mensual = util2.busquedaTabla(em, "bankingly_banca_movil", "total_udis_mensual_menores");
                                                                         //Deposito en pesos mexicanos juveniles
-                                                                        Tablas tb_juveniles_permitido_diario = util2.busquedaTabla(em, "bankingly_banca_movil", "total_deposito_diario_juveniles");
+                                                                        Tabla tb_juveniles_permitido_diario = util2.busquedaTabla(em, "bankingly_banca_movil", "total_deposito_diario_juveniles");
                                                                         //Deposito en udis juveniles
-                                                                        Tablas tb_juveniles_udis_mensual = util2.busquedaTabla(em, "bankingly_banca_movil", "total_udis_mensual_juveniles");
+                                                                        Tabla tb_juveniles_udis_mensual = util2.busquedaTabla(em, "bankingly_banca_movil", "total_udis_mensual_juveniles");
 
                                                                         //Obtengo la fecha de trabajo
                                                                         Query query_fecha_trabajo = em.createNativeQuery("SELECT to_char(fechatrabajo,'yyyy/mm/dd') FROM origenes limit 1");
@@ -1336,7 +1336,7 @@ public abstract class FacadeTransaction<T> {
                                                                         String fecha_trabajo = String.valueOf(query_fecha_trabajo.getSingleResult());
 
                                                                         //tb_precio_udi en el periodo
-                                                                        Tablas tb_precio_udi_periodo = util2.busquedaTabla(em, "valor_udi", fecha_trabajo.substring(0, 7).replace("/", ""));
+                                                                        Tabla tb_precio_udi_periodo = util2.busquedaTabla(em, "valor_udi", fecha_trabajo.substring(0, 7).replace("/", ""));
 
                                                                         //Construyo la consulta para buscar el monto diario de un menor o juvenil
                                                                         String consulta_permitido_diario = "select (CASE WHEN sum(monto)>0 THEN sum(monto) else 0.0 END) from auxiliares_d"
@@ -1467,8 +1467,8 @@ public abstract class FacadeTransaction<T> {
                                                                         /*Query query_fecha_trabajo = em.createNativeQuery("SELECT to_char(fechatrabajo,'yyyy/mm/dd') FROM origenes limit 1");
 
                                                                         String fecha_trabajo = String.valueOf(query_fecha_trabajo.getSingleResult());
-                                                                        Tablas tb_precio_udi_periodo = util2.busquedaTabla(em, "valor_udi", fecha_trabajo.substring(0, 7).replace("\\/", ""));
-                                                                        Tablas tb_udis_permitido_tercero = util2.busquedaTabla(em, "bankingly_banca_movil","max_udis_por_transferencia");//fecha_trabajo.substring(0, 7).replace("\\/", ""));
+                                                                        Tabla tb_precio_udi_periodo = util2.busquedaTabla(em, "valor_udi", fecha_trabajo.substring(0, 7).replace("\\/", ""));
+                                                                        Tabla tb_udis_permitido_tercero = util2.busquedaTabla(em, "bankingly_banca_movil","max_udis_por_transferencia");//fecha_trabajo.substring(0, 7).replace("\\/", ""));
                                                                         if((monto * Double.parseDouble(tb_precio_udi_periodo.getDato1())) <= Double.parseDouble(tb_udis_permitido_tercero.getDato1())){
                                                                          */ message = message + " VALIDADO CON EXITO";
                                                                         /*}else{
@@ -1581,7 +1581,7 @@ public abstract class FacadeTransaction<T> {
             if (bOrigen) {
                 Double saldo = Double.parseDouble(ctaOrigen.getSaldo().toString());
                 if (util2.obtenerOrigen(em) == 30200) {
-                    Tablas tablaProductoTDD = new TarjetaDeDebito().productoTddwebservice(em);
+                    Tabla tablaProductoTDD = new TarjetaDeDebito().productoTddwebservice(em);
                     //Si el pago del prestamo se esta haciendo desde la TDD
                     if (ctaOrigen.getAuxiliaresPK().getIdproducto() == Integer.parseInt(tablaProductoTDD.getDato1())) {
                         WsSiscoopFoliosTarjetasPK1 foliosPK = new WsSiscoopFoliosTarjetasPK1(ctaOrigen.getAuxiliaresPK().getIdorigenp(), ctaOrigen.getAuxiliaresPK().getIdproducto(), ctaOrigen.getAuxiliaresPK().getIdauxiliar());
@@ -1673,10 +1673,10 @@ public abstract class FacadeTransaction<T> {
                                                         if (util2.obtenerOrigen(em) == 30200) {
                                                             System.out.println("entro a csn");
                                                             //Buscamos que el producto origen pertenezca al grupo de retiro
-                                                            Tablas tb = util2.busquedaTabla(em, "bankingly_banca_movil", "grupo_retiro");
+                                                            Tabla tb = util2.busquedaTabla(em, "bankingly_banca_movil", "grupo_retiro");
                                                             if (ctaOrigen.getIdgrupo() == Integer.parseInt(tb.getDato1())) {
                                                                 //Ahora verifico que el destino perteneneza al grupo de depositos
-                                                                Tablas tbRetiro = util2.busquedaTabla(em, "bankingly_banca_movil", "grupo_deposito");
+                                                                Tabla tbRetiro = util2.busquedaTabla(em, "bankingly_banca_movil", "grupo_deposito");
                                                                 String cadena[] = tbRetiro.getDato1().split("\\|");
                                                                 List list = Arrays.asList(cadena);
                                                                 for (int i = 0; i < list.size(); i++) {
@@ -1686,7 +1686,7 @@ public abstract class FacadeTransaction<T> {
                                                                 }
                                                                 if (banderaGrupo) {
                                                                     //valido que el producto acepte depositos
-                                                                    Tablas tbDeposito = util2.busquedaTabla(em, "bankingly_banca_movil", "productos_deposito");
+                                                                    Tabla tbDeposito = util2.busquedaTabla(em, "bankingly_banca_movil", "productos_deposito");
 
                                                                     String productos_deposito[] = tbDeposito.getDato2().split("\\|");
                                                                     List list_deposito = Arrays.asList(productos_deposito);
@@ -1816,10 +1816,10 @@ public abstract class FacadeTransaction<T> {
         System.out.println("Consulta de validaciones de cuenta :" + folio_origen_spei);
         String message = "";
         ResponseSPEIDTO dtoSPEI = new ResponseSPEIDTO();
-        TablasPK urlTbPK = new TablasPK("bankingly_banca_movil", "speipath");
+        TablaPK urlTbPK = new TablaPK("bankingly_banca_movil", "speipath");
 
         //Busco en tablas,la tabla para url de SPEI en otro proyecto propio de Fenoreste que conecta a STP
-        Tablas tablaSpeiPath = em.find(Tablas.class,
+        Tabla tablaSpeiPath = em.find(Tabla.class,
                 urlTbPK);
         URL url = new URL(tablaSpeiPath.getDato1());
         System.out.println("urlFenoreste:" + url);
@@ -1848,7 +1848,7 @@ public abstract class FacadeTransaction<T> {
 
                         if (util2.obtenerOrigen(em) == 30200) {
                             //Buscamos el producto para tarjeta de debito
-                            Tablas tablaProductoTDD = new TarjetaDeDebito().productoTddwebservice(em);
+                            Tabla tablaProductoTDD = new TarjetaDeDebito().productoTddwebservice(em);
                             System.out.println("El producto para Tarjeta de debito es:" + tablaProductoTDD);
 
                             //Si el retiro debe ser de Tarjeta de debito
@@ -1891,11 +1891,11 @@ public abstract class FacadeTransaction<T> {
                                         if (saldo >= total_pago) {
                                             if (util2.obtenerOrigen(em) == 30200) {
                                                 //Buscamos que el producto origen pertenezca al grupo de retiro
-                                                Tablas tb = util2.busquedaTabla(em, "bankingly_banca_movil", "grupo_retiro");
+                                                Tabla tb = util2.busquedaTabla(em, "bankingly_banca_movil", "grupo_retiro");
                                                 if (folio_origen_.getIdgrupo() == Integer.parseInt(tb.getDato1())) {
-                                                    Tablas tb_minimo = util2.busquedaTabla(em, "bankingly_banca_movil", "spei_monto_minimo");
+                                                    Tabla tb_minimo = util2.busquedaTabla(em, "bankingly_banca_movil", "spei_monto_minimo");
                                                     if (orden.getMonto() >= Integer.parseInt(tb_minimo.getDato1())) {
-                                                        Tablas tb_maximo = util2.busquedaTabla(em, "bankingly_banca_movil", "spei_monto_maximo");
+                                                        Tabla tb_maximo = util2.busquedaTabla(em, "bankingly_banca_movil", "spei_monto_maximo");
                                                         if (orden.getMonto() <= Integer.parseInt(tb_maximo.getDato1())) {
                                                             message = "VALIDADO CON EXITO";
                                                         } else {
@@ -1978,8 +1978,8 @@ public abstract class FacadeTransaction<T> {
             
 
             //Busco la tabla para el proyecto SPEI 
-            TablasPK urlTablaPK = new TablasPK("bankingly_banca_movil", "speipath");
-            Tablas tablaSpeiPath = em.find(Tablas.class, urlTablaPK);
+            TablaPK urlTablaPK = new TablaPK("bankingly_banca_movil", "speipath");
+            Tabla tablaSpeiPath = em.find(Tabla.class, urlTablaPK);
             //Obtengo los datos de la tabla para generar la URL de conexion
             URL url = new URL(tablaSpeiPath.getDato1() + tablaSpeiPath.getDato2());
             //Una ves generada la url contacteno el parametro para enviar orden(srvEnviarOrden)
@@ -2166,8 +2166,8 @@ public abstract class FacadeTransaction<T> {
         EntityManager em = AbstractFacade.conexion();
         String mensaje = "";
         try {
-            TablasPK tbPk = new TablasPK("bankingly_banca_movil", "montomaximominimo");
-            Tablas tb = em.find(Tablas.class,
+            TablaPK tbPk = new TablaPK("bankingly_banca_movil", "montomaximominimo");
+            Tabla tb = em.find(Tabla.class,
                     tbPk);
             if (amount > Double.parseDouble(tb.getDato1())) {
                 mensaje = "MAYOR";
@@ -2264,11 +2264,11 @@ public abstract class FacadeTransaction<T> {
         return fecha;
     }
 
-    public Tablas busquedaTabla(TablasPK pk) {
-        Tablas tabla = null;
+    public Tabla busquedaTabla(TablaPK pk) {
+        Tabla tabla = null;
         EntityManager em = AbstractFacade.conexion();
         try {
-            tabla = em.find(Tablas.class, pk);
+            tabla = em.find(Tabla.class, pk);
         } catch (Exception e) {
             System.out.println("Error al buscar tabla:" + e.getMessage());
             em.close();
@@ -2287,10 +2287,10 @@ public abstract class FacadeTransaction<T> {
             System.out.println("El identificado de transferencia es:" + identificadorTransferencia);
             WsSiscoopFoliosTarjetas1 tarjeta = null;
             //Buscamos el producto para TDD en tablas 
-            Tablas tablaProductoTDD = new TarjetaDeDebito().productoTddwebservice(em);
+            Tabla tablaProductoTDD = new TarjetaDeDebito().productoTddwebservice(em);
             System.out.println("Producto_para_tarjeta_de_debito:" + tablaProductoTDD.getDato1());
             //Busco el producto configurado para retiros
-            Tablas tabla_retiro = util2.busquedaTabla(em, "bankingly_banca_movil", "producto_retiro");
+            Tabla tabla_retiro = util2.busquedaTabla(em, "bankingly_banca_movil", "producto_retiro");
             System.out.println("Producto para retiro es:" + tabla_retiro.getDato1());
             //Bandera que me sirve para decir si existe o no la tdd
             boolean tddEncontrada = false;
@@ -2305,7 +2305,7 @@ public abstract class FacadeTransaction<T> {
                     //Si la tdd es el producto conffgurado para              retiros
                     if (Integer.parseInt(tablaProductoTDD.getDato1()) == Integer.parseInt(tabla_retiro.getDato1())) {
                         //Verifico que la activar tdd este en 1--activado
-                        Tablas activa_tdd = util2.busquedaTabla(em, "bankingly_banca_movil", "activa_tdd");
+                        Tabla activa_tdd = util2.busquedaTabla(em, "bankingly_banca_movil", "activa_tdd");
                         if (Integer.parseInt(activa_tdd.getDato2()) == 1) {
                             try {
                                 //Buscando la tarjeta de debito 
@@ -2335,8 +2335,8 @@ public abstract class FacadeTransaction<T> {
                                         System.out.println("Es una transferencia a tercero dentro de la entidad");
                                         Query query_fecha_trabajo = em.createNativeQuery("SELECT to_char(fechatrabajo,'yyyymmdd') FROM origenes limit 1");
                                         String fecha_trabajo = String.valueOf(query_fecha_trabajo.getSingleResult());
-                                        Tablas tb_precio_udi_periodo = util2.busquedaTabla(em, "valor_udi", fecha_trabajo.substring(0, 6));
-                                        Tablas tb_udis_permitido_tercero = util2.busquedaTabla(em, "bankingly_banca_movil", "max_udis_por_transferencia");//fecha_trabajo.substring(0, 7).replace("\\/", ""));
+                                        Tabla tb_precio_udi_periodo = util2.busquedaTabla(em, "valor_udi", fecha_trabajo.substring(0, 6));
+                                        Tabla tb_udis_permitido_tercero = util2.busquedaTabla(em, "bankingly_banca_movil", "max_udis_por_transferencia");//fecha_trabajo.substring(0, 7).replace("\\/", ""));
                                         if (transactionOWN.getAmount() <= (Double.parseDouble(tb_precio_udi_periodo.getDato1()) * Double.parseDouble(tb_udis_permitido_tercero.getDato1()))) {
                                             mensaje = validarTransferenciaATerceros(transactionOWN.getDebitProductBankIdentifier(),
                                                     transactionOWN.getAmount(),
@@ -2353,8 +2353,8 @@ public abstract class FacadeTransaction<T> {
                                         if (identificadorTransferencia == 4) {
                                             Query query_fecha_trabajo = em.createNativeQuery("SELECT to_char(fechatrabajo,'yyyymmdd') FROM origenes limit 1");
                                             String fecha_trabajo = String.valueOf(query_fecha_trabajo.getSingleResult());
-                                            Tablas tb_precio_udi_periodo = util2.busquedaTabla(em, "valor_udi", fecha_trabajo.substring(0, 6));
-                                            Tablas tb_udis_permitido_tercero = util2.busquedaTabla(em, "bankingly_banca_movil", "max_udis_por_transferencia");//fecha_trabajo.substring(0, 7).replace("\\/", ""));
+                                            Tabla tb_precio_udi_periodo = util2.busquedaTabla(em, "valor_udi", fecha_trabajo.substring(0, 6));
+                                            Tabla tb_udis_permitido_tercero = util2.busquedaTabla(em, "bankingly_banca_movil", "max_udis_por_transferencia");//fecha_trabajo.substring(0, 7).replace("\\/", ""));
                                             if (transactionOWN.getAmount() <= (Double.parseDouble(tb_precio_udi_periodo.getDato1()) * Double.parseDouble(tb_udis_permitido_tercero.getDato1()))) {
                                                 mensaje = validarPagoAPrestamos(identificadorTransferencia, transactionOWN.getDebitProductBankIdentifier(),
                                                         transactionOWN.getAmount(),
@@ -2375,8 +2375,8 @@ public abstract class FacadeTransaction<T> {
                                     if (identificadorTransferencia == 5) {//Si es una orden SPEI  
                                         Query query_fecha_trabajo = em.createNativeQuery("SELECT to_char(fechatrabajo,'yyyymmdd') FROM origenes limit 1");
                                         String fecha_trabajo = String.valueOf(query_fecha_trabajo.getSingleResult());
-                                        Tablas tb_precio_udi_periodo = util2.busquedaTabla(em, "valor_udi", fecha_trabajo.substring(0, 6));
-                                        Tablas tb_udis_permitido_tercero = util2.busquedaTabla(em, "bankingly_banca_movil", "max_udis_por_transferencia");//fecha_trabajo.substring(0, 7).replace("\\/", ""));
+                                        Tabla tb_precio_udi_periodo = util2.busquedaTabla(em, "valor_udi", fecha_trabajo.substring(0, 6));
+                                        Tabla tb_udis_permitido_tercero = util2.busquedaTabla(em, "bankingly_banca_movil", "max_udis_por_transferencia");//fecha_trabajo.substring(0, 7).replace("\\/", ""));
                                         if (transactionOWN.getAmount() <= (Double.parseDouble(tb_precio_udi_periodo.getDato1()) * Double.parseDouble(tb_udis_permitido_tercero.getDato1()))) {
                                             //Validaremos el monto de transaccion acumulada mensual
                                             String consulta_movs = "SELECT (CASE WHEN sum(amount::numeric) > 0 THEN sum(amount::numeric) ELSE 0 END) FROM transferencias_bankingly WHERE clientbankidentifier='" + transactionOWN.getClientBankIdentifier()
@@ -2387,7 +2387,7 @@ public abstract class FacadeTransaction<T> {
                                                 Query query_calculo_monto_mensual = em.createNativeQuery(consulta_movs);
                                                 Double total_en_el_mes = Double.parseDouble(String.valueOf(query_calculo_monto_mensual.getSingleResult()));
                                                 //Ahora buscamos la tabla donde esta parametrizado el maximo por mes
-                                                Tablas tb_maximo_mxn_mes = util2.busquedaTabla(em, "bankingly_banca_movil", "max_mxn_mensual");
+                                                Tabla tb_maximo_mxn_mes = util2.busquedaTabla(em, "bankingly_banca_movil", "max_mxn_mensual");
                                                 total_acumulado_mes = total_en_el_mes;
                                                 maximo_perimitido_mes = Double.parseDouble(tb_maximo_mxn_mes.getDato1());
                                             } catch (Exception e) {
@@ -2428,8 +2428,8 @@ public abstract class FacadeTransaction<T> {
                             Query query_fecha_trabajo = em.createNativeQuery("SELECT to_char(fechatrabajo,'yyyymmdd') FROM origenes limit 1");
 
                             String fecha_trabajo = String.valueOf(query_fecha_trabajo.getSingleResult());
-                            Tablas tb_precio_udi_periodo = util2.busquedaTabla(em, "valor_udi", fecha_trabajo.substring(0, 6));
-                            Tablas tb_udis_permitido_tercero = util2.busquedaTabla(em, "bankingly_banca_movil", "max_udis_por_transferencia");//fecha_trabajo.substring(0, 7).replace("\\/", ""));
+                            Tabla tb_precio_udi_periodo = util2.busquedaTabla(em, "valor_udi", fecha_trabajo.substring(0, 6));
+                            Tabla tb_udis_permitido_tercero = util2.busquedaTabla(em, "bankingly_banca_movil", "max_udis_por_transferencia");//fecha_trabajo.substring(0, 7).replace("\\/", ""));
                             if (transactionOWN.getAmount() <= (Double.parseDouble(tb_precio_udi_periodo.getDato1()) * Double.parseDouble(tb_udis_permitido_tercero.getDato1()))) {
                                 mensaje = validarTransferenciaATerceros(transactionOWN.getDebitProductBankIdentifier(),
                                         transactionOWN.getAmount(),
@@ -2446,8 +2446,8 @@ public abstract class FacadeTransaction<T> {
                                 Query query_fecha_trabajo = em.createNativeQuery("SELECT to_char(fechatrabajo,'yyyymmdd') FROM origenes limit 1");
 
                                 String fecha_trabajo = String.valueOf(query_fecha_trabajo.getSingleResult());
-                                Tablas tb_precio_udi_periodo = util2.busquedaTabla(em, "valor_udi", fecha_trabajo.substring(0, 6));
-                                Tablas tb_udis_permitido_tercero = util2.busquedaTabla(em, "bankingly_banca_movil", "max_udis_por_transferencia");//fecha_trabajo.substring(0, 7).replace("\\/", ""));
+                                Tabla tb_precio_udi_periodo = util2.busquedaTabla(em, "valor_udi", fecha_trabajo.substring(0, 6));
+                                Tabla tb_udis_permitido_tercero = util2.busquedaTabla(em, "bankingly_banca_movil", "max_udis_por_transferencia");//fecha_trabajo.substring(0, 7).replace("\\/", ""));
                                 if (transactionOWN.getAmount() <= (Double.parseDouble(tb_precio_udi_periodo.getDato1()) * Double.parseDouble(tb_udis_permitido_tercero.getDato1()))) {
                                     mensaje = validarPagoAPrestamos(identificadorTransferencia, transactionOWN.getDebitProductBankIdentifier(),
                                             transactionOWN.getAmount(),

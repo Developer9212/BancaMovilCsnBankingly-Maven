@@ -11,7 +11,7 @@ import com.fenoreste.rest.WsTDD.TarjetaDeDebito;
 import com.fenoreste.rest.entidades.AuxiliaresPK;
 import com.fenoreste.rest.entidades.Productos;
 import com.fenoreste.rest.entidades.Auxiliares;
-import com.fenoreste.rest.entidades.Tablas;
+import com.fenoreste.rest.entidades.Tabla;
 import com.fenoreste.rest.entidades.WsSiscoopFoliosTarjetasPK1;
 import com.syc.ws.endpoint.siscoop.BalanceQueryResponseDto;
 import java.math.BigDecimal;
@@ -58,7 +58,7 @@ public abstract class FacadeAccounts<T> {
             Productos pr = em.find(Productos.class, aux.getAuxiliaresPK().getIdproducto());
 
             if (util2.obtenerOrigen(em) == 30200) {
-                Tablas tb_producto_tdd = util2.busquedaTabla(em, "bankingly_banca_movil", "producto_tdd");
+                Tabla tb_producto_tdd = util2.busquedaTabla(em, "bankingly_banca_movil", "producto_tdd");
                 if (aux.getAuxiliaresPK().getIdproducto() == Integer.parseInt(tb_producto_tdd.getDato1())) {
                     WsSiscoopFoliosTarjetasPK1 foliosPK = new WsSiscoopFoliosTarjetasPK1(aux.getAuxiliaresPK().getIdorigenp(), aux.getAuxiliaresPK().getIdproducto(), aux.getAuxiliaresPK().getIdauxiliar());
                     BalanceQueryResponseDto responseSaldo = wsTDD.saldoTDD(foliosPK);

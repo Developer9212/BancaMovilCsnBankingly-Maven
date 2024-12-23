@@ -14,8 +14,8 @@ import com.fenoreste.rest.dao.TransactionDAO;
 import com.fenoreste.rest.ResponseDTO.VaucherDTO;
 import com.fenoreste.rest.dao.EntradaMovsDAO;
 import com.fenoreste.rest.entidades.MovimientoEntrada;
-import com.fenoreste.rest.entidades.Tablas;
-import com.fenoreste.rest.entidades.TablasPK;
+import com.fenoreste.rest.entidades.Tabla;
+import com.fenoreste.rest.entidades.TablaPK;
 import com.fenoreste.rest.entidades.TerceroActivacion;
 import com.fenoreste.rest.entidades.Transferencia;
 import com.github.cliftonlabs.json_simple.JsonObject;
@@ -379,14 +379,14 @@ public class TransactionResources {
             long differenceDay = 0;
             long differenceHour = 0;
             long differenceMinutos = 0;
-            Tablas tabla = null;
+            Tabla tabla = null;
             if (dao.validacionTerceroActivo(opa, username) != null) {
                 tercero = dao.validacionTerceroActivo(opa, username);
                 diff = dao.fechaServidorTimestamp().getTime() - tercero.getFecharegistro().getTime();
                 differenceDay = timeDay.convert(diff, TimeUnit.MILLISECONDS);
                 differenceHour = timeHora.convert(diff, TimeUnit.MILLISECONDS);
                 differenceMinutos = timeMinutos.convert(diff, TimeUnit.MILLISECONDS);
-                TablasPK pk = new TablasPK("bankingly_banca_movil", "timer_tercero_transaccion");
+                TablaPK pk = new TablaPK("bankingly_banca_movil", "timer_tercero_transaccion");
                 tabla = dao.busquedaTabla(pk);
 
                 System.out.println("El total de dias del registro tercero es: " + differenceDay + " el total de horas es: " + differenceHour + " el total de minutos es: " + differenceMinutos);

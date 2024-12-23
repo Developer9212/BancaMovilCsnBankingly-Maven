@@ -18,8 +18,8 @@ import com.fenoreste.rest.entidades.Productos_bankingly;
 import com.fenoreste.rest.entidades.Persona;
 import com.fenoreste.rest.entidades.PersonasPK;
 import com.fenoreste.rest.entidades.Productos;
-import com.fenoreste.rest.entidades.Tablas;
-import com.fenoreste.rest.entidades.TablasPK;
+import com.fenoreste.rest.entidades.Tabla;
+import com.fenoreste.rest.entidades.TablaPK;
 import com.fenoreste.rest.entidades.WsSiscoopFoliosTarjetasPK1;
 import com.itextpdf.html2pdf.ConverterProperties;
 import com.itextpdf.html2pdf.HtmlConverter;
@@ -105,7 +105,7 @@ public abstract class FacadeProductos<T> {
 
                 if (util2.obtenerOrigen(em) == 30200) {
                     if (ccb.getProductTypeId() != 4) {
-                        Tablas producto_retiro = util2.busquedaTabla(em, "bankingly_banca_movil", "producto_retiro");
+                        Tabla producto_retiro = util2.busquedaTabla(em, "bankingly_banca_movil", "producto_retiro");
                         if (a.getAuxiliaresPK().getIdproducto() == Integer.parseInt(producto_retiro.getDato1())){
                             canTransact = "3";
                         } else {
@@ -181,7 +181,7 @@ public abstract class FacadeProductos<T> {
                     //Verificamos cual es el origen 
                     if (util2.obtenerOrigen(em) == 30200) {
                         //Buscamo la tdd
-                        Tablas tablaTDD = util2.busquedaTabla(em, "bankingly_banca_movil", "producto_tdd");
+                        Tabla tablaTDD = util2.busquedaTabla(em, "bankingly_banca_movil", "producto_tdd");
                         //Si el producto es la TDD obtenemos el saldo del WEB SErvice de Alestra
                         if (a.getAuxiliaresPK().getIdproducto() == Integer.parseInt(tablaTDD.getDato1())) {
                             //Buscamos registros de folio para obtener el id tarjeta                       
@@ -208,7 +208,7 @@ public abstract class FacadeProductos<T> {
                     String proximo_pago = "";
                     String canTransact = "";
 
-                    Tablas producto_retiro = util2.busquedaTabla(em, "bankingly_banca_movil", "producto_retiro");
+                    Tabla producto_retiro = util2.busquedaTabla(em, "bankingly_banca_movil", "producto_retiro");
                     //Busco el producto en el catalogo de cuentas baniingly
                     Productos_bankingly tipo_cuenta_bankingly = em.find(Productos_bankingly.class, a.getAuxiliaresPK().getIdproducto());
 
@@ -344,8 +344,8 @@ public abstract class FacadeProductos<T> {
                 String fi = "";
                 String ff = "";
                 LocalDateTime localDate = LocalDateTime.parse(fechaServidorDB + " 00:00:00", dtf);
-                TablasPK tbEstados_cuentaPK = new TablasPK("bankingly_banca_movil", "total_estados_cuenta");
-                Tablas tbEstados_Cuenta = em.find(Tablas.class, tbEstados_cuentaPK);
+                TablaPK tbEstados_cuentaPK = new TablaPK("bankingly_banca_movil", "total_estados_cuenta");
+                Tabla tbEstados_Cuenta = em.find(Tabla.class, tbEstados_cuentaPK);
                 
                 int total_estados = 0; 
                 if (productType == 4) {

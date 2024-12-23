@@ -5,8 +5,8 @@
  */
 package com.fenoreste.rest.Util;
 
-import com.fenoreste.rest.entidades.Tablas;
-import com.fenoreste.rest.entidades.TablasPK;
+import com.fenoreste.rest.entidades.Tabla;
+import com.fenoreste.rest.entidades.TablaPK;
 import java.io.IOException;
 import javax.persistence.EntityManager;
 import sun.misc.BASE64Decoder;
@@ -45,13 +45,13 @@ public class Authorization {
         return false;
     }
 
-    private Tablas getUser() {
-        TablasPK tbpk = new TablasPK("bankingly", "credenciales");
+    private Tabla getUser() {
+        TablaPK tbpk = new TablaPK("bankingly", "credenciales");
         boolean bandera = false;
         EntityManager em = AbstractFacade.conexion();
-        Tablas tb = new Tablas();
+        Tabla tb = new Tabla();
         try {
-            tb = em.find(Tablas.class, tbpk);
+            tb = em.find(Tabla.class, tbpk);
         } catch (Exception e) {
             System.out.println("error en busqueda tablas Auth:" + e.getMessage());
             return tb;

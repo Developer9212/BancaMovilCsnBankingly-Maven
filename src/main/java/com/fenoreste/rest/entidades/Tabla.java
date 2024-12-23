@@ -21,10 +21,10 @@ import javax.xml.bind.annotation.XmlRootElement;
 @Entity
 @Table(name = "tablas")
 @XmlRootElement
-public class Tablas implements Serializable {
+public class Tabla implements Serializable {
     
     @EmbeddedId
-    private TablasPK tablasPK;
+    private TablaPK tablasPK;
     @Column(name = "nombre")
     private String nombre;
     @Column(name = "dato1")
@@ -40,10 +40,10 @@ public class Tablas implements Serializable {
     @Column(name = "tipo")
     private short tipo;
 
-    public Tablas() {
+    public Tabla() {
     }
 
-    public Tablas(TablasPK tablasPK, String nombre, String dato1, String dato2, String dato3, String dato4, String dato5, short tipo) {
+    public Tabla(TablaPK tablasPK, String nombre, String dato1, String dato2, String dato3, String dato4, String dato5, short tipo) {
         this.tablasPK = tablasPK;
         this.nombre = nombre;
         this.dato1 = dato1;
@@ -54,11 +54,11 @@ public class Tablas implements Serializable {
         this.tipo = tipo;
     }
 
-    public TablasPK getTablasPK() {
+    public TablaPK getTablasPK() {
         return tablasPK;
     }
 
-    public void setTablasPK(TablasPK tablasPK) {
+    public void setTablasPK(TablaPK tablasPK) {
         this.tablasPK = tablasPK;
     }
 

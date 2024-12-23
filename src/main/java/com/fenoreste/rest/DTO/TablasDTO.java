@@ -5,7 +5,7 @@
  */
 package com.fenoreste.rest.DTO;
 
-import com.fenoreste.rest.entidades.TablasPK;
+import com.fenoreste.rest.entidades.TablaPK;
 import java.io.Serializable;
 import java.util.Objects;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -18,7 +18,7 @@ public class TablasDTO implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    protected TablasPK tablasPK;
+    protected TablaPK tablasPK;
     private String nombre;
     private String dato1;
     private String dato2;
@@ -30,11 +30,11 @@ public class TablasDTO implements Serializable {
     public TablasDTO() {
     }
 
-    public TablasPK getTablasPK() {
+    public TablaPK getTablasPK() {
         return tablasPK;
     }
 
-    public void setTablasPK(TablasPK tablasPK) {
+    public void setTablasPK(TablaPK tablasPK) {
         this.tablasPK = tablasPK;
     }
 

@@ -5,6 +5,7 @@
  */
 package com.fenoreste.rest.dao;
 
+import com.fenoreste.rest.DTO.OgsDTO;
 import com.fenoreste.rest.DTO.OpaDTO;
 import com.fenoreste.rest.Request.FixedTermMethodPaymentDTO;
 import com.fenoreste.rest.ResponseDTO.CatalogFixedTermDepositDTO;
@@ -21,6 +22,8 @@ import com.fenoreste.rest.entidades.Persona;
 import com.fenoreste.rest.entidades.PersonasPK;
 import com.fenoreste.rest.entidades.Productos;
 import com.fenoreste.rest.entidades.Productos_bankingly;
+import com.fenoreste.rest.entidades.Tabla;
+import com.fenoreste.rest.entidades.TablaPK;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -114,8 +117,40 @@ public abstract class FacadeFixedTermDeposit<T> {
     
     
     public FixedTermMethodPaymentResponseDTO metodosPago(FixedTermMethodPaymentDTO peticion){
-        
-        return null;
+        FixedTermMethodPaymentResponseDTO response = new FixedTermMethodPaymentResponseDTO();
+        OpaDTO opa = util.opa(peticion.getDebitProductBankIdentifier());
+        OgsDTO ogs = util.ogs(peticion.getClientBankIdentifier());
+        try {
+            EntityManager em = AbstractFacade.conexion();
+            TablaPK tablaPK;
+            Tabla tabla;
+            AuxiliaresPK auxpk = new AuxiliaresPK(opa.getIdorigenp(), opa.getIdproducto(), opa.getIdauxiliar());
+            Auxiliares aux = em.find(Auxiliares.class, auxpk);
+            if(aux != null){
+                tablaPK = new TablaPK("bankingly_banca_movil","producto_retiro");
+                tabla = em.find(Tabla.class, tablaPK);
+                int productoRetiro = Integer.parseInt(tabla.getDato1());
+                if(aux.getAuxiliaresPK().getIdorigenp() == productoRetiro){
+                    if(aux.getSaldo().doubleValue() - aux.getGarantia().doubleValue() >= peticion.getDepositAmount()){
+                        //Vamos a consultar si el plazo elegido es compatible con el producto
+                        Productos producto = em.find(Productos.class, aux.getAuxiliaresPK().getIdproducto());
+                        String cnosulta = "SELECT count(*) FROM tablas WHERE idtabla='tasas' and idelemento like 'tasaiar%' AND order by idelemento;"
+                        
+                    }else{
+                        System.out.println(":::::::::::::::::::El producto a retirar para invertir no tiene saldo suficiente::::::::::::::");
+                    }
+                }else{
+                    System.out.println("::::::::::::::::Producto seleccionado para pago,no configurado para retiros:::::::::::::");
+                }
+            }else{
+                System.out.println("::::::::::::No existe folio seleccionado para retiro::::::::::::::::::::::::");
+            }
+            
+          
+        } catch (Exception e) {
+            System.out.println("::::::::::Error al obtener metodos de pago:::::::::::::::"+e.getMessage());
+        }        
+        return response;
         
     }
 

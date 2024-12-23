@@ -10,8 +10,8 @@ import com.fenoreste.rest.WsTDD.TarjetaDeDebito;
 import com.fenoreste.rest.entidades.Auxiliares;
 import com.fenoreste.rest.entidades.AuxiliaresPK;
 import com.fenoreste.rest.entidades.Clabes_Interbancarias;
-import com.fenoreste.rest.entidades.Tablas;
-import com.fenoreste.rest.entidades.TablasPK;
+import com.fenoreste.rest.entidades.Tabla;
+import com.fenoreste.rest.entidades.TablaPK;
 import com.fenoreste.rest.entidades.WsClabeActivacion;
 import com.fenoreste.rest.entidades.WsSiscoopFoliosTarjetasPK1;
 import com.fenoreste.rest.entidades.Banca_movil_usuarios;
@@ -108,8 +108,8 @@ public abstract class FacadeCustomer<T> {
         String consulta = "";
         try {
             //Busco la tabla donde guarda el producto para banca movil
-            TablasPK tablasPK = new TablasPK("bankingly_banca_movil", "producto_banca_movil");
-            Tablas tablaProducto = em.find(Tablas.class, tablasPK);
+            TablaPK tablasPK = new TablaPK("bankingly_banca_movil", "producto_banca_movil");
+            Tabla tablaProducto = em.find(Tabla.class, tablasPK);
             //Buscamos que el socio tenga el producto para banca movil aperturado en auxiliares            
             //Reglas CSN,Mitras
             String busquedaFolio = "SELECT * FROM auxiliares WHERE idorigen=" + idorigen + " AND idgrupo=" + idgrupo + " AND idsocio=" + idsocio + " AND idproducto=" + tablaProducto.getDato1() + " AND estatus=0";
@@ -124,7 +124,7 @@ public abstract class FacadeCustomer<T> {
                 //1.-30200 CSN
                 if (util.obtenerOrigen(em) == 30200) {
                     //Buscamos que el socio tenga el producto 133 y con el saldo de 50 pesos
-                    Tablas tb_producto_tdd = util.busquedaTabla(em, "bankingly_banca_movil", "producto_tdd");
+                    Tabla tb_producto_tdd = util.busquedaTabla(em, "bankingly_banca_movil", "producto_tdd");
                     try {
                         //Buscamos que en la tdd tenga minimo 50 pesos de saldo leemos el ws de Alestra
                         String busqueda133 = "SELECT * FROM auxiliares a WHERE idorigen=" + idorigen
@@ -155,14 +155,14 @@ public abstract class FacadeCustomer<T> {
                                 if (clabe_folio != null) {
                                     if (clabe_folio.isActiva()) {
                                         String cuenta = String.format("%06d", clabe_folio.getAux_pk().getIdorigenp()) + "" + String.format("%05d", clabe_folio.getAux_pk().getIdproducto()) + "" + String.format("%08d", clabe_folio.getAux_pk().getIdauxiliar());
-                                        Tablas tb_activar_registra_cuenta_persona_fisica = util.busquedaTabla(em, "bankingly_banca_movil", "activa_desactiva_registra_cuenta");
+                                        Tabla tb_activar_registra_cuenta_persona_fisica = util.busquedaTabla(em, "bankingly_banca_movil", "activa_desactiva_registra_cuenta");
                                         if (Integer.parseInt(tb_activar_registra_cuenta_persona_fisica.getDato1()) == 1) {
                                             System.out.println("Registrando persona fisica");
                                             JSONObject request = new JSONObject();
                                             request.put("productBankIdentifier", cuenta);
                                             System.out.println("Peticion inserta persona fisica:"+request);
                                             
-                                            Tablas tb_path = util.busquedaTabla(em, "bankingly_banca_movil", "registra_cuenta_spei");
+                                            Tabla tb_path = util.busquedaTabla(em, "bankingly_banca_movil", "registra_cuenta_spei");
                                             
                                             System.out.println("Http endpoint:"+tb_path.getDato2());
                                             HttpConsumo consumo = new HttpConsumo(tb_path.getDato2(), request.toString());
@@ -232,7 +232,7 @@ public abstract class FacadeCustomer<T> {
                         userDB.setPersonasPK(p.getPersonasPK());
                         userDB.setAlias_usuario(username);
                         //Para insertar opa buscamos su producto configurado en tablas
-                        Tablas tb = util.busquedaTabla(em, "bankingly_banca_movil", "producto_banca_movil");
+                        Tabla tb = util.busquedaTabla(em, "bankingly_banca_movil", "producto_banca_movil");
                         String b_auxiliares = "SELECT * FROM auxiliares a WHERE "
                                 + "idorigen=" + p.getPersonasPK().getIdorigen()
                                 + " AND idgrupo=" + p.getPersonasPK().getIdgrupo()

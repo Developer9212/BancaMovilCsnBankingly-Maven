@@ -2,8 +2,8 @@ package com.fenoreste.rest.WsTDD;
 
 import com.fenoreste.rest.Util.AbstractFacade;
 import com.fenoreste.rest.Util.UtilidadesGenerales;
-import com.fenoreste.rest.entidades.Tablas;
-import com.fenoreste.rest.entidades.TablasPK;
+import com.fenoreste.rest.entidades.Tabla;
+import com.fenoreste.rest.entidades.TablaPK;
 import com.fenoreste.rest.entidades.WsSiscoopFoliosTarjetas1;
 import com.fenoreste.rest.entidades.WsSiscoopFoliosTarjetasPK1;
 import javax.persistence.EntityManager;
@@ -20,10 +20,10 @@ import javax.persistence.Query;
 public class TarjetaDeDebito {
 
     // CONSULTA Y ACTUALIZA EL SALDO DE LA TarjetaDeDebito
-    public Tablas productoTddWS(EntityManager em) {
+    public Tabla productoTddWS(EntityManager em) {
         try {
-            TablasPK pkt = new TablasPK("identificador_uso_tdd", "activa");
-            Tablas tb = em.find(Tablas.class, pkt);
+            TablaPK pkt = new TablaPK("identificador_uso_tdd", "activa");
+            Tabla tb = em.find(Tabla.class, pkt);
             if (tb != null) {
                 return tb;
             } else {
@@ -36,15 +36,15 @@ public class TarjetaDeDebito {
     }
 
     // PRODUCTO VALIDO PARA LA TDD
-    public Tablas productoTddwebservice(EntityManager em) {
-        Tablas tabla = null;
+    public Tabla productoTddwebservice(EntityManager em) {
+        Tabla tabla = null;
         System.out.println("Llegando a buscar el producto para Tarjeta de debito....");
         try {
             EntityManager d = AbstractFacade.conexion();
             // Producto de la tdd
 
-            TablasPK tablasPK = new TablasPK("bankingly_banca_movil", "producto_tdd");
-            tabla = d.find(Tablas.class, tablasPK);
+            TablaPK tablasPK = new TablaPK("bankingly_banca_movil", "producto_tdd");
+            tabla = d.find(Tabla.class, tablasPK);
 
         } catch (NumberFormatException e) {
             System.out.println("Error en consultar producto en producto_para_webservice de TarjetaDeDebito." + e.getMessage());
@@ -160,8 +160,8 @@ public class TarjetaDeDebito {
         UtilidadesGenerales util = new UtilidadesGenerales();
         try {
             //Tabla para obtener usuario y contraseña
-            Tablas crendenciales = util.busquedaTabla(em, "bankingly_banca_movil", "wsdl_credenciales");
-            Tablas parametros = util.busquedaTabla(em, "bankingly_banca_movil", "wsdl_parametros");
+            Tabla crendenciales = util.busquedaTabla(em, "bankingly_banca_movil", "wsdl_credenciales");
+            Tabla parametros = util.busquedaTabla(em, "bankingly_banca_movil", "wsdl_parametros");
             if (parametros != null) {
                 System.out.println("Conectando ws ALestra....");
                 //1.-Usuario,2.-contraseña,3.-host,4.-puerto,5.-wsdl

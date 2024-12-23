@@ -6,6 +6,7 @@
 package com.fenoreste.rest.RESTservices;
 
 import com.fenoreste.rest.Request.FixedTermMethodPaymentDTO;
+import com.fenoreste.rest.ResponseDTO.TermDataResVo;
 import com.fenoreste.rest.ResponseDTO.DetallesInversionDTO;
 import com.fenoreste.rest.dao.FixedTermDepositDAO;
 import javax.ws.rs.GET;
@@ -17,7 +18,7 @@ import javax.ws.rs.core.Response;
 import com.github.cliftonlabs.json_simple.JsonObject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
-
+import com.fenoreste.rest.ResponseDTO.FixedTermMethodPaymentResponseDTO;
 /**
  *
  * @author nahum
@@ -56,17 +57,36 @@ public class FixedTermDepositResources {
     
     
     @POST
-    @Path("/depositTermMethodsPayment")
+    @Path("/fixedTermDepositTermsData")
+    @Produces({MediaType.APPLICATION_JSON + ";charset=utf-8"})
+    @Consumes({MediaType.APPLICATION_JSON + ";charset=utf-8"})
+    public Response methodPayment(TermDataResVo request) {
+        
+        
+      return null;  
+    }
+    
+    @POST
+    @Path("/fixedTermDepositMethodsPayment")
     @Produces({MediaType.APPLICATION_JSON + ";charset=utf-8"})
     @Consumes({MediaType.APPLICATION_JSON + ";charset=utf-8"})
     public Response methodPayment(FixedTermMethodPaymentDTO request) {
 
         FixedTermDepositDAO metodos = new FixedTermDepositDAO();
         JsonObject Json_De_Error = new JsonObject();
+        FixedTermMethodPaymentResponseDTO response;
         
         if (!metodos.actividad_horario()) {
             Json_De_Error.put("ERROR", "VERIFIQUE SU HORARIO DE ACTIVIDAD FECHA,HORA O CONTACTE A SU PROVEEEDOR");
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Json_De_Error).build();
+        }
+        
+        try {
+            
+            
+        } catch (Exception e) {
+            
+            
         }
    return null;
         

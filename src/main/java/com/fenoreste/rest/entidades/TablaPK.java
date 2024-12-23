@@ -16,17 +16,17 @@ import javax.persistence.Embeddable;
  */
 @Cacheable(false)
 @Embeddable
-public class TablasPK implements Serializable {
+public class TablaPK implements Serializable {
 
     @Column(name = "idtabla")
     private String idtabla;
     @Column(name = "idelemento")
     private String idelemento;
 
-    public TablasPK() {
+    public TablaPK() {
     }
 
-    public TablasPK(String idtabla, String idelemento) {
+    public TablaPK(String idtabla, String idelemento) {
         this.idtabla = idtabla;
         this.idelemento = idelemento;
     }
@@ -58,10 +58,10 @@ public class TablasPK implements Serializable {
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof TablasPK)) {
+        if (!(object instanceof TablaPK)) {
             return false;
         }
-        TablasPK other = (TablasPK) object;
+        TablaPK other = (TablaPK) object;
         if ((this.idtabla == null && other.idtabla != null) || (this.idtabla != null && !this.idtabla.equals(other.idtabla))) {
             return false;
         }

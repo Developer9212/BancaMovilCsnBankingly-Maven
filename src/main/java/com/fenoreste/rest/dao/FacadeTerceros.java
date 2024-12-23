@@ -27,7 +27,7 @@ import com.fenoreste.rest.entidades.Productos;
 import com.fenoreste.rest.entidades.ProductosTercero;
 import com.fenoreste.rest.entidades.ProductosTerceros;
 import com.fenoreste.rest.entidades.Productos_bankingly;
-import com.fenoreste.rest.entidades.Tablas;
+import com.fenoreste.rest.entidades.Tabla;
 import com.fenoreste.rest.entidades.TerceroActivacion;
 import com.fenoreste.rest.entidades.TerceroActivacionPK;
 import java.text.SimpleDateFormat;
@@ -335,7 +335,7 @@ public abstract class FacadeTerceros<T> {
             PersonasPK personaPK = new PersonasPK(ogs.getIdorigen(), ogs.getIdgrupo(), ogs.getIdsocio());
             Persona p = em.find(Persona.class, personaPK);
             if (p.getCelular().trim().equals(numero.trim())) {
-                Tablas tb_activo_sms = util2.busquedaTabla(em, "bankingly_banca_movil", "smsactivo");
+                Tabla tb_activo_sms = util2.busquedaTabla(em, "bankingly_banca_movil", "smsactivo");
                 if (tb_activo_sms.getDato1().trim().equals("1")) {
                     PreparaSMS sendSms = new PreparaSMS();
                     String respuesta_envio_token = sendSms.enviarTokenAltaTerceros(em, numero, token);

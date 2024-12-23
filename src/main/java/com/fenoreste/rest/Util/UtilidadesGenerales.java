@@ -10,8 +10,8 @@ import com.fenoreste.rest.entidades.AuxiliaresPK;
 import com.fenoreste.rest.entidades.Origenes;
 import com.fenoreste.rest.entidades.Persona;
 import com.fenoreste.rest.entidades.PersonasPK;
-import com.fenoreste.rest.entidades.Tablas;
-import com.fenoreste.rest.entidades.TablasPK;
+import com.fenoreste.rest.entidades.Tabla;
+import com.fenoreste.rest.entidades.TablaPK;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
@@ -72,12 +72,12 @@ public class UtilidadesGenerales {
         return origen;
     }
 
-    public Tablas busquedaTabla(EntityManager em, String idtabla, String idelemento) {
-        Tablas tb = null;
+    public Tabla busquedaTabla(EntityManager em, String idtabla, String idelemento) {
+        Tabla tb = null;
         System.out.println("Buscando la tabla idtabla:" + idtabla + " idelemento:" + idelemento);
         try {
-            TablasPK tbPK = new TablasPK(idtabla, idelemento);
-            tb = em.find(Tablas.class, tbPK);
+            TablaPK tbPK = new TablaPK(idtabla, idelemento);
+            tb = em.find(Tabla.class, tbPK);
         } catch (Exception e) {
             System.out.println("Error al buscar tabla:" + e.getMessage());
             return tb;
@@ -106,7 +106,7 @@ public class UtilidadesGenerales {
                 idsocio=a.getIdsocio();
             }
              
-            Tablas tb_sopar = busquedaTabla(em, "bankingly_banca_movil", "sopar");
+            Tabla tb_sopar = busquedaTabla(em, "bankingly_banca_movil", "sopar");
             String consulta_sopar = "SELECT CASE WHEN count(*) > 0 THEN count(*) ELSE 0 END FROM sopar WHERE idorigen=" + idorigen + " AND idgrupo=" + idgrupo + " AND idsocio=" + idsocio + " AND tipo='" + tb_sopar.getDato2() + "'";
             Query query_sopar = em.createNativeQuery(consulta_sopar);
             int count_sopar = Integer.parseInt(String.valueOf(query_sopar.getSingleResult()));
