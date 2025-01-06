@@ -1597,7 +1597,7 @@ public abstract class FacadeTransaction<T> {
                                                                                 Double udisMaximo = (ctaDestino.getSaldo().doubleValue() + monto) / valorUdiMes;
                                                                                 Double udisMaximoMensual = 0.0;
 
-                                                                                tabla = util2.busquedaTabla(em, "bankigly_banca_movil", "maximoudis_menorjuvenil_tutornosocio");
+                                                                                tabla = util2.busquedaTabla(em, "bankingly_banca_movil", "maximoudis_menorjuvenil_tutornosocio");
 
                                                                                 if (udisMaximo <= Double.parseDouble(tabla.getDato1())) {
                                                                                     String consultaMaximo = "SELECT (CASE WHEN sum(monto)>0 THEN sum(monto) ELSE 0.0 END) FROM auxiliares_d"
