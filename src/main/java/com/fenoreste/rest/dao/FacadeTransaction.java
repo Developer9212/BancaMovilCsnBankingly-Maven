@@ -1615,7 +1615,7 @@ public abstract class FacadeTransaction<T> {
                                                                                         System.out.println(":::::::::Error al obtener total UDIS en el mes:::::::::::::");
                                                                                     }
 
-                                                                                    tabla = util2.busquedaTabla(em, "bankingly_banca_movil", "maximoudis_mensual_menorjuvenil_tutornosocio");
+                                                                                    tabla = util2.busquedaTabla(em, "bankingly_banca_movil", "maxudi_mensual_menorjuvenil_tutornosocio");
                                                                                     if (udisMaximo <= Double.parseDouble(tabla.getDato1())) {
                                                                                         consultaMaximo = "SELECT (CASE WHEN sum(monto)>0 THEN sum(monto) else 0.0 END) FROM auxiliares_d"
                                                                                                 + " WHERE idorigenp = " + ctaDestino.getAuxiliaresPK().getIdorigenp()
