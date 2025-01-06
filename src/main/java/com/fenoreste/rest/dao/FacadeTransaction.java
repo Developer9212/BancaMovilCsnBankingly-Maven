@@ -1485,10 +1485,10 @@ public abstract class FacadeTransaction<T> {
                                                                                                     + " WHERE idorigenp = " + ctaDestino.getAuxiliaresPK().getIdorigenp()
                                                                                                     + " AND idproducto  = " + ctaDestino.getAuxiliaresPK().getIdproducto()
                                                                                                     + " AND idauxiliar  = " + ctaDestino.getAuxiliaresPK().getIdauxiliar()
-                                                                                                    + " AND date(fecha) ='" + fecha_trabajo + "'"
+                                                                                                    + " AND date(fecha) = '" + fecha_trabajo + "'"
                                                                                                     + " AND cargoabono  =1";
 
-                                                                                            query = em.createNamedQuery(consultaMaximoDiario);
+                                                                                            query = em.createNativeQuery(consultaMaximoDiario);
                                                                                             montoDiario = Double.parseDouble(String.valueOf(query.getSingleResult()));
 
                                                                                             tabla = util2.busquedaTabla(em, "bankingly_banca_movil", "maximodiario_menorjuvenil_tutorsocio");
