@@ -230,7 +230,7 @@ public class TransactionResources {
                         // backendOperationResult.setBackendMessage(mensaje);
                         //}
                     }
-                    //Si subtransactionType es 9 y transactionType es 6: El tipo de transaccion es es un pago a prestamos 
+                    //Si subtransactionType es 9 y transactionType es 6: El tipo de transaccion es es un pago a prestamos  propio
                     if (dto.getSubTransactionTypeId() == 9 && dto.getTransactionTypeId() == 6) {
                         backendOperationResult = dao.transferencias(dto, 3, null);
                     }

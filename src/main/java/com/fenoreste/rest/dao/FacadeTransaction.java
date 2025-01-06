@@ -21,10 +21,13 @@ import com.fenoreste.rest.entidades.Auxiliares;
 import com.fenoreste.rest.entidades.AuxiliaresD;
 import com.fenoreste.rest.entidades.AuxiliaresPK;
 import com.fenoreste.rest.entidades.Origenes;
+import com.fenoreste.rest.entidades.Persona;
+import com.fenoreste.rest.entidades.PersonasPK;
 import com.fenoreste.rest.entidades.Polizas;
 import com.fenoreste.rest.entidades.Productos_bankingly;
 import com.fenoreste.rest.entidades.Procesa_pago_movimientos;
 import com.fenoreste.rest.entidades.Productos;
+import com.fenoreste.rest.entidades.Referencia;
 import com.fenoreste.rest.entidades.Tabla;
 import com.fenoreste.rest.entidades.TablaPK;
 import com.fenoreste.rest.entidades.TerceroActivacion;
@@ -51,6 +54,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
@@ -64,6 +68,7 @@ import javax.persistence.Query;
 import org.json.JSONObject;
 
 import java.util.Base64;
+import javax.persistence.NoResultException;
 
 /**
  *
@@ -106,7 +111,54 @@ public abstract class FacadeTransaction<T> {
         //Si no es TDD pasa directo hasta aca
         //Si es una transferencia entre mis cuentas
         //if (identificadorTransferencia == 1 && retiro == false && banderaCSN == false) {
-        if (identificadorTransferencia == 1 && banderaCSN == false) {
+
+        if (identificadorTransferencia == 1 || identificadorTransferencia == 2) {
+            //Validamos la transferencia             
+            messageBackend = validarTransferenciaCSN(transactionOWN, identificadorTransferencia, null);
+            backendResponse.setBackendMessage(messageBackend);
+            banderaCSN = true;
+        } else if (identificadorTransferencia == 3 || identificadorTransferencia == 4) {
+            messageBackend = validarTransferenciaCSN(transactionOWN, identificadorTransferencia, null);
+            backendResponse.setBackendMessage(messageBackend);
+            banderaCSN = true;
+            if (messageBackend.contains("_")) {
+                String[] messageBackend_hipotecario = messageBackend.split(":");
+                total_pagar_hipotecario = messageBackend_hipotecario[1];
+                System.out.println("total a pagar hipotecario es:" + total_pagar_hipotecario);
+            }
+            if (messageBackend.contains("TDD")) {
+                banderaTDD = true;
+            }
+        } else if (identificadorTransferencia == 5) {
+            //Valido la transferencia y devuelvo el mensaje que se produce
+            //Busco la cuenta spei en tablas solo capital
+            tb_spei_cuenta = util2.busquedaTabla(em, "bankingly_banca_movil", "cuenta_spei");
+            //Busco la cuenta spei en tablas solo para comisiones                    
+            tb_spei_cuenta_comisiones = util2.busquedaTabla(em, "bankingly_banca_movil", "cuenta_spei_comisiones");
+            comisiones = Double.parseDouble(tb_spei_cuenta_comisiones.getDato2());
+            total_a_enviar = transactionOWN.getAmount() - (comisiones + (comisiones * 0.16));
+            //Valido el producto para retiro
+            //Busco el producto configurado para retiros
+            messageBackend = validarTransferenciaCSN(transactionOWN, identificadorTransferencia, SPEIOrden);
+
+            if (messageBackend.toUpperCase().contains("EXITO")) {
+                SPEIOrden.setMonto(total_a_enviar);
+                //Enviamos al orden SPEI
+                response = metodoEnviarSPEI(SPEIOrden);
+                if (response.getId() > 3) {
+                    backendResponse.setBackendMessage("ORDEN ENVIADA CON EXITO");
+                    banderaCSN = true;
+                } else {
+                    backendResponse.setBackendMessage(response.getError());
+                }
+            } else {
+                backendResponse.setBackendMessage(messageBackend);
+            }
+
+        }
+
+        //Comentado el 23/12/2024 
+        /* if (identificadorTransferencia == 1 && banderaCSN == false) {
             //Valido la transferencia y devuelvo el mensaje que se produce
             //Valido el origen si es CSN 
             if (util2.obtenerOrigen(em) == 30200) {
@@ -188,8 +240,7 @@ public abstract class FacadeTransaction<T> {
                     backendResponse.setBackendMessage(messageBackend);
                 }
             }
-        }
-
+        }*/
         try {
             if (backendResponse.getBackendMessage().toUpperCase().contains("EXITO")) {
                 Transferencia transaction = new Transferencia();
@@ -540,7 +591,7 @@ public abstract class FacadeTransaction<T> {
                                             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
                                             String fechaactivacionDestino = sdf.format(aDestino.getFechaactivacion()).substring(0, 10);
                                             String fechaBase = fechaTr_.substring(0, 10);
-                                            System.out.println("FechaActivacion Modificado:" +fechaactivacionDestino.replace("\\/", "-") + ",fechaBase:" + fechaBase);
+                                            System.out.println("FechaActivacion Modificado:" + fechaactivacionDestino.replace("\\/", "-") + ",fechaBase:" + fechaBase);
                                             String si_se_puede_aplicar = "select sai_bankingly_limite_adelanto (" + aDestino.getAuxiliaresPK().getIdorigenp() + ","
                                                     + "" + aDestino.getAuxiliaresPK().getIdproducto() + ","
                                                     + "" + aDestino.getAuxiliaresPK().getIdauxiliar() + ","
@@ -548,9 +599,9 @@ public abstract class FacadeTransaction<T> {
                                                     + transaction.getAmount() + ",NULL)";
                                             Query query_se_puede_aplicar = em.createNativeQuery(si_se_puede_aplicar);
                                             Double se_puede_pagar = Double.parseDouble(String.valueOf(query_se_puede_aplicar.getSingleResult()));
-                                            System.out.println("Fecha Activacion base:"+fechaactivacionDestino+",Fecha origenes Base:"+fechaBase);
-                                            System.out.println("FechaActivacion Modificando:"+fechaactivacionDestino.replace("-", "/")+", FechaBase:"+fechaBase.replace("-","/"));
-                                            if (!fechaactivacionDestino.replace("-","/").equals(fechaBase.replace("-", "/"))) {
+                                            System.out.println("Fecha Activacion base:" + fechaactivacionDestino + ",Fecha origenes Base:" + fechaBase);
+                                            System.out.println("FechaActivacion Modificando:" + fechaactivacionDestino.replace("-", "/") + ", FechaBase:" + fechaBase.replace("-", "/"));
+                                            if (!fechaactivacionDestino.replace("-", "/").equals(fechaBase.replace("-", "/"))) {
                                                 System.out.println("Accedio porque la fecha activacion es diferente a la fechaTrabajo1");
                                                 if (se_puede_pagar > 0) {
                                                     //Datos a procesar
@@ -676,8 +727,7 @@ public abstract class FacadeTransaction<T> {
                                     //Busco el tipo el tipo de amortizacion
 
                                     if (aDestino.getTipoamortizacion() == 5) {
-                                       
-                                        
+
                                         SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
                                         String fechaactivacionDestino = sdf.format(aDestino.getFechaactivacion()).substring(0, 10);
                                         String fechaBase = fechaTr_.substring(0, 10);
@@ -688,22 +738,22 @@ public abstract class FacadeTransaction<T> {
                                                 + transaction.getAmount() + ",NULL)";
                                         Query query_se_puede_aplicar = em.createNativeQuery(si_se_puede_aplicar);
                                         Double se_puede_pagar = Double.parseDouble(String.valueOf(query_se_puede_aplicar.getSingleResult()));
-                                        System.out.println("Fecha Activacion base:"+fechaactivacionDestino+",Fecha origenes Base:"+fechaBase);
-                                        System.out.println("FechaActivacion Modificando:"+fechaactivacionDestino.replace("-", "/")+", FechaBase:"+fechaBase.replace("-","/"));
-                                       
+                                        System.out.println("Fecha Activacion base:" + fechaactivacionDestino + ",Fecha origenes Base:" + fechaBase);
+                                        System.out.println("FechaActivacion Modificando:" + fechaactivacionDestino.replace("-", "/") + ", FechaBase:" + fechaBase.replace("-", "/"));
+
                                         if (se_puede_pagar > 0) {
-                                            System.out.println("Fecha activacion Modificando :"+fechaactivacionDestino.replace("\\/","-") +" ,FechaBase:"+fechaBase);
-                                            if (!fechaactivacionDestino.replace("-","/").equals(fechaBase.replace("-", "/"))) {
-                                                
-                                                 //Datos a procesar
-                                        try {
-                                            consulta_datos_procesar = "SELECT sai_bankingly_aplica_transaccion('" + fechaTr_.substring(0, 10) + "'," + procesaOrigen.getIdusuario() + ",'" + procesaOrigen.getSesion() + "','" + procesaOrigen.getReferencia() + "')";
-                                            procesa_movimiento = em.createNativeQuery(consulta_datos_procesar);
-                                            total_procesados = Integer.parseInt(String.valueOf(procesa_movimiento.getSingleResult()));
-                                        } catch (Exception e) {
-                                            total_procesados = 0;
-                                        }
-                                        
+                                            System.out.println("Fecha activacion Modificando :" + fechaactivacionDestino.replace("\\/", "-") + " ,FechaBase:" + fechaBase);
+                                            if (!fechaactivacionDestino.replace("-", "/").equals(fechaBase.replace("-", "/"))) {
+
+                                                //Datos a procesar
+                                                try {
+                                                    consulta_datos_procesar = "SELECT sai_bankingly_aplica_transaccion('" + fechaTr_.substring(0, 10) + "'," + procesaOrigen.getIdusuario() + ",'" + procesaOrigen.getSesion() + "','" + procesaOrigen.getReferencia() + "')";
+                                                    procesa_movimiento = em.createNativeQuery(consulta_datos_procesar);
+                                                    total_procesados = Integer.parseInt(String.valueOf(procesa_movimiento.getSingleResult()));
+                                                } catch (Exception e) {
+                                                    total_procesados = 0;
+                                                }
+
                                                 if (total_procesados > 0) {
                                                     if (procesaOrigen.getMonto() > se_puede_pagar) {
                                                         double totalDevolver = procesaOrigen.getMonto() - se_puede_pagar;
@@ -1255,8 +1305,7 @@ public abstract class FacadeTransaction<T> {
                                 boolean bDestino = false;
                                 try {
                                     //Busco la cuenta destino
-                                    Query queryDestino = em.createNativeQuery(cuentaDestino, Auxiliares.class
-                                    );
+                                    Query queryDestino = em.createNativeQuery(cuentaDestino, Auxiliares.class);
                                     ctaDestino = (Auxiliares) queryDestino.getSingleResult();
                                     bDestino = true;
                                 } catch (Exception e) {
@@ -1265,8 +1314,7 @@ public abstract class FacadeTransaction<T> {
                                 }
                                 if (bDestino) {
                                     //Busco el producto destino
-                                    Productos productoDestino = em.find(Productos.class,
-                                            ctaDestino.getAuxiliaresPK().getIdproducto());
+                                    Productos productoDestino = em.find(Productos.class, ctaDestino.getAuxiliaresPK().getIdproducto());
                                     //Valido que la cuenta destino este activa
                                     if (ctaDestino.getEstatus() == 2) {
                                         //Busco si existe el producto destino en el catalogo de banca movil
@@ -1320,7 +1368,15 @@ public abstract class FacadeTransaction<T> {
                                                                     }
                                                                 }
                                                                 if (banderaProductosDeposito) {
+
                                                                     if (ctaDestino.getIdgrupo() == 20 || ctaDestino.getIdgrupo() == 25) {
+                                                                        Double montoMensual = 0.0;
+                                                                        Double montoDiario = 0.0;
+                                                                        Tabla tabla = null;
+                                                                        Query query_fecha_trabajo = em.createNativeQuery("SELECT to_char(fechatrabajo,'yyyy/mm/dd') FROM origenes limit 1");
+
+                                                                        String fecha_trabajo = String.valueOf(query_fecha_trabajo.getSingleResult());
+                                                                        /*
                                                                         //Deposito en pesos mexicanos menores
                                                                         Tabla tb_menores_permitido_diario = util2.busquedaTabla(em, "bankingly_banca_movil", "total_deposito_diario_menores");
                                                                         //Total en udis
@@ -1331,9 +1387,7 @@ public abstract class FacadeTransaction<T> {
                                                                         Tabla tb_juveniles_udis_mensual = util2.busquedaTabla(em, "bankingly_banca_movil", "total_udis_mensual_juveniles");
 
                                                                         //Obtengo la fecha de trabajo
-                                                                        Query query_fecha_trabajo = em.createNativeQuery("SELECT to_char(fechatrabajo,'yyyy/mm/dd') FROM origenes limit 1");
-
-                                                                        String fecha_trabajo = String.valueOf(query_fecha_trabajo.getSingleResult());
+                                                                       
 
                                                                         //tb_precio_udi en el periodo
                                                                         Tabla tb_precio_udi_periodo = util2.busquedaTabla(em, "valor_udi", fecha_trabajo.substring(0, 7).replace("/", ""));
@@ -1365,102 +1419,295 @@ public abstract class FacadeTransaction<T> {
                                                                         double monto_diario = 0;
                                                                         Query udis_mensual = null;
                                                                         double monto_udis_mensual = 0;
+
+                                                                        
+
                                                                         System.out.println("consulta_deposito_diario:" + consulta_permitido_diario);
-                                                                        System.out.println("Consulta_udis_mensual:" + consulta_udis_permitido);
+                                                                        System.out.println("Consulta_udis_mensual:" + consulta_udis_permitido);*/
 
-                                                                        //Si el grupo es un menor
-                                                                        if (ctaDestino.getIdgrupo() == 20) {
-                                                                            //Busco si lo que se le permite a un menor dirario no es mayor a lo que hay en la tabla  
+                                                                        //Busco el tutor del socio menor o juvenil
+                                                                        String consultaReferencia = " SELECT * FROM referencias "
+                                                                                + " WHERE idorigen =" + ctaDestino.getIdorigen()
+                                                                                + " AND idgrupo =" + ctaDestino.getIdgrupo()
+                                                                                + " AND idsocio =" + ctaDestino.getIdsocio()
+                                                                                + " AND tiporeferencia = 0 LIMIT 1";
+
+                                                                        Query query = em.createNativeQuery(consultaReferencia, Referencia.class);
+                                                                        Referencia referenciaMJ = (Referencia) query.getSingleResult();
+
+                                                                        //Si se encuentra el tutor
+                                                                        if (referenciaMJ != null) {
+                                                                            //Ahora si tiene tutor verificamos si es un socio o no 04012024
+                                                                            String consultaSocioTutor = " SELECT * FROM auxiliares "
+                                                                                    + " WHERE idorigen =" + referenciaMJ.getIdorigenr()
+                                                                                    + " AND idgrupo =" + referenciaMJ.getIdgrupor()
+                                                                                    + " AND idsocio =" + referenciaMJ.getIdsocior()
+                                                                                    + " AND idproducto = 101"
+                                                                                    + " AND saldo >= 1000 LIMIT 1";
+
+                                                                            query = em.createNativeQuery(consultaSocioTutor, Auxiliares.class);
+                                                                            Auxiliares auxiliarTutor = null;
                                                                             try {
-                                                                                System.out.println("Calculando el permitido diario...");
-                                                                                monto_permitido_diario = em.createNativeQuery(consulta_permitido_diario);
-                                                                                System.out.println("Ejecutando sentencia de busqueda...");
-                                                                                monto_diario = Double.parseDouble(String.valueOf(monto_permitido_diario.getSingleResult()));
-                                                                                System.out.println("La busqueda de permitido diario fue de:" + monto_diario);
-                                                                            } catch (Exception e) {
-                                                                                System.out.println("Error al buscar le maximo diario permitido:" + e.getMessage());
-                                                                                monto_diario = 0.0;
-                                                                            }
-                                                                            if ((monto_diario + monto) <= Double.parseDouble(tb_menores_permitido_diario.getDato1())) {
-                                                                                //Ahora busco todos los movimientos para saber el total de usdis
-                                                                                //Busco la tabla donde esta el total de udis
-                                                                                try {
-                                                                                    System.out.println("Buscando los udis mensual para menor...");
-                                                                                    udis_mensual = em.createNativeQuery(consulta_udis_permitido);
-                                                                                    System.out.println("Ejecutando consulta udis menor...");
-                                                                                    monto_udis_mensual = Double.parseDouble(String.valueOf(udis_mensual.getSingleResult())) / Double.parseDouble(tb_precio_udi_periodo.getDato1());
-                                                                                    System.out.println("Resultado udis menor es:" + monto_udis_mensual);
-                                                                                } catch (Exception e) {
-                                                                                    System.out.println("Error al buscar udis para menor:" + e.getMessage());
-                                                                                    monto_udis_mensual = 0;
-                                                                                }
-
-                                                                                if (monto_udis_mensual <= Double.parseDouble(tb_menores_udis_mensual.getDato1())) {
-                                                                                    message = message + " VALIDADO CON EXITO";
-                                                                                } else {
-                                                                                    message = "MONTO EN UDIS TRASPASA AL PERMITIDO POR MES";
-                                                                                }
-
-                                                                            } else {
-                                                                                message = "EL MONTO TRASPASA AL PERMITIDO DIARIO";
+                                                                                auxiliarTutor = (Auxiliares) query.getSingleResult();
+                                                                            } catch (NoResultException e) {
+                                                                                // Manejar caso donde no hay resultados
+                                                                                System.out.println("::::::No se encontró un resultado tutor socio::::::");
                                                                             }
 
-                                                                        } else if (ctaDestino.getIdgrupo() == 25) {//Si es un juvenil
-                                                                            //Busco si lo que se le permite a un menor dirario no es mayor a lo que hay en la tabla  
-                                                                            try {
-                                                                                System.out.println("Buscando monto diario para juvenil...");
-                                                                                monto_permitido_diario = em.createNativeQuery(consulta_permitido_diario);
-                                                                                System.out.println("Ejecutando sentencia de busqueda juvenil....");
-                                                                                monto_diario = Double.parseDouble(String.valueOf(monto_permitido_diario.getSingleResult()));
-                                                                                System.out.println("Resultado de monto diario juvenil:" + monto_diario);
-                                                                            } catch (Exception e) {
-                                                                                System.out.println("Error al buscar monto diario para juvenil:" + e.getMessage());
-                                                                                monto_diario = 0.0;
-                                                                            }
+                                                                            //Si es socio
+                                                                            if (auxiliarTutor != null) {
+                                                                                //Busco cuanto tiene en la cuenta glabla(Ahorro) modificacion integrada el 02022025
+                                                                                //Modificando desarrollo el 02/01/2025 para menores y juveniles
+                                                                                if (ctaDestino.getAuxiliaresPK().getIdproducto() == 120 || ctaDestino.getAuxiliaresPK().getIdproducto() == 125) {
+                                                                                    //Si la cuenta destino tercero menor es ahorro
+                                                                                    //Buscamos el monto maximo que debe tener en el ahorro
+                                                                                    tabla = util2.busquedaTabla(em, "bankingly_banca_movil", "maximo_ahorro_menorjuvenil");
+                                                                                    if ((ctaDestino.getSaldo().doubleValue() + monto) <= Double.parseDouble(tabla.getDato1())) {
+                                                                                        //Buscamos el monto maximo en transferencias mensual
+                                                                                        String consultaMaximoMes = "SELECT (CASE WHEN sum(monto)>0 THEN sum(monto) ELSE 0.0 END) FROM auxiliares_d"
+                                                                                                + " WHERE idorigenp = " + ctaDestino.getAuxiliaresPK().getIdorigenp()
+                                                                                                + " AND idproducto = " + ctaDestino.getAuxiliaresPK().getIdproducto()
+                                                                                                + " AND idauxiliar = " + ctaDestino.getAuxiliaresPK().getIdproducto()
+                                                                                                + " AND cargoabono=1"
+                                                                                                + " AND periodo='" + fecha_trabajo.substring(0, 7).replace("/", "") + "'";
 
-                                                                            if ((monto_diario + monto) <= Double.parseDouble(tb_juveniles_permitido_diario.getDato1())) {
-                                                                                //Ahora busco todos los movimientos para saber el total de usdis
-                                                                                //Busco la tabla donde esta el total de udis
-                                                                                try {
-                                                                                    System.out.println("Buscando udis mensual para juvenil...");
-                                                                                    udis_mensual = em.createNativeQuery(consulta_udis_permitido);
-                                                                                    System.out.println("Ejecutando sentencia busqueda udis mensual juvenil...");
-                                                                                    monto_udis_mensual = Double.parseDouble(String.valueOf(udis_mensual.getSingleResult())) / Double.parseDouble(tb_precio_udi_periodo.getDato1());
-                                                                                    System.out.println("Resultado udis mensual juvenil:" + monto_udis_mensual);
-                                                                                } catch (Exception e) {
-                                                                                    System.out.println("Error al buscar udis mensual juvenil:" + e.getMessage());
-                                                                                    monto_udis_mensual = 0;
-                                                                                }
-
-                                                                                if (monto_udis_mensual <= Double.parseDouble(tb_juveniles_udis_mensual.getDato1())) {
-
-                                                                                    //Valido que si tiene el 180 no puede recibir depositos en el 125
-                                                                                    boolean Bandera_180 = false;
-                                                                                    try {
-                                                                                        String busqueda_180 = "SELECT * FROM auxiliares WHERE idorigen=" + ctaDestino.getIdorigen() + " AND idgrupo=" + ctaDestino.getIdgrupo() + " AND idsocio=" + ctaDestino.getIdsocio() + " AND idproducto=180";
-                                                                                        Query query_180 = em.createNativeQuery(busqueda_180, Auxiliares.class
-                                                                                        );
-                                                                                        Auxiliares a_180 = (Auxiliares) query_180.getSingleResult();
-                                                                                        if (a_180 != null) {
-                                                                                            Bandera_180 = true;
+                                                                                        try {
+                                                                                            query = em.createNativeQuery(consultaMaximoMes);
+                                                                                            montoMensual = Double.parseDouble(String.valueOf(query.getSingleResult()));
+                                                                                        } catch (Exception e) {
+                                                                                            System.out.println(":::::::Error en la busqueda de monto maximo mensual::::::::");
                                                                                         }
+
+                                                                                        tabla = util2.busquedaTabla(em, "bankingly_banca_movil", "maximomensual_menorjuvenil_tutorsocio");
+                                                                                        if ((montoMensual + monto) <= Double.parseDouble(tabla.getDato1())) {
+
+                                                                                            String consultaMaximoDiario = "SELECT (CASE WHEN sum(monto)>0 THEN sum(monto) else 0.0 END) FROM auxiliares_d"
+                                                                                                    + " WHERE idorigenp = " + ctaDestino.getAuxiliaresPK().getIdorigenp()
+                                                                                                    + " AND idproducto  = " + ctaDestino.getAuxiliaresPK().getIdproducto()
+                                                                                                    + " AND idauxiliar  = " + ctaDestino.getAuxiliaresPK().getIdauxiliar()
+                                                                                                    + " AND date(fecha) ='" + fecha_trabajo + "'"
+                                                                                                    + " AND cargoabono  =1";
+
+                                                                                            query = em.createNamedQuery(consultaMaximoDiario);
+                                                                                            montoDiario = Double.parseDouble(String.valueOf(query.getSingleResult()));
+
+                                                                                            tabla = util2.busquedaTabla(em, "bankingly_banca_movil", "maximodiario_menorjuvenil_tutorsocio");
+                                                                                            if ((montoDiario + monto) <= Double.parseDouble(tabla.getDato1())) {
+                                                                                                if (ctaDestino.getIdgrupo() == 25) {//Validacion solo para juvenil
+                                                                                                    String busqueda_180 = "SELECT * FROM auxiliares WHERE"
+                                                                                                            + " idorigen=" + ctaDestino.getIdorigen()
+                                                                                                            + " AND idgrupo=" + ctaDestino.getIdgrupo()
+                                                                                                            + " AND idsocio=" + ctaDestino.getIdsocio()
+                                                                                                            + " AND idproducto=180 AND estatus in(0,,1,2)";
+
+                                                                                                    Query query_180 = em.createNativeQuery(busqueda_180, Auxiliares.class);
+                                                                                                    Auxiliares a_180 = (Auxiliares) query_180.getSingleResult();
+                                                                                                    if (a_180 != null) {
+                                                                                                        System.out.println("::::::::::::SOCIO JUVENIL NO SE LE PERMITE MOVIMIENTOS::::::::::::");
+                                                                                                        message = "::::::::::::::::::::SOCIO JUVENIL NO SE LE PERMITE MOVIMIENTOS:::::::::::::::::::";
+                                                                                                    } else {
+                                                                                                        message = message + " VALIDADO CON EXITO";
+                                                                                                    }
+                                                                                                } else {
+                                                                                                    message = message + " VALIDADO CON EXITO";
+                                                                                                }
+
+                                                                                            } else {
+                                                                                                message = "MAXIMO DIARIO ALCANZADO";
+                                                                                                System.out.println("::::::Monto + monto diario excede el limite permitido::::::::::::::");
+                                                                                            }
+                                                                                        } else {
+                                                                                            message = "MAXIMO MENSUAL ALCANZADO";
+                                                                                            System.out.println("::::::Monto + monto mensual excede el limite permitido::::::::::::::");
+                                                                                        }
+
+                                                                                    } else {
+                                                                                        System.out.println("::::::::::::::Cuenta ahorro para grupo:" + ctaDestino.getIdgrupo() + " excede limite maximo:" + tabla.getDato1() + ":::::::::::");
+                                                                                        message = "CUENTA AHORRO MENOR EXCEDE LIMITE MAXIMO";
+                                                                                    }
+                                                                                }
+
+                                                                                /*if (ctaDestino.getIdgrupo() == 25) {//Si es un juvenil Comentado el 03012025 por integracion de validacion solicitada
+                                                                                    
+                                                                                      if (ctaDestino.getAuxiliaresPK().getIdproducto() == 120) {
+                                                                                          
+                                                                                      }
+                                                                                    
+                                                                                    
+                                                                                    
+                                                                                    //Busco si lo que se le permite a un menor dirario no es mayor a lo que hay en la tabla  
+                                                                                    try {
+                                                                                        System.out.println("Buscando monto diario para juvenil...");
+                                                                                        monto_permitido_diario = em.createNativeQuery(consulta_permitido_diario);
+                                                                                        System.out.println("Ejecutando sentencia de busqueda juvenil....");
+                                                                                        monto_diario = Double.parseDouble(String.valueOf(monto_permitido_diario.getSingleResult()));
+                                                                                        System.out.println("Resultado de monto diario juvenil:" + monto_diario);
                                                                                     } catch (Exception e) {
-                                                                                        Bandera_180 = false;
+                                                                                        System.out.println("Error al buscar monto diario para juvenil:" + e.getMessage());
+                                                                                        monto_diario = 0.0;
                                                                                     }
 
-                                                                                    if (!Bandera_180) {
+                                                                                    if ((monto_diario + monto) <= Double.parseDouble(tb_juveniles_permitido_diario.getDato1())) {
+                                                                                        //Ahora busco todos los movimientos para saber el total de usdis
+                                                                                        //Busco la tabla donde esta el total de udis
+                                                                                        try {
+                                                                                            System.out.println("Buscando udis mensual para juvenil...");
+                                                                                            udis_mensual = em.createNativeQuery(consulta_udis_permitido);
+                                                                                            System.out.println("Ejecutando sentencia busqueda udis mensual juvenil...");
+                                                                                            monto_udis_mensual = Double.parseDouble(String.valueOf(udis_mensual.getSingleResult())) / Double.parseDouble(tb_precio_udi_periodo.getDato1());
+                                                                                            System.out.println("Resultado udis mensual juvenil:" + monto_udis_mensual);
+                                                                                        } catch (Exception e) {
+                                                                                            System.out.println("Error al buscar udis mensual juvenil:" + e.getMessage());
+                                                                                            monto_udis_mensual = 0;
+                                                                                        }
+
+                                                                                        if (monto_udis_mensual <= Double.parseDouble(tb_juveniles_udis_mensual.getDato1())) {
+
+                                                                                            //Valido que si tiene el 180 no puede recibir depositos en el 125
+                                                                                            boolean Bandera_180 = false;
+                                                                                            try {
+                                                                                                String busqueda_180 = "SELECT * FROM auxiliares WHERE idorigen=" + ctaDestino.getIdorigen() + " AND idgrupo=" + ctaDestino.getIdgrupo() + " AND idsocio=" + ctaDestino.getIdsocio() + " AND idproducto=180";
+                                                                                                Query query_180 = em.createNativeQuery(busqueda_180, Auxiliares.class
+                                                                                                );
+                                                                                                Auxiliares a_180 = (Auxiliares) query_180.getSingleResult();
+                                                                                                if (a_180 != null) {
+                                                                                                    Bandera_180 = true;
+                                                                                                }
+                                                                                            } catch (Exception e) {
+                                                                                                Bandera_180 = false;
+                                                                                            }
+
+                                                                                            if (!Bandera_180) {
+                                                                                                message = message + " VALIDADO CON EXITO";
+                                                                                            } else {
+                                                                                                message = "VERIFIQUE EL GRUPO DE SOCIO";
+                                                                                            }
+                                                                                        } else {
+                                                                                            message = "MONTO EN UDIS TRASPASA AL PERMITIDO POR MES";
+                                                                                        }
+
+                                                                                    } else {
+                                                                                        message = "EL MONTO DIARIO PERMITIDO TRASPASA AL PERMITIDO";
+                                                                                    }
+                                                                                }*/
+                                                                            } else {//No es socio
+
+                                                                                tabla = util2.busquedaTabla(em, "valor_udi", fecha_trabajo.substring(0, 7).replace("/", ""));
+                                                                                double valorUdiMes = Double.parseDouble(tabla.getDato1());
+                                                                                Double udisMaximo = (ctaDestino.getSaldo().doubleValue() + monto) / valorUdiMes;
+                                                                                Double udisMaximoMensual = 0.0;
+
+                                                                                tabla = util2.busquedaTabla(em, "bankigly_banca_movil", "maximoudis_menorjuvenil_tutornosocio");
+
+                                                                                if (udisMaximo <= Double.parseDouble(tabla.getDato1())) {
+                                                                                    String consultaMaximo = "SELECT (CASE WHEN sum(monto)>0 THEN sum(monto) ELSE 0.0 END) FROM auxiliares_d"
+                                                                                            + " WHERE idorigenp = " + ctaDestino.getAuxiliaresPK().getIdorigenp()
+                                                                                            + " AND idproducto = " + ctaDestino.getAuxiliaresPK().getIdproducto()
+                                                                                            + " AND idauxiliar = " + ctaDestino.getAuxiliaresPK().getIdauxiliar()
+                                                                                            + " AND cargoabono = 1"
+                                                                                            + " AND periodo = '" + fecha_trabajo.substring(0, 7).replace("/", "") + "'";
+
+                                                                                    try {
+                                                                                        query = em.createNativeQuery(consultaMaximo);
+                                                                                        montoMensual = Double.parseDouble(String.valueOf(query.getSingleResult()));
+                                                                                        udisMaximo = (montoMensual + monto) / valorUdiMes;
+                                                                                    } catch (Exception e) {
+                                                                                        System.out.println(":::::::::Error al obtener total UDIS en el mes:::::::::::::");
+                                                                                    }
+
+                                                                                    tabla = util2.busquedaTabla(em, "bankingly_banca_movil", "maximoudis_mensual_menorjuvenil_tutornosocio");
+                                                                                    if (udisMaximo <= Double.parseDouble(tabla.getDato1())) {
+                                                                                        consultaMaximo = "SELECT (CASE WHEN sum(monto)>0 THEN sum(monto) else 0.0 END) FROM auxiliares_d"
+                                                                                                + " WHERE idorigenp = " + ctaDestino.getAuxiliaresPK().getIdorigenp()
+                                                                                                + " AND idproducto  = " + ctaDestino.getAuxiliaresPK().getIdproducto()
+                                                                                                + " AND idauxiliar  = " + ctaDestino.getAuxiliaresPK().getIdauxiliar()
+                                                                                                + " AND date(fecha) ='" + fecha_trabajo + "'"
+                                                                                                + " AND cargoabono  =1";
+                                                                                        try {
+                                                                                            query = em.createNativeQuery(consultaMaximo);
+                                                                                            montoDiario = (Double.parseDouble(String.valueOf(query.getSingleResult())) + monto);
+                                                                                        } catch (Exception e) {
+                                                                                            System.out.println("::::::Error al buscar UDIS diario mensual::::::::");
+                                                                                        }
+
+                                                                                        tabla = util2.busquedaTabla(em, "bankingly_banca_movil", "maximodiario_menorjuvenil_tutorsocio");
+
+                                                                                        if (montoDiario <= Double.parseDouble(String.valueOf(tabla.getDato1()))) {
+                                                                                            if (ctaDestino.getIdgrupo() == 25) {//Validacion solo para juvenil
+                                                                                                String busqueda_180 = "SELECT * FROM auxiliares WHERE"
+                                                                                                        + " idorigen=" + ctaDestino.getIdorigen()
+                                                                                                        + " AND idgrupo=" + ctaDestino.getIdgrupo()
+                                                                                                        + " AND idsocio=" + ctaDestino.getIdsocio()
+                                                                                                        + " AND idproducto=180 AND estatus in(0,,1,2)";
+
+                                                                                                Query query_180 = em.createNativeQuery(busqueda_180, Auxiliares.class);
+                                                                                                Auxiliares a_180 = (Auxiliares) query_180.getSingleResult();
+                                                                                                if (a_180 != null) {
+                                                                                                    System.out.println("::::::::::::SOCIO JUVENIL NO SE LE PERMITE MOVIMIENTOS::::::::::::");
+                                                                                                    message = "::::::::::::::::::::SOCIO JUVENIL NO SE LE PERMITE MOVIMIENTOS:::::::::::::::::::";
+                                                                                                } else {
+                                                                                                    message = message + " VALIDADO CON EXITO";
+                                                                                                }
+                                                                                            } else {
+                                                                                                message = message + " VALIDADO CON EXITO";
+                                                                                            }
+                                                                                        } else {
+                                                                                            message = "MONTO DIARIO TRASPASA LO PERMITIDO";
+                                                                                            System.out.println("::::::Monto diario traspasa lo permitido:::::::::::::");
+                                                                                        }
+                                                                                    } else {
+                                                                                        message = "UDIS MAXIMO MENSUAL ALCANZADO";
+                                                                                        System.out.println("::::::Udis maximo mensual alcanzado:::::::::::::");
+                                                                                    }
+
+                                                                                } else {
+                                                                                    System.out.println("::::::::::::::Cuenta ahorro para grupo:" + ctaDestino.getIdgrupo() + " excede limite maximo en UDIS:" + tabla.getDato1() + ":::::::::::");
+                                                                                    message = "CUENTA AHORRO MENOR EXCEDE LIMITE MAXIMO EN UDIS";
+                                                                                }
+
+                                                                                /*
+                                                                                try {
+                                                                                    query = em.createNativeQuery(consultaSaldoAhorro);
+
+                                                                                    System.out.println("Calculando el permitido diario...");
+                                                                                    monto_permitido_diario = em.createNativeQuery(consulta_permitido_diario);
+                                                                                    System.out.println("Ejecutando sentencia de busqueda...");
+                                                                                    monto_diario = Double.parseDouble(String.valueOf(monto_permitido_diario.getSingleResult()));
+                                                                                    System.out.println("La busqueda de permitido diario fue de:" + monto_diario);
+                                                                                } catch (Exception e) {
+                                                                                    System.out.println("Error al buscar le maximo diario permitido:" + e.getMessage());
+                                                                                    monto_diario = 0.0;
+                                                                                }
+                                                                                if ((monto_diario + monto) <= Double.parseDouble(tb_menores_permitido_diario.getDato1())) {
+                                                                                    //Ahora busco todos los movimientos para saber el total de usdis
+                                                                                    //Busco la tabla donde esta el total de udis
+                                                                                    try {
+                                                                                        System.out.println("Buscando los udis mensual para menor...");
+                                                                                        udis_mensual = em.createNativeQuery(consulta_udis_permitido);
+                                                                                        System.out.println("Ejecutando consulta udis menor...");
+                                                                                        monto_udis_mensual = Double.parseDouble(String.valueOf(udis_mensual.getSingleResult())) / Double.parseDouble(tb_precio_udi_periodo.getDato1());
+                                                                                        System.out.println("Resultado udis menor es:" + monto_udis_mensual);
+                                                                                    } catch (Exception e) {
+                                                                                        System.out.println("Error al buscar udis para menor:" + e.getMessage());
+                                                                                        monto_udis_mensual = 0;
+                                                                                    }
+
+                                                                                    if (monto_udis_mensual <= Double.parseDouble(tb_menores_udis_mensual.getDato1())) {
                                                                                         message = message + " VALIDADO CON EXITO";
                                                                                     } else {
-                                                                                        message = "VERIFIQUE EL GRUPO DE SOCIO";
+                                                                                        message = "MONTO EN UDIS TRASPASA AL PERMITIDO POR MES";
                                                                                     }
-                                                                                } else {
-                                                                                    message = "MONTO EN UDIS TRASPASA AL PERMITIDO POR MES";
-                                                                                }
 
-                                                                            } else {
-                                                                                message = "EL MONTO DIARIO PERMITIDO TRASPASA AL PERMITIDO";
+                                                                                } else {
+                                                                                    message = "EL MONTO TRASPASA AL PERMITIDO DIARIO";
+                                                                                }*/
                                                                             }
+
+                                                                        } else {
+                                                                            System.out.println(":::::::::::::Socio menor o juvenil sin tutor,no puede continuar:::::::::::::::");
+                                                                            message = "SOCIO MENOR O JUVENIL SIN TUTOR";
                                                                         }
+
                                                                     } else {//el resto                                                                        
                                                                         //tb_precio_udi en el periodo
                                                                         //Obtengo la fecha de trabajo
@@ -1973,9 +2220,7 @@ public abstract class FacadeTransaction<T> {
             request.put("rfcCurpBeneficiario", orden.getRfcCurpBeneficiario());
             request.put("cuentaBeneficiario", orden.getCuentaBeneficiario());
             request.put("latitud", orden.getLatitud());
-            request.put("longitud",orden.getLongitud());
-            
-            
+            request.put("longitud", orden.getLongitud());
 
             //Busco la tabla para el proyecto SPEI 
             TablaPK urlTablaPK = new TablaPK("bankingly_banca_movil", "speipath");
