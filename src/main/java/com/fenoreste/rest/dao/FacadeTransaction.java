@@ -1494,15 +1494,15 @@ public abstract class FacadeTransaction<T> {
                                                                                             tabla = util2.busquedaTabla(em, "bankingly_banca_movil", "maximodiario_menorjuvenil_tutorsocio");
                                                                                             if ((montoDiario + monto) <= Double.parseDouble(tabla.getDato1())) {
                                                                                                 if (ctaDestino.getIdgrupo() == 25) {//Validacion solo para juvenil
-                                                                                                    String busqueda_180 = "SELECT * FROM auxiliares WHERE"
+                                                                                                    String busqueda_182 = "SELECT * FROM auxiliares WHERE"
                                                                                                             + " idorigen=" + ctaDestino.getIdorigen()
                                                                                                             + " AND idgrupo=" + ctaDestino.getIdgrupo()
                                                                                                             + " AND idsocio=" + ctaDestino.getIdsocio()
-                                                                                                            + " AND idproducto=180 AND estatus in(0,,1,2)";
+                                                                                                            + " AND idproducto=182 AND estatus in(0,,1,2)";
 
-                                                                                                    Query query_180 = em.createNativeQuery(busqueda_180, Auxiliares.class);
-                                                                                                    Auxiliares a_180 = (Auxiliares) query_180.getSingleResult();
-                                                                                                    if (a_180 != null) {
+                                                                                                    Query query_182 = em.createNativeQuery(busqueda_182, Auxiliares.class);
+                                                                                                    Auxiliares a_182 = (Auxiliares) query_182.getSingleResult();
+                                                                                                    if (a_182 != null) {
                                                                                                         System.out.println("::::::::::::SOCIO JUVENIL NO SE LE PERMITE MOVIMIENTOS::::::::::::");
                                                                                                         message = "::::::::::::::::::::SOCIO JUVENIL NO SE LE PERMITE MOVIMIENTOS:::::::::::::::::::";
                                                                                                     } else {
@@ -1634,15 +1634,15 @@ public abstract class FacadeTransaction<T> {
 
                                                                                         if (montoDiario <= Double.parseDouble(String.valueOf(tabla.getDato1()))) {
                                                                                             if (ctaDestino.getIdgrupo() == 25) {//Validacion solo para juvenil
-                                                                                                String busqueda_180 = "SELECT * FROM auxiliares WHERE"
+                                                                                                String busqueda_182 = "SELECT * FROM auxiliares WHERE"
                                                                                                         + " idorigen=" + ctaDestino.getIdorigen()
                                                                                                         + " AND idgrupo=" + ctaDestino.getIdgrupo()
                                                                                                         + " AND idsocio=" + ctaDestino.getIdsocio()
-                                                                                                        + " AND idproducto=180 AND estatus in(0,,1,2)";
+                                                                                                        + " AND idproducto=182 AND estatus in(0,,1,2)";
 
-                                                                                                Query query_180 = em.createNativeQuery(busqueda_180, Auxiliares.class);
-                                                                                                Auxiliares a_180 = (Auxiliares) query_180.getSingleResult();
-                                                                                                if (a_180 != null) {
+                                                                                                Query query_182 = em.createNativeQuery(busqueda_182, Auxiliares.class);
+                                                                                                Auxiliares a_182 = (Auxiliares) query_182.getSingleResult();
+                                                                                                if (a_182 != null) {
                                                                                                     System.out.println("::::::::::::SOCIO JUVENIL NO SE LE PERMITE MOVIMIENTOS::::::::::::");
                                                                                                     message = "::::::::::::::::::::SOCIO JUVENIL NO SE LE PERMITE MOVIMIENTOS:::::::::::::::::::";
                                                                                                 } else {
