@@ -1467,7 +1467,7 @@ public abstract class FacadeTransaction<T> {
                                                                                         String consultaMaximoMes = "SELECT (CASE WHEN sum(monto)>0 THEN sum(monto) ELSE 0.0 END) FROM auxiliares_d"
                                                                                                 + " WHERE idorigenp = " + ctaDestino.getAuxiliaresPK().getIdorigenp()
                                                                                                 + " AND idproducto = " + ctaDestino.getAuxiliaresPK().getIdproducto()
-                                                                                                + " AND idauxiliar = " + ctaDestino.getAuxiliaresPK().getIdproducto()
+                                                                                                + " AND idauxiliar = " + ctaDestino.getAuxiliaresPK().getIdauxiliar()
                                                                                                 + " AND cargoabono=1"
                                                                                                 + " AND periodo='" + fecha_trabajo.substring(0, 7).replace("/", "") + "'";
 
