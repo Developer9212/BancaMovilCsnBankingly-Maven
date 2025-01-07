@@ -6,6 +6,7 @@
 package com.fenoreste.rest.RESTservices;
 
 import com.fenoreste.rest.Request.FixedTermMethodPaymentDTO;
+import com.fenoreste.rest.Request.TermDataReqVo;
 import com.fenoreste.rest.ResponseDTO.TermDataResVo;
 import com.fenoreste.rest.ResponseDTO.DetallesInversionDTO;
 import com.fenoreste.rest.dao.FixedTermDepositDAO;
@@ -19,6 +20,7 @@ import com.github.cliftonlabs.json_simple.JsonObject;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import com.fenoreste.rest.ResponseDTO.FixedTermMethodPaymentResponseDTO;
+
 /**
  *
  * @author nahum
@@ -33,7 +35,7 @@ public class FixedTermDepositResources {
 
         FixedTermDepositDAO metodos = new FixedTermDepositDAO();
         JsonObject Json_De_Error = new JsonObject();
-        
+
         if (!metodos.actividad_horario()) {
             Json_De_Error.put("ERROR", "VERIFIQUE SU HORARIO DE ACTIVIDAD FECHA,HORA O CONTACTE A SU PROVEEEDOR");
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Json_De_Error).build();
@@ -41,7 +43,7 @@ public class FixedTermDepositResources {
 
         String accountId = productBankIdentifier;
         DetallesInversionDTO info_cuenta = null;
-        
+
         try {
             info_cuenta = metodos.getDetallesInversion(accountId);
             if (info_cuenta != null) {
@@ -54,42 +56,53 @@ public class FixedTermDepositResources {
             return Response.status(Response.Status.BAD_REQUEST).entity(Json_De_Error).build();
         }
     }
-    
-    
+
     @POST
-    @Path("/fixedTermDepositTermsData")
+    @Path("fixedTermDepositTermsData")
     @Produces({MediaType.APPLICATION_JSON + ";charset=utf-8"})
     @Consumes({MediaType.APPLICATION_JSON + ";charset=utf-8"})
-    public Response methodPayment(TermDataResVo request) {
-        
-        
-      return null;  
+    public Response fixedTermDepositTermsData(TermDataReqVo request) {
+        FixedTermDepositDAO fixedTermDepositDAO = new FixedTermDepositDAO();
+        System.out.println("La peticion fixed Term Deposit Terms Data:" + request);
+        JsonObject json = new JsonObject();
+
+        if (!fixedTermDepositDAO.actividad_horario()) {
+            json.put("ERROR", "VERIFIQUE SU HORARIO DE ACTIVIDAD FECHA,HORA O CONTACTE A SU PROVEEEDOR");
+            return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(json).build();
+        }
+
+        try {
+
+        } catch (Exception e) {
+            System.out.println("::::::::Error al ejecutar condiciones de deposito a plazo::::::::::::");
+        }
+
+        return null;
     }
-    
+
     @POST
     @Path("/fixedTermDepositMethodsPayment")
     @Produces({MediaType.APPLICATION_JSON + ";charset=utf-8"})
     @Consumes({MediaType.APPLICATION_JSON + ";charset=utf-8"})
     public Response methodPayment(FixedTermMethodPaymentDTO request) {
 
+        System.out.println("La peticion Fixed Term Method Payment :" + request);
         FixedTermDepositDAO metodos = new FixedTermDepositDAO();
         JsonObject Json_De_Error = new JsonObject();
-        FixedTermMethodPaymentResponseDTO response;
-        
+        FixedTermMethodPaymentResponseDTO response = new FixedTermMethodPaymentResponseDTO();
+
         if (!metodos.actividad_horario()) {
             Json_De_Error.put("ERROR", "VERIFIQUE SU HORARIO DE ACTIVIDAD FECHA,HORA O CONTACTE A SU PROVEEEDOR");
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(Json_De_Error).build();
         }
-        
+
         try {
-            
-            
+
         } catch (Exception e) {
-            
-            
+
         }
-   return null;
-        
+        return null;
+
         /*
         
         try {
@@ -104,8 +117,38 @@ public class FixedTermDepositResources {
             return Response.status(Response.Status.BAD_REQUEST).entity(Json_De_Error).build();
         }*/
     }
-    
-    
-    
+
+    @POST
+    @Path("/fixedTermDepositInterestData")
+    @Produces({MediaType.APPLICATION_JSON + ";charset=utf-8"})
+    @Consumes({MediaType.APPLICATION_JSON + ";charset=utf-8"})
+    public Response interesesDepositoPlazo(String cadena) {
+
+        System.out.println("La peticion Fixed Term Deposit Interest Data :" + cadena);
+
+        return null;
+    }
+
+    @POST
+    @Path("/insertFixedTermDeposit")
+    @Produces({MediaType.APPLICATION_JSON + ";charset=utf-8"})
+    @Consumes({MediaType.APPLICATION_JSON + ";charset=utf-8"})
+    public Response terminarDepositoPlazo(String cadena) {
+
+        System.out.println("La peticion Insert Fixed Term Deposit :" + cadena);
+
+        return null;
+    }
+
+    @POST
+    @Path("/renewalTypesFixedTermDeposit")
+    @Produces({MediaType.APPLICATION_JSON + ";charset=utf-8"})
+    @Consumes({MediaType.APPLICATION_JSON + ";charset=utf-8"})
+    public Response condicionesRenovacionDepositoPlazo(String cadena) {
+
+        System.out.println("La peticion renewal Types Fixed Term Deposit :" + cadena);
+
+        return null;
+    }
 
 }

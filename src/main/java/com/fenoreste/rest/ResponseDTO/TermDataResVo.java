@@ -10,44 +10,74 @@ package com.fenoreste.rest.ResponseDTO;
  * @author Will
  */
 public class TermDataResVo implements java.io.Serializable {
-    
+
     private static final long serialVersionUID = 1L;
-    
-    private String fixedTermDepositType;
-    private String clientBankIdentifier;
-    private String debitProductBankIdentifier;
-    private String debitCurrencyId;
+
+    private Integer fixedTermDepositType;
+    private boolean enableTermsFromBackend;
+    private Double depositAmount;
+    private Double minDepositAmount;
+    private Integer termLimit;
+    private String dueDate;
 
     public TermDataResVo() {
     }
 
-  
-    public String getClientBankIdentifier() {
-        return clientBankIdentifier;
+    public TermDataResVo(Integer fixedTermDepositType, boolean enableTermsFromBackend, Double depositAmount, Double minDepositAmount, Integer termLimit, String dueDate) {
+        this.fixedTermDepositType = fixedTermDepositType;
+        this.enableTermsFromBackend = enableTermsFromBackend;
+        this.depositAmount = depositAmount;
+        this.minDepositAmount = minDepositAmount;
+        this.termLimit = termLimit;
+        this.dueDate = dueDate;
     }
 
-    public void setClientBankIdentifier(String clientBankIdentifier) {
-        this.clientBankIdentifier = clientBankIdentifier;
+    public Integer getFixedTermDepositType() {
+        return fixedTermDepositType;
     }
 
-    public String getDebitProductBankIdentifier() {
-        return debitProductBankIdentifier;
+    public void setFixedTermDepositType(Integer fixedTermDepositType) {
+        this.fixedTermDepositType = fixedTermDepositType;
     }
 
-    public void setDebitProductBankIdentifier(String debitProductBankIdentifier) {
-        this.debitProductBankIdentifier = debitProductBankIdentifier;
+    public boolean isEnableTermsFromBackend() {
+        return enableTermsFromBackend;
     }
 
-    public String getDebitCurrencyId() {
-        return debitCurrencyId;
+    public void setEnableTermsFromBackend(boolean enableTermsFromBackend) {
+        this.enableTermsFromBackend = enableTermsFromBackend;
     }
 
-    public void setDebitCurrencyId(String debitCurrencyId) {
-        this.debitCurrencyId = debitCurrencyId;
+    public Double getDepositAmount() {
+        return depositAmount;
     }
 
-    
-    
-    
-    
+    public void setDepositAmount(Double depositAmount) {
+        this.depositAmount = depositAmount;
+    }
+
+    public Double getMinDepositAmount() {
+        return minDepositAmount;
+    }
+
+    public void setMinDepositAmount(Double minDepositAmount) {
+        this.minDepositAmount = minDepositAmount;
+    }
+
+    public Integer getTermLimit() {
+        return termLimit;
+    }
+
+    public void setTermLimit(Integer termLimit) {
+        this.termLimit = termLimit;
+    }
+
+    public String getDueDate() {
+        return dueDate;
+    }
+
+    public void setDueDate(String dueDate) {
+        this.dueDate = dueDate;
+    }
+
 }
