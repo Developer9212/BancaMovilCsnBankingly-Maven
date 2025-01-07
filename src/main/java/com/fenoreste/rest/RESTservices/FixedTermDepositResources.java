@@ -27,7 +27,9 @@ import com.fenoreste.rest.ResponseDTO.FixedTermMethodPaymentResponseDTO;
  */
 @Path("/fixedTermDeposit")
 public class FixedTermDepositResources {
-
+    
+    
+    //fixedTermDeposit/fixedTermDepositTermsData
     @GET
     @Path("/details/{productBankIdentifier}")
     @Produces({MediaType.APPLICATION_JSON + ";charset=utf-8"})
@@ -58,7 +60,7 @@ public class FixedTermDepositResources {
     }
 
     @POST
-    @Path("fixedTermDepositTermsData")
+    @Path("/GetFixedTermDepositTermsData/")
     @Produces({MediaType.APPLICATION_JSON + ";charset=utf-8"})
     @Consumes({MediaType.APPLICATION_JSON + ";charset=utf-8"})
     public Response fixedTermDepositTermsData(TermDataReqVo request) {
@@ -81,7 +83,7 @@ public class FixedTermDepositResources {
     }
 
     @POST
-    @Path("/fixedTermDepositMethodsPayment")
+    @Path("/GetFixedTermDepositPaymentMethods")
     @Produces({MediaType.APPLICATION_JSON + ";charset=utf-8"})
     @Consumes({MediaType.APPLICATION_JSON + ";charset=utf-8"})
     public Response methodPayment(FixedTermMethodPaymentDTO request) {
@@ -119,7 +121,7 @@ public class FixedTermDepositResources {
     }
 
     @POST
-    @Path("/fixedTermDepositInterestData")
+    @Path("/GetFixedTermDepositInterestData")
     @Produces({MediaType.APPLICATION_JSON + ";charset=utf-8"})
     @Consumes({MediaType.APPLICATION_JSON + ";charset=utf-8"})
     public Response interesesDepositoPlazo(String cadena) {
@@ -130,7 +132,7 @@ public class FixedTermDepositResources {
     }
 
     @POST
-    @Path("/insertFixedTermDeposit")
+    @Path("/InsertFixedTermDeposit")
     @Produces({MediaType.APPLICATION_JSON + ";charset=utf-8"})
     @Consumes({MediaType.APPLICATION_JSON + ";charset=utf-8"})
     public Response terminarDepositoPlazo(String cadena) {
@@ -141,7 +143,7 @@ public class FixedTermDepositResources {
     }
 
     @POST
-    @Path("/renewalTypesFixedTermDeposit")
+    @Path("/GetRenewalTypesFixedTermDeposit")
     @Produces({MediaType.APPLICATION_JSON + ";charset=utf-8"})
     @Consumes({MediaType.APPLICATION_JSON + ";charset=utf-8"})
     public Response condicionesRenovacionDepositoPlazo(String cadena) {

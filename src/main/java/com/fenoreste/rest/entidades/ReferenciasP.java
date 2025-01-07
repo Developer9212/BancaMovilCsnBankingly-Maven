@@ -19,7 +19,7 @@ import javax.persistence.Table;
 public class ReferenciasP implements Serializable {
 
     @EmbeddedId
-    protected AuxiliaresPK auxiliaresPK;
+    protected AuxiliarPK auxiliaresPK;
     private Double tiporeferencia;
     private String referencia;
     private Integer idorigenpr;
@@ -29,11 +29,11 @@ public class ReferenciasP implements Serializable {
     public ReferenciasP() {
     }
 
-    public AuxiliaresPK getAuxiliaresPK() {
+    public AuxiliarPK getAuxiliaresPK() {
         return auxiliaresPK;
     }
 
-    public void setAuxiliaresPK(AuxiliaresPK auxiliaresPK) {
+    public void setAuxiliaresPK(AuxiliarPK auxiliaresPK) {
         this.auxiliaresPK = auxiliaresPK;
     }
 

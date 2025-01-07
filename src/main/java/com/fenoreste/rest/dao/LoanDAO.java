@@ -1,9 +1,9 @@
 package com.fenoreste.rest.dao;
 
-import com.fenoreste.rest.entidades.Auxiliares;
+import com.fenoreste.rest.entidades.Auxiliar;
 
-public class LoanDAO extends FacadeLoan<Auxiliares>{
+public class LoanDAO extends FacadeLoan<Auxiliar>{
 	 public LoanDAO() {
-		    super(Auxiliares.class);		  
+		    super(Auxiliar.class);		  
      } 
 	}

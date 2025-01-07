@@ -5,16 +5,16 @@
  */
 package com.fenoreste.rest.dao;
 
-import com.fenoreste.rest.entidades.Auxiliares;
+import com.fenoreste.rest.entidades.Auxiliar;
 
 /**
  *
  * @author wilmer
  */
-public class TercerosDAO extends FacadeTerceros<Auxiliares> {
+public class TercerosDAO extends FacadeTerceros<Auxiliar> {
 
     public TercerosDAO() {
-        super(Auxiliares.class);
+        super(Auxiliar.class);
     }
     
 }

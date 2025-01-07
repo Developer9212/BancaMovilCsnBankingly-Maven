@@ -24,7 +24,7 @@ public class Clabes_Interbancarias implements Serializable  {
     private static final long serialVersionUID = 1L;
     
     @EmbeddedId
-    AuxiliaresPK aux_pk;
+    AuxiliarPK aux_pk;
     private String clabe;
     @Temporal(TemporalType.TIMESTAMP)
     private Date fecha_hora;
@@ -35,11 +35,11 @@ public class Clabes_Interbancarias implements Serializable  {
     public Clabes_Interbancarias() {
     }
 
-    public AuxiliaresPK getAux_pk() {
+    public AuxiliarPK getAux_pk() {
         return aux_pk;
     }
 
-    public void setAux_pk(AuxiliaresPK aux_pk) {
+    public void setAux_pk(AuxiliarPK aux_pk) {
         this.aux_pk = aux_pk;
     }
 

@@ -5,14 +5,14 @@
  */
 package com.fenoreste.rest.dao;
 
-import com.fenoreste.rest.entidades.Auxiliares;
+import com.fenoreste.rest.entidades.Auxiliar;
 
 /**
  *
  * @author nahum
  */
-public class FixedTermDepositDAO extends FacadeFixedTermDeposit<Auxiliares>{
+public class FixedTermDepositDAO extends FacadeFixedTermDeposit<Auxiliar>{
     public FixedTermDepositDAO() {
-        super(Auxiliares.class);
+        super(Auxiliar.class);
     }
 }

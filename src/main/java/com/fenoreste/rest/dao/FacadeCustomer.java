@@ -7,8 +7,8 @@ import com.fenoreste.rest.entidades.Persona;
 import com.fenoreste.rest.Util.AbstractFacade;
 import com.fenoreste.rest.Util.HttpConsumo;
 import com.fenoreste.rest.WsTDD.TarjetaDeDebito;
-import com.fenoreste.rest.entidades.Auxiliares;
-import com.fenoreste.rest.entidades.AuxiliaresPK;
+import com.fenoreste.rest.entidades.Auxiliar;
+import com.fenoreste.rest.entidades.AuxiliarPK;
 import com.fenoreste.rest.entidades.Clabes_Interbancarias;
 import com.fenoreste.rest.entidades.Tabla;
 import com.fenoreste.rest.entidades.TablaPK;
@@ -113,8 +113,8 @@ public abstract class FacadeCustomer<T> {
             //Buscamos que el socio tenga el producto para banca movil aperturado en auxiliares            
             //Reglas CSN,Mitras
             String busquedaFolio = "SELECT * FROM auxiliares WHERE idorigen=" + idorigen + " AND idgrupo=" + idgrupo + " AND idsocio=" + idsocio + " AND idproducto=" + tablaProducto.getDato1() + " AND estatus=0";
-            Query busquedaFolioQuery = em.createNativeQuery(busquedaFolio, Auxiliares.class);
-            Auxiliares a = (Auxiliares) busquedaFolioQuery.getSingleResult();
+            Query busquedaFolioQuery = em.createNativeQuery(busquedaFolio, Auxiliar.class);
+            Auxiliar a = (Auxiliar) busquedaFolioQuery.getSingleResult();
 
             //Si ya tiene el producto para banca movil activo
             if (a != null) {
@@ -131,8 +131,8 @@ public abstract class FacadeCustomer<T> {
                                 + " AND idgrupo=" + idgrupo
                                 + " AND idsocio=" + idsocio
                                 + " AND idproducto=" + Integer.parseInt(tb_producto_tdd.getDato1()) + " AND estatus=2";
-                        Query auxiliar = em.createNativeQuery(busqueda133, Auxiliares.class);
-                        Auxiliares a_tdd = (Auxiliares) auxiliar.getSingleResult();
+                        Query auxiliar = em.createNativeQuery(busqueda133, Auxiliar.class);
+                        Auxiliar a_tdd = (Auxiliar) auxiliar.getSingleResult();
 
                         WsSiscoopFoliosTarjetasPK1 foliosPK = new WsSiscoopFoliosTarjetasPK1(a_tdd.getAuxiliaresPK().getIdorigenp(), a_tdd.getAuxiliaresPK().getIdproducto(), a_tdd.getAuxiliaresPK().getIdauxiliar());
 
@@ -150,7 +150,7 @@ public abstract class FacadeCustomer<T> {
                             //Ahora verificamos que no se un socio bloqueado buscamos en la lista sopar
                             if (!util.validacionSopar(a_tdd.getAuxiliaresPK().getIdorigenp(), a_tdd.getAuxiliaresPK().getIdproducto(), a_tdd.getAuxiliaresPK().getIdauxiliar(), 2)) {
                                 //Ahora verifico que el socio tenga clabe para SPEI 
-                                AuxiliaresPK clave_llave = new AuxiliaresPK(a_tdd.getAuxiliaresPK().getIdorigenp(), a_tdd.getAuxiliaresPK().getIdproducto(), a_tdd.getAuxiliaresPK().getIdauxiliar());
+                                AuxiliarPK clave_llave = new AuxiliarPK(a_tdd.getAuxiliaresPK().getIdorigenp(), a_tdd.getAuxiliaresPK().getIdproducto(), a_tdd.getAuxiliaresPK().getIdauxiliar());
                                 Clabes_Interbancarias clabe_folio = em.find(Clabes_Interbancarias.class, clave_llave);
                                 if (clabe_folio != null) {
                                     if (clabe_folio.isActiva()) {
@@ -239,9 +239,9 @@ public abstract class FacadeCustomer<T> {
                                 + " AND idsocio=" + p.getPersonasPK().getIdsocio()
                                 + " AND idproducto=" + Integer.parseInt(tb.getDato1()) + " AND estatus=0";
 
-                        Query query_auxiliar = em.createNativeQuery(b_auxiliares, Auxiliares.class
+                        Query query_auxiliar = em.createNativeQuery(b_auxiliares, Auxiliar.class
                         );
-                        Auxiliares a = (Auxiliares) query_auxiliar.getSingleResult();
+                        Auxiliar a = (Auxiliar) query_auxiliar.getSingleResult();
 
                         userDB.setPersonasPK(p.getPersonasPK());
                         userDB.setEstatus(true);
@@ -279,12 +279,12 @@ public abstract class FacadeCustomer<T> {
         try {
             String busqueda_folio = "SELECT * FROM ws_siscoop_clabe_interbancaria WHERE clabe='" + cuenta + "'";
             System.out.println("Busqueda Folio:" + busqueda_folio);
-            Auxiliares a = null;
+            Auxiliar a = null;
             try {
                 Query query = em.createNativeQuery(busqueda_folio, Clabes_Interbancarias.class);
                 Clabes_Interbancarias clabe_folio = (Clabes_Interbancarias) query.getSingleResult();
-                AuxiliaresPK a_pk = new AuxiliaresPK(clabe_folio.getAux_pk().getIdorigenp(), clabe_folio.getAux_pk().getIdproducto(), clabe_folio.getAux_pk().getIdauxiliar());
-                a = em.find(Auxiliares.class, a_pk);
+                AuxiliarPK a_pk = new AuxiliarPK(clabe_folio.getAux_pk().getIdorigenp(), clabe_folio.getAux_pk().getIdproducto(), clabe_folio.getAux_pk().getIdauxiliar());
+                a = em.find(Auxiliar.class, a_pk);
                 if (clabe_folio.isActiva()) {
                     bandera_existe = true;
                 }

@@ -20,7 +20,7 @@ import javax.persistence.Table;
 @Table(name = "bankingly_movimientos_ca")
 public class Procesa_pago_movimientos implements Serializable {
     @EmbeddedId
-    protected AuxiliaresPK auxiliaresPK;
+    protected AuxiliarPK auxiliaresPK;
     @Column(name = "fecha")
     private Timestamp fecha;
     @Column(name = "idusuario")
@@ -55,11 +55,11 @@ public class Procesa_pago_movimientos implements Serializable {
     public Procesa_pago_movimientos() {
     }
 
-    public AuxiliaresPK getAuxiliaresPK() {
+    public AuxiliarPK getAuxiliaresPK() {
         return auxiliaresPK;
     }
 
-    public void setAuxiliaresPK(AuxiliaresPK auxiliaresPK) {
+    public void setAuxiliaresPK(AuxiliarPK auxiliaresPK) {
         this.auxiliaresPK = auxiliaresPK;
     }
 

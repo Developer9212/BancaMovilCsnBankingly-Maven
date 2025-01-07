@@ -9,7 +9,7 @@ import com.fenoreste.rest.DTO.OgsDTO;
 import com.fenoreste.rest.DTO.OpaDTO;
 import com.fenoreste.rest.Util.Utilidades;
 import com.fenoreste.rest.Util.UtilidadesGenerales;
-import com.fenoreste.rest.entidades.AuxiliaresD;
+import com.fenoreste.rest.entidades.AuxiliarD;
 import com.fenoreste.rest.entidades.Persona;
 import com.fenoreste.rest.entidades.PersonasPK;
 import com.fenoreste.rest.entidades.Productos;
@@ -44,9 +44,9 @@ public class PreparaSMS {
             //Buscamos el movimiento que se hizo
             String busqueda_aux_d_origen = "SELECT * FROM auxiliares_d WHERE idorigenp=" + opa_origen.getIdorigenp() + " AND idproducto=" + opa_origen.getIdproducto() + " AND idauxiliar=" + opa_origen.getIdauxiliar() + " ORDER BY fecha DESC LIMIT 1";
             System.out.println("Busqueda del auxiliar:" + busqueda_aux_d_origen);
-            Query query_aux_d_origen = em.createNativeQuery(busqueda_aux_d_origen, AuxiliaresD.class);
-            AuxiliaresD ad_origen = (AuxiliaresD) query_aux_d_origen.getSingleResult();
-            AuxiliaresD ad_destino = null;
+            Query query_aux_d_origen = em.createNativeQuery(busqueda_aux_d_origen, AuxiliarD.class);
+            AuxiliarD ad_origen = (AuxiliarD) query_aux_d_origen.getSingleResult();
+            AuxiliarD ad_destino = null;
 
             //Buscamos el nombre del producto 
             Productos pr_origen = em.find(Productos.class, opa_origen.getIdproducto());
@@ -56,8 +56,8 @@ public class PreparaSMS {
                 opa_destino = util2.opa(creditAccount);
                 String busqueda_aux_d_destino = "SELECT * FROM auxiliares_d WHERE idorigenp=" + opa_destino.getIdorigenp() + " AND idproducto=" + opa_destino.getIdproducto() + " AND idauxiliar=" + opa_destino.getIdauxiliar() + " ORDER BY fecha DESC LIMIT 1";
                 System.out.println("Busqueda del auxiliar:" + busqueda_aux_d_destino);
-                Query query_aux_d_destino = em.createNativeQuery(busqueda_aux_d_destino, AuxiliaresD.class);
-                ad_destino = (AuxiliaresD) query_aux_d_destino.getSingleResult();
+                Query query_aux_d_destino = em.createNativeQuery(busqueda_aux_d_destino, AuxiliarD.class);
+                ad_destino = (AuxiliarD) query_aux_d_destino.getSingleResult();
                 pr_destino = em.find(Productos.class, opa_destino.getIdproducto());
                 auth_destino = String.valueOf(ad_destino.getTransaccion().intValue());//ad_destino.getIdorigenc() + "" + ad_destino.getPeriodo() + "" + ad_destino.getIdtipo() + "" + ad_destino.getIdpoliza();
 

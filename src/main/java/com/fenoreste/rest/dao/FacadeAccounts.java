@@ -8,9 +8,9 @@ import com.fenoreste.rest.ResponseDTO.AccountDetailsDTO;
 import com.fenoreste.rest.ResponseDTO.AccountMovementsDTO;
 import com.fenoreste.rest.Util.Utilidades;
 import com.fenoreste.rest.WsTDD.TarjetaDeDebito;
-import com.fenoreste.rest.entidades.AuxiliaresPK;
+import com.fenoreste.rest.entidades.AuxiliarPK;
 import com.fenoreste.rest.entidades.Productos;
-import com.fenoreste.rest.entidades.Auxiliares;
+import com.fenoreste.rest.entidades.Auxiliar;
 import com.fenoreste.rest.entidades.Tabla;
 import com.fenoreste.rest.entidades.WsSiscoopFoliosTarjetasPK1;
 import com.syc.ws.endpoint.siscoop.BalanceQueryResponseDto;
@@ -41,8 +41,8 @@ public abstract class FacadeAccounts<T> {
         OpaDTO opa = util.opa(accountId);
         AccountDetailsDTO cuenta = null;
         try {
-            AuxiliaresPK auxpk = new AuxiliaresPK(opa.getIdorigenp(), opa.getIdproducto(), opa.getIdauxiliar());
-            Auxiliares aux = em.find(Auxiliares.class, auxpk);
+            AuxiliarPK auxpk = new AuxiliarPK(opa.getIdorigenp(), opa.getIdproducto(), opa.getIdauxiliar());
+            Auxiliar aux = em.find(Auxiliar.class, auxpk);
             String S24H = DateFormat.getDateInstance().format(substractDate(1));
             String S48H = DateFormat.getDateInstance().format(substractDate(2));
 

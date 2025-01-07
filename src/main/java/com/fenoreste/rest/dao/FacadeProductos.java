@@ -11,7 +11,7 @@ import com.fenoreste.rest.ResponseDTO.ProductsDTO;
 import com.fenoreste.rest.Util.s;
 import com.fenoreste.rest.Util.Utilidades;
 import com.fenoreste.rest.WsTDD.TarjetaDeDebito;
-import com.fenoreste.rest.entidades.Auxiliares;
+import com.fenoreste.rest.entidades.Auxiliar;
 import com.fenoreste.rest.entidades.Catalog_Status_Bankingly;
 import com.fenoreste.rest.entidades.Origenes;
 import com.fenoreste.rest.entidades.Productos_bankingly;
@@ -70,12 +70,12 @@ public abstract class FacadeProductos<T> {
             } else if (!clientBankIdentifiers.equals("") && productTypes == null) {
                 consulta = "SELECT * FROM auxiliares a INNER JOIN tipos_cuenta_bankingly USING(idproducto) WHERE replace((to_char(a.idorigen,'099999')||to_char(a.idgrupo,'09')||to_char(a.idsocio,'099999')),' ','')='" + clientBankIdentifiers + "' AND a.estatus=2";
             }
-            Query query = em.createNativeQuery(consulta, Auxiliares.class);
-            List<Auxiliares> ListaA = query.setHint(QueryHints.CACHE_USAGE, CacheUsage.DoNotCheckCache).getResultList();
+            Query query = em.createNativeQuery(consulta, Auxiliar.class);
+            List<Auxiliar> ListaA = query.setHint(QueryHints.CACHE_USAGE, CacheUsage.DoNotCheckCache).getResultList();
 
             for (int i = 0; i < ListaA.size(); i++) {
                 ProductsDTO auxi = new ProductsDTO();
-                Auxiliares a = ListaA.get(i);
+                Auxiliar a = ListaA.get(i);
 
                 try {
                     ccb = em.find(Productos_bankingly.class, a.getAuxiliaresPK().getIdproducto());
@@ -166,15 +166,15 @@ public abstract class FacadeProductos<T> {
                         + " WHERE idorigenp=" + opa.getIdorigenp() + " AND idproducto=" + opa.getIdproducto() + " AND idauxiliar=" + opa.getIdauxiliar()
                         + " AND  idorigen=" + ogs.getIdorigen() + " AND idgrupo=" + ogs.getIdgrupo() + " AND idsocio=" + ogs.getIdsocio() + " AND estatus=2";
                 System.out.println("consulta:" + consulta);
-                Query query = em.createNativeQuery(consulta, Auxiliares.class);
-                List<Auxiliares> lista_folios = query.getResultList();
+                Query query = em.createNativeQuery(consulta, Auxiliar.class);
+                List<Auxiliar> lista_folios = query.getResultList();
 
                 //Identifico la caja para la TDD
                 //Double saldo = 0.0;
                 //Corro un ciclo con todos los folios encontrados para el socio
                 for (int i = 0; i < lista_folios.size(); i++) {
                     //Obtengo folio por folio
-                    Auxiliares a = lista_folios.get(i);
+                    Auxiliar a = lista_folios.get(i);
                     //Obtengo el saldo del folio auxiliar
                     saldo = a.getSaldo();
 
@@ -323,8 +323,8 @@ public abstract class FacadeProductos<T> {
                 String BusquedaProducto = "SELECT * FROM auxiliares a WHERE idorigenp=" + opa.getIdorigenp() + " AND idproducto=" + opa.getIdproducto() + " AND idauxiliar=" + opa.getIdauxiliar()
                         + " AND idorigen=" + ogs.getIdorigen() + " AND idgrupo=" + ogs.getIdgrupo() + " AND idsocio=" + ogs.getIdsocio() + " AND estatus=2";
                 System.out.println("Consulta:" + BusquedaProducto);
-                Query queryB = em.createNativeQuery(BusquedaProducto, Auxiliares.class);
-                Auxiliares a = (Auxiliares) queryB.getSingleResult();
+                Query queryB = em.createNativeQuery(BusquedaProducto, Auxiliar.class);
+                Auxiliar a = (Auxiliar) queryB.getSingleResult();
                 if (a != null) {
                     ba = true;
                 }

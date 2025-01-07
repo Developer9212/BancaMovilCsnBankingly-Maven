@@ -15,7 +15,7 @@ import javax.persistence.Embeddable;
  * @author Elliot
  */
 @Embeddable
-public class AuxiliaresPK implements Serializable {
+public class AuxiliarPK implements Serializable {
 
     @Column(name = "idorigenp", nullable = false)
     private Integer idorigenp;
@@ -24,10 +24,10 @@ public class AuxiliaresPK implements Serializable {
     @Column(name = "idauxiliar")
     private Integer idauxiliar;
 
-    public AuxiliaresPK() {
+    public AuxiliarPK() {
     }
 
-    public AuxiliaresPK(Integer idorigenp, Integer idproducto, Integer idauxiliar) {
+    public AuxiliarPK(Integer idorigenp, Integer idproducto, Integer idauxiliar) {
         this.idorigenp = idorigenp;
         this.idproducto = idproducto;
         this.idauxiliar = idauxiliar;
@@ -77,7 +77,7 @@ public class AuxiliaresPK implements Serializable {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        final AuxiliaresPK other = (AuxiliaresPK) obj;
+        final AuxiliarPK other = (AuxiliarPK) obj;
         if (!Objects.equals(this.idorigenp, other.idorigenp)) {
             return false;
         }

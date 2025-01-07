@@ -17,9 +17,9 @@ import com.fenoreste.rest.ResponseDTO.VaucherDTO;
 import com.fenoreste.rest.Util.AbstractFacade;
 import com.fenoreste.rest.Util.Utilidades;
 import com.fenoreste.rest.WsTDD.TarjetaDeDebito;
-import com.fenoreste.rest.entidades.Auxiliares;
-import com.fenoreste.rest.entidades.AuxiliaresD;
-import com.fenoreste.rest.entidades.AuxiliaresPK;
+import com.fenoreste.rest.entidades.Auxiliar;
+import com.fenoreste.rest.entidades.AuxiliarD;
+import com.fenoreste.rest.entidades.AuxiliarPK;
 import com.fenoreste.rest.entidades.Origenes;
 import com.fenoreste.rest.entidades.Persona;
 import com.fenoreste.rest.entidades.PersonasPK;
@@ -295,8 +295,8 @@ public abstract class FacadeTransaction<T> {
                 //Obtengo los productos origen y destino
                 //Origen
                 String origenP = "SELECT * FROM auxiliares WHERE idorigenp=" + opa.getIdorigenp() + " AND idproducto=" + opa.getIdproducto() + " AND idauxiliar=" + opa.getIdauxiliar();
-                Query queryOrigen = em.createNativeQuery(origenP, Auxiliares.class);
-                Auxiliares aOrigen = (Auxiliares) queryOrigen.getSingleResult();
+                Query queryOrigen = em.createNativeQuery(origenP, Auxiliar.class);
+                Auxiliar aOrigen = (Auxiliar) queryOrigen.getSingleResult();
 
                 //Lo utlizon para los datos a procesar 
                 long time = System.currentTimeMillis();
@@ -337,7 +337,7 @@ public abstract class FacadeTransaction<T> {
                 Procesa_pago_movimientos procesaDestino = new Procesa_pago_movimientos();
 
                 OpaDTO opaD = null;
-                Auxiliares aDestino = null;
+                Auxiliar aDestino = null;
                 //Si es un spei lo identifico porque aqui va a una cuenta contable
 
                 if (identificadorTransferencia == 5) {//tipo de orden SPEI
@@ -379,8 +379,8 @@ public abstract class FacadeTransaction<T> {
                     em.clear();
 
                     //El abono a cuenta cntable que recibe solo capital de la transferencia
-                    AuxiliaresPK aPKSPEI = null;
-                    aPKSPEI = new AuxiliaresPK(0, 1, 0);
+                    AuxiliarPK aPKSPEI = null;
+                    aPKSPEI = new AuxiliarPK(0, 1, 0);
 
                     procesaDestino.setAuxiliaresPK(aPKSPEI);
                     procesaDestino.setFecha(fecha_transferencia);
@@ -406,7 +406,7 @@ public abstract class FacadeTransaction<T> {
                     em.clear();
 
                     //guardo el abono a la cuenta contable comisiones
-                    aPKSPEI = new AuxiliaresPK(1, 1, 1);
+                    aPKSPEI = new AuxiliarPK(1, 1, 1);
                     procesaDestino.setAuxiliaresPK(aPKSPEI);
                     procesaDestino.setFecha(fecha_transferencia);
                     procesaDestino.setIdusuario(Integer.parseInt(tb_usuario_spei.getDato1()));
@@ -429,7 +429,7 @@ public abstract class FacadeTransaction<T> {
 
                     em.clear();
                     //Guardo el abono a la cuenta contable para comisiones de SPi
-                    aPKSPEI = new AuxiliaresPK(2, 1, 2);
+                    aPKSPEI = new AuxiliarPK(2, 1, 2);
                     procesaDestino.setAuxiliaresPK(aPKSPEI);
                     procesaDestino.setFecha(fecha_transferencia);
                     procesaDestino.setIdusuario(Integer.parseInt(tb_usuario_spei.getDato1()));
@@ -455,8 +455,8 @@ public abstract class FacadeTransaction<T> {
                     opaD = util.opa(transaction.getCreditproductbankidentifier());
                     //Destino
                     String destinoP = "SELECT * FROM auxiliares WHERE idorigenp=" + opaD.getIdorigenp() + " AND idproducto=" + opaD.getIdproducto() + " AND idauxiliar=" + opaD.getIdauxiliar();
-                    Query queryDestino = em.createNativeQuery(destinoP, Auxiliares.class);
-                    aDestino = (Auxiliares) queryDestino.getSingleResult();
+                    Query queryDestino = em.createNativeQuery(destinoP, Auxiliar.class);
+                    aDestino = (Auxiliar) queryDestino.getSingleResult();
 
                     //Obtengo el producto Destino
                     prDestino = em.find(Productos.class, aDestino.getAuxiliaresPK().getIdproducto());
@@ -1017,8 +1017,8 @@ public abstract class FacadeTransaction<T> {
         try {
             System.out.println("LLEgo");
             String busqueda_Auxiliar = "SELECT * FROM auxiliares_d WHERE transaccion=" + idtransaccion;
-            Query busqueda_aux = AbstractFacade.conexion().createNativeQuery(busqueda_Auxiliar, AuxiliaresD.class);
-            AuxiliaresD ad = (AuxiliaresD) busqueda_aux.getSingleResult();
+            Query busqueda_aux = AbstractFacade.conexion().createNativeQuery(busqueda_Auxiliar, AuxiliarD.class);
+            AuxiliarD ad = (AuxiliarD) busqueda_aux.getSingleResult();
             System.out.println("Auxiliar d:" + ad);
             File file_html = construirHtmlVoucher(ad);
 
@@ -1052,14 +1052,14 @@ public abstract class FacadeTransaction<T> {
         boolean banderaGrupo = false;
         boolean banderaProductosDeposito = false;
         try {
-            Auxiliares ctaOrigen = null;
+            Auxiliar ctaOrigen = null;
             boolean bOrigen = false;
             System.out.println("ConsultaParaCuentaOrigen:" + cuentaOrigen);
             try {
-                Query query = em.createNativeQuery(cuentaOrigen, Auxiliares.class
+                Query query = em.createNativeQuery(cuentaOrigen, Auxiliar.class
                 );
                 //Obtengo el producto origen
-                ctaOrigen = (Auxiliares) query.getSingleResult();
+                ctaOrigen = (Auxiliar) query.getSingleResult();
                 bOrigen = true;
             } catch (Exception e) {
                 System.out.println("No existe Cuenta Origen");
@@ -1104,13 +1104,13 @@ public abstract class FacadeTransaction<T> {
                         if (ctaOrigen.getEstatus() == 2) {
                             //verifico que el saldo del producto origen es mayor o igual a lo que se intenta transferir
                             if (saldo >= monto) {
-                                Auxiliares ctaDestino = null;
+                                Auxiliar ctaDestino = null;
                                 boolean bDestino = false;
                                 //Busco la cuenta destino
                                 try {
-                                    Query queryDestino = em.createNativeQuery(cuentaDestino, Auxiliares.class
+                                    Query queryDestino = em.createNativeQuery(cuentaDestino, Auxiliar.class
                                     );
-                                    ctaDestino = (Auxiliares) queryDestino.getSingleResult();
+                                    ctaDestino = (Auxiliar) queryDestino.getSingleResult();
                                     bDestino = true;
                                 } catch (Exception e) {
                                     System.out.println("Error al encontrar productoDestino:" + e.getMessage());
@@ -1254,13 +1254,13 @@ public abstract class FacadeTransaction<T> {
         boolean banderaGrupo = false;
         boolean banderaProductosDeposito = false;
         try {
-            Auxiliares ctaOrigen = null;
+            Auxiliar ctaOrigen = null;
             boolean bOrigen = false;
             try {
-                Query query = em.createNativeQuery(cuentaOrigen, Auxiliares.class
+                Query query = em.createNativeQuery(cuentaOrigen, Auxiliar.class
                 );
                 //Obtengo el producto origen
-                ctaOrigen = (Auxiliares) query.getSingleResult();
+                ctaOrigen = (Auxiliar) query.getSingleResult();
                 bOrigen = true;
             } catch (Exception e) {
                 System.out.println("Error al buscar producto origen:" + e.getMessage());
@@ -1301,12 +1301,12 @@ public abstract class FacadeTransaction<T> {
                         if (ctaOrigen.getEstatus() == 2) {
                             //verifico que el saldo del producto origen es mayor o igual a lo que se intenta transferir
                             if (saldo >= monto) {
-                                Auxiliares ctaDestino = null;
+                                Auxiliar ctaDestino = null;
                                 boolean bDestino = false;
                                 try {
                                     //Busco la cuenta destino
-                                    Query queryDestino = em.createNativeQuery(cuentaDestino, Auxiliares.class);
-                                    ctaDestino = (Auxiliares) queryDestino.getSingleResult();
+                                    Query queryDestino = em.createNativeQuery(cuentaDestino, Auxiliar.class);
+                                    ctaDestino = (Auxiliar) queryDestino.getSingleResult();
                                     bDestino = true;
                                 } catch (Exception e) {
                                     System.out.println("Error al buscar producto destino:" + e.getMessage());
@@ -1445,10 +1445,10 @@ public abstract class FacadeTransaction<T> {
                                                                                     + " AND idproducto = 101"
                                                                                     + " AND saldo >= 1000 LIMIT 1";
 
-                                                                            query = em.createNativeQuery(consultaSocioTutor, Auxiliares.class);
-                                                                            Auxiliares auxiliarTutor = null;
+                                                                            query = em.createNativeQuery(consultaSocioTutor, Auxiliar.class);
+                                                                            Auxiliar auxiliarTutor = null;
                                                                             try {
-                                                                                auxiliarTutor = (Auxiliares) query.getSingleResult();
+                                                                                auxiliarTutor = (Auxiliar) query.getSingleResult();
                                                                             } catch (NoResultException e) {
                                                                                 // Manejar caso donde no hay resultados
                                                                                 System.out.println("::::::No se encontró un resultado tutor socio::::::");
@@ -1500,8 +1500,8 @@ public abstract class FacadeTransaction<T> {
                                                                                                             + " AND idsocio=" + ctaDestino.getIdsocio()
                                                                                                             + " AND idproducto=182 AND estatus in(0,,1,2)";
 
-                                                                                                    Query query_182 = em.createNativeQuery(busqueda_182, Auxiliares.class);
-                                                                                                    Auxiliares a_182 = (Auxiliares) query_182.getSingleResult();
+                                                                                                    Query query_182 = em.createNativeQuery(busqueda_182, Auxiliar.class);
+                                                                                                    Auxiliar a_182 = (Auxiliar) query_182.getSingleResult();
                                                                                                     if (a_182 != null) {
                                                                                                         System.out.println("::::::::::::SOCIO JUVENIL NO SE LE PERMITE MOVIMIENTOS::::::::::::");
                                                                                                         message = "::::::::::::::::::::SOCIO JUVENIL NO SE LE PERMITE MOVIMIENTOS:::::::::::::::::::";
@@ -1567,9 +1567,9 @@ public abstract class FacadeTransaction<T> {
                                                                                             boolean Bandera_180 = false;
                                                                                             try {
                                                                                                 String busqueda_180 = "SELECT * FROM auxiliares WHERE idorigen=" + ctaDestino.getIdorigen() + " AND idgrupo=" + ctaDestino.getIdgrupo() + " AND idsocio=" + ctaDestino.getIdsocio() + " AND idproducto=180";
-                                                                                                Query query_180 = em.createNativeQuery(busqueda_180, Auxiliares.class
+                                                                                                Query query_180 = em.createNativeQuery(busqueda_180, Auxiliar.class
                                                                                                 );
-                                                                                                Auxiliares a_180 = (Auxiliares) query_180.getSingleResult();
+                                                                                                Auxiliar a_180 = (Auxiliar) query_180.getSingleResult();
                                                                                                 if (a_180 != null) {
                                                                                                     Bandera_180 = true;
                                                                                                 }
@@ -1640,8 +1640,8 @@ public abstract class FacadeTransaction<T> {
                                                                                                         + " AND idsocio=" + ctaDestino.getIdsocio()
                                                                                                         + " AND idproducto=182 AND estatus in(0,,1,2)";
 
-                                                                                                Query query_182 = em.createNativeQuery(busqueda_182, Auxiliares.class);
-                                                                                                Auxiliares a_182 = (Auxiliares) query_182.getSingleResult();
+                                                                                                Query query_182 = em.createNativeQuery(busqueda_182, Auxiliar.class);
+                                                                                                Auxiliar a_182 = (Auxiliar) query_182.getSingleResult();
                                                                                                 if (a_182 != null) {
                                                                                                     System.out.println("::::::::::::SOCIO JUVENIL NO SE LE PERMITE MOVIMIENTOS::::::::::::");
                                                                                                     message = "::::::::::::::::::::SOCIO JUVENIL NO SE LE PERMITE MOVIMIENTOS:::::::::::::::::::";
@@ -1802,7 +1802,7 @@ public abstract class FacadeTransaction<T> {
         boolean bDestino = false;
         boolean banderaProductosDeposito = false;
         boolean banderaGrupo = false;
-        Auxiliares ctaOrigen = null;
+        Auxiliar ctaOrigen = null;
         Productos productoDestino = null;
 
         String cuentaOrigen = "SELECT * FROM auxiliares a WHERE idorigenp=" + opaO.getIdorigenp() + " AND idproducto=" + opaO.getIdproducto() + " AND idauxiliar=" + opaO.getIdauxiliar()
@@ -1818,9 +1818,9 @@ public abstract class FacadeTransaction<T> {
         try {
             boolean bOrigen = false;
             try {
-                Query query = em.createNativeQuery(cuentaOrigen, Auxiliares.class);
+                Query query = em.createNativeQuery(cuentaOrigen, Auxiliar.class);
                 //Obtengo el producto origen
-                ctaOrigen = (Auxiliares) query.getSingleResult();
+                ctaOrigen = (Auxiliar) query.getSingleResult();
                 bOrigen = true;
             } catch (Exception e) {
                 System.out.println("Error cuando se intento validar el origen");
@@ -1859,11 +1859,11 @@ public abstract class FacadeTransaction<T> {
                         if (ctaOrigen.getEstatus() == 2) {
                             //verifico que el saldo del producto origen es mayor o igual a lo que se intenta transferir
                             if (saldo >= monto) {
-                                Auxiliares ctaDestino = null;
+                                Auxiliar ctaDestino = null;
                                 try {
                                     //Busco la cuenta destino
-                                    Query queryDestino = em.createNativeQuery(cuentaDestino, Auxiliares.class);
-                                    ctaDestino = (Auxiliares) queryDestino.getSingleResult();
+                                    Query queryDestino = em.createNativeQuery(cuentaDestino, Auxiliar.class);
+                                    ctaDestino = (Auxiliar) queryDestino.getSingleResult();
                                     productoDestino = em.find(Productos.class, opaD.getIdproducto());
                                     bDestino = true;
                                 } catch (Exception e) {
@@ -2076,13 +2076,13 @@ public abstract class FacadeTransaction<T> {
             if (pingURL(url, tablaSpeiPath.getDato3())) {
                 System.out.println("Si hay Ping a spei");
                 try {
-                    Auxiliares folio_origen_ = null;
+                    Auxiliar folio_origen_ = null;
                     boolean bOrigen = false;
                     try {
-                        Query query = em.createNativeQuery(folio_origen_spei, Auxiliares.class
+                        Query query = em.createNativeQuery(folio_origen_spei, Auxiliar.class
                         );
                         //Obtengo el folio origen para tarjeta de debito
-                        folio_origen_ = (Auxiliares) query.getSingleResult();
+                        folio_origen_ = (Auxiliar) query.getSingleResult();
                         bOrigen = true;
 
                     } catch (Exception e) {
@@ -2541,8 +2541,8 @@ public abstract class FacadeTransaction<T> {
             boolean tddEncontrada = false;
 
             OpaDTO opaOrigen = util.opa(transactionOWN.getDebitProductBankIdentifier());
-            AuxiliaresPK auxpk = new AuxiliaresPK(opaOrigen.getIdorigenp(), opaOrigen.getIdproducto(), opaOrigen.getIdauxiliar());
-            Auxiliares a = em.find(Auxiliares.class,
+            AuxiliarPK auxpk = new AuxiliarPK(opaOrigen.getIdorigenp(), opaOrigen.getIdproducto(), opaOrigen.getIdauxiliar());
+            Auxiliar a = em.find(Auxiliar.class,
                     auxpk);
             //Si el producto configurado para retiros no es la tdd entra aqui
             if (opaOrigen.getIdproducto() == Integer.parseInt(tabla_retiro.getDato1())) {
@@ -2731,7 +2731,7 @@ public abstract class FacadeTransaction<T> {
 
     }
 
-    private File construirHtmlVoucher(AuxiliaresD ad) throws FileNotFoundException {
+    private File construirHtmlVoucher(AuxiliarD ad) throws FileNotFoundException {
         //Leyendo el .txt con estructura del html
         File fileTxt = new File(ruta() + "voucher.txt");
         //El nombre que se le dara al html

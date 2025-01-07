@@ -14,8 +14,8 @@ import com.fenoreste.rest.ResponseDTO.ThirdPartyProductDTO;
 import com.fenoreste.rest.ResponseDTO.userDocumentIdDTO;
 import com.fenoreste.rest.Util.AbstractFacade;
 import com.fenoreste.rest.Util.Utilidades;
-import com.fenoreste.rest.entidades.Auxiliares;
-import com.fenoreste.rest.entidades.AuxiliaresPK;
+import com.fenoreste.rest.entidades.Auxiliar;
+import com.fenoreste.rest.entidades.AuxiliarPK;
 import com.fenoreste.rest.entidades.Colonias;
 import com.fenoreste.rest.entidades.Estados;
 import com.fenoreste.rest.entidades.Municipios;
@@ -157,7 +157,7 @@ public abstract class FacadeTerceros<T> {
         EntityManager em = AbstractFacade.conexion();
         ThirdPartyProductDTO dto = new ThirdPartyProductDTO();
         try {
-            Auxiliares a = validarTercero(productNumber, productTypeId);
+            Auxiliar a = validarTercero(productNumber, productTypeId);
             if (a != null) {
                 if (a.getEstatus() == 2) {
                     userDocumentIdDTO userDocument = new userDocumentIdDTO();
@@ -242,7 +242,7 @@ public abstract class FacadeTerceros<T> {
 
     }
 
-    public Auxiliares validarTercero(String opaTercero, int productType) {
+    public Auxiliar validarTercero(String opaTercero, int productType) {
         System.out.println("productTypeId:" + productType);
         EntityManager em = AbstractFacade.conexion();
         String message = "";
@@ -251,8 +251,8 @@ public abstract class FacadeTerceros<T> {
             int p = Integer.parseInt(opaTercero.substring(6, 11));
             int a = Integer.parseInt(opaTercero.substring(11, 19));
             System.out.println(o + "-" + p + "-" + a);
-            AuxiliaresPK auxiPK = new AuxiliaresPK(o, p, a);
-            Auxiliares auxiliar = em.find(Auxiliares.class, auxiPK);
+            AuxiliarPK auxiPK = new AuxiliarPK(o, p, a);
+            Auxiliar auxiliar = em.find(Auxiliar.class, auxiPK);
             if (auxiliar != null) {
                 if (auxiliar.getEstatus() != null) {
                     Productos_bankingly pr = em.find(Productos_bankingly.class, p);

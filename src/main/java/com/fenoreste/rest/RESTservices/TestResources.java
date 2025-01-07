@@ -7,7 +7,7 @@ package com.fenoreste.rest.RESTservices;
 
 import com.fenoreste.rest.Util.AbstractFacade;
 import com.fenoreste.rest.dao.CustomerDAO;
-import com.fenoreste.rest.entidades.Auxiliares;
+import com.fenoreste.rest.entidades.Auxiliar;
 import com.fenoreste.rest.entidades.Persona;
 import com.fenoreste.rest.entidades.Banca_movil_usuarios;
 import com.github.cliftonlabs.json_simple.JsonObject;

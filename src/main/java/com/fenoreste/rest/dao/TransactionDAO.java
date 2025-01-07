@@ -5,14 +5,14 @@
  */
 package com.fenoreste.rest.dao;
 
-import com.fenoreste.rest.entidades.Auxiliares;
+import com.fenoreste.rest.entidades.Auxiliar;
 
 /**
  *
  * @author Elliot
  */
-public class TransactionDAO extends FacadeTransaction<Auxiliares>{
+public class TransactionDAO extends FacadeTransaction<Auxiliar>{
 	 public TransactionDAO() {
-		    super(Auxiliares.class);		  
+		    super(Auxiliar.class);		  
      } 
 	}

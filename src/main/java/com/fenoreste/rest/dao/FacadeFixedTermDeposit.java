@@ -18,8 +18,8 @@ import com.fenoreste.rest.ResponseDTO.TermDataResVo;
 import com.fenoreste.rest.Util.AbstractFacade;
 import com.fenoreste.rest.Util.Utilidades;
 import com.fenoreste.rest.Util.UtilidadesGenerales;
-import com.fenoreste.rest.entidades.Auxiliares;
-import com.fenoreste.rest.entidades.AuxiliaresPK;
+import com.fenoreste.rest.entidades.Auxiliar;
+import com.fenoreste.rest.entidades.AuxiliarPK;
 import com.fenoreste.rest.entidades.Persona;
 import com.fenoreste.rest.entidades.PersonasPK;
 import com.fenoreste.rest.entidades.Productos;
@@ -43,7 +43,12 @@ public abstract class FacadeFixedTermDeposit<T> {
 
     Utilidades util = new Utilidades();
     UtilidadesGenerales util2 = new UtilidadesGenerales();
-
+    
+    Auxiliar auxiliar = null;
+    AuxiliarPK auxiliarPK = null;
+    
+    EntityManager em = null;
+    
     public FacadeFixedTermDeposit(Class<T> entiClass) {
     }
 
@@ -52,8 +57,8 @@ public abstract class FacadeFixedTermDeposit<T> {
         OpaDTO opa = util.opa(accountId);
         DetallesInversionDTO fixedTermDeposit = null;
         try {
-            AuxiliaresPK auxpk = new AuxiliaresPK(opa.getIdorigenp(), opa.getIdproducto(), opa.getIdauxiliar());
-            Auxiliares aux = em.find(Auxiliares.class, auxpk);
+            AuxiliarPK auxpk = new AuxiliarPK(opa.getIdorigenp(), opa.getIdproducto(), opa.getIdauxiliar());
+            Auxiliar aux = em.find(Auxiliar.class, auxpk);
             PersonasPK ppk = new PersonasPK(aux.getIdorigen(), aux.getIdgrupo(), aux.getIdsocio());
             Persona per = em.find(Persona.class, ppk);
             Productos producto = em.find(Productos.class, aux.getAuxiliaresPK().getIdproducto());
@@ -116,12 +121,20 @@ public abstract class FacadeFixedTermDeposit<T> {
         return fixedTermDeposit;
     }
     
-    public TermDataResVo condicionesInversion(TermDataReqVo resquest){
+    public TermDataResVo condicionesInversion(TermDataReqVo request){
         TermDataResVo response = new TermDataResVo();
         try {
+            OgsDTO ogs = util.ogs(request.getClientBankIdentifier());
+            OpaDTO opa = util.opa(request.getProductBankIdentifier());
             
-            
-            
+            em = AbstractFacade.conexion();
+            auxiliarPK = new AuxiliarPK(opa.getIdorigenp(),opa.getIdproducto(),opa.getIdauxiliar());
+            auxiliar = em.find(Auxiliar.class,auxiliarPK);
+            if(auxiliar != null){
+                
+            }else{
+                System.out.println("::::::::::Cuenta acreedora inversion no existe::::::::::::::");   
+            }            
         } catch (Exception e) {
             System.out.println("::::::::Error al obtener condiciones de deposito a plazo::::::::::::::"+e.getMessage());
         }
@@ -134,11 +147,11 @@ public abstract class FacadeFixedTermDeposit<T> {
         OpaDTO opa = util.opa(peticion.getDebitProductBankIdentifier());
         OgsDTO ogs = util.ogs(peticion.getClientBankIdentifier());
         try {
-            EntityManager em = AbstractFacade.conexion();
+            em = AbstractFacade.conexion();
             TablaPK tablaPK;
             Tabla tabla;
-            AuxiliaresPK auxpk = new AuxiliaresPK(opa.getIdorigenp(), opa.getIdproducto(), opa.getIdauxiliar());
-            Auxiliares aux = em.find(Auxiliares.class, auxpk);
+            AuxiliarPK auxpk = new AuxiliarPK(opa.getIdorigenp(), opa.getIdproducto(), opa.getIdauxiliar());
+            Auxiliar aux = em.find(Auxiliar.class, auxpk);
             if(aux != null){
                 tablaPK = new TablaPK("bankingly_banca_movil","producto_retiro");
                 tabla = em.find(Tabla.class, tablaPK);
@@ -147,7 +160,7 @@ public abstract class FacadeFixedTermDeposit<T> {
                     if(aux.getSaldo().doubleValue() - aux.getGarantia().doubleValue() >= peticion.getDepositAmount()){
                         //Vamos a consultar si el plazo elegido es compatible con el producto
                         Productos producto = em.find(Productos.class, aux.getAuxiliaresPK().getIdproducto());
-                        String cnosulta = "SELECT count(*) FROM tablas WHERE idtabla='tasas' and idelemento like 'tasaiar%' AND order by idelemento;"
+                        String cnosulta = "SELECT count(*) FROM tablas WHERE idtabla='tasas' and idelemento like 'tasaiar%' AND order by idelemento";
                         
                     }else{
                         System.out.println(":::::::::::::::::::El producto a retirar para invertir no tiene saldo suficiente::::::::::::::");

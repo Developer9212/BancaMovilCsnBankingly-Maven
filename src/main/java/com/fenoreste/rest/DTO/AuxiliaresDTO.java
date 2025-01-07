@@ -5,7 +5,7 @@
  */
 package com.fenoreste.rest.DTO;
 
-import com.fenoreste.rest.entidades.AuxiliaresPK;
+import com.fenoreste.rest.entidades.AuxiliarPK;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
@@ -19,7 +19,7 @@ public class AuxiliaresDTO implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    protected AuxiliaresPK auxiliaresPK;
+    protected AuxiliarPK auxiliaresPK;
     private Integer idorigen;
     private Integer idgrupo;
     private Integer idsocio;
@@ -104,11 +104,11 @@ public class AuxiliaresDTO implements Serializable {
         this.idsocio = idsocio;
     }
 
-    public AuxiliaresPK getAuxiliaresPK() {
+    public AuxiliarPK getAuxiliaresPK() {
         return auxiliaresPK;
     }
 
-    public void setAuxiliaresPK(AuxiliaresPK auxiliaresPK) {
+    public void setAuxiliaresPK(AuxiliarPK auxiliaresPK) {
         this.auxiliaresPK = auxiliaresPK;
     }
 

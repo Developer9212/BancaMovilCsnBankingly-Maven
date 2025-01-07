@@ -24,11 +24,11 @@ import javax.persistence.TemporalType;
 @Entity
 @Table(name = "auxiliares")
 @Cacheable(false)
-public class Auxiliares implements Serializable {
+public class Auxiliar implements Serializable {
     private static final long serialVersionUID = 1L;
     
     @EmbeddedId
-    protected AuxiliaresPK auxiliaresPK;
+    protected AuxiliarPK auxiliaresPK;
     @Column(name = "idorigen")
     private Integer idorigen;
     @Column(name = "idgrupo")
@@ -150,15 +150,15 @@ public class Auxiliares implements Serializable {
     @Column(name = "reservaidncm")
     private BigDecimal reservaidncm;
 
-    public Auxiliares() {
+    public Auxiliar() {
     }
 
-    public Auxiliares(AuxiliaresPK auxiliaresPK) {
+    public Auxiliar(AuxiliarPK auxiliaresPK) {
         this.auxiliaresPK = auxiliaresPK;
     }
 
-    public Auxiliares(int idorigenp, int idproducto, int idauxiliar) {
-        this.auxiliaresPK = new AuxiliaresPK(idorigenp, idproducto, idauxiliar);
+    public Auxiliar(int idorigenp, int idproducto, int idauxiliar) {
+        this.auxiliaresPK = new AuxiliarPK(idorigenp, idproducto, idauxiliar);
     }
 
     public int getIdorigen() {
@@ -185,11 +185,11 @@ public class Auxiliares implements Serializable {
         this.idsocio = idsocio;
     }
 
-    public AuxiliaresPK getAuxiliaresPK() {
+    public AuxiliarPK getAuxiliaresPK() {
         return auxiliaresPK;
     }
 
-    public void setAuxiliaresPK(AuxiliaresPK auxiliaresPK) {
+    public void setAuxiliaresPK(AuxiliarPK auxiliaresPK) {
         this.auxiliaresPK = auxiliaresPK;
     }
 
@@ -627,10 +627,10 @@ public class Auxiliares implements Serializable {
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
-        if (!(object instanceof Auxiliares)) {
+        if (!(object instanceof Auxiliar)) {
             return false;
         }
-        Auxiliares other = (Auxiliares) object;
+        Auxiliar other = (Auxiliar) object;
         return !((this.auxiliaresPK == null && other.auxiliaresPK != null) || (this.auxiliaresPK != null && !this.auxiliaresPK.equals(other.auxiliaresPK)));
     }
 

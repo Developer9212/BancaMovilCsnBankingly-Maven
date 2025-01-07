@@ -10,9 +10,9 @@ import com.fenoreste.rest.ResponseDTO.LoanPayment;
 import com.fenoreste.rest.ResponseDTO.LoanRate;
 import com.fenoreste.rest.Util.Utilidades;
 import com.fenoreste.rest.entidades.Amortizaciones;
-import com.fenoreste.rest.entidades.AuxiliaresPK;
-import com.fenoreste.rest.entidades.Auxiliares;
-import com.fenoreste.rest.entidades.AuxiliaresD;
+import com.fenoreste.rest.entidades.AuxiliarPK;
+import com.fenoreste.rest.entidades.Auxiliar;
+import com.fenoreste.rest.entidades.AuxiliarD;
 import com.fenoreste.rest.entidades.Catalog_Status_Bankingly;
 import com.fenoreste.rest.entidades.Loan_Fee_Status;
 import java.math.BigDecimal;
@@ -49,8 +49,8 @@ public abstract class FacadeLoan<T> {
         OpaDTO opa = util.opa(productBankIdentifier);
         LoanDTO dto = null;
         try {
-            AuxiliaresPK auxpk = new AuxiliaresPK(opa.getIdorigenp(), opa.getIdproducto(), opa.getIdauxiliar());
-            Auxiliares aux = em.find(Auxiliares.class, auxpk);
+            AuxiliarPK auxpk = new AuxiliarPK(opa.getIdorigenp(), opa.getIdproducto(), opa.getIdauxiliar());
+            Auxiliar aux = em.find(Auxiliar.class, auxpk);
             if (aux.getEstatus() == 2) {
                 Catalog_Status_Bankingly sts = em.find(Catalog_Status_Bankingly.class, Integer.parseInt(aux.getEstatus().toString()));
                 Double currentBalance = Double.parseDouble(aux.getSaldo().toString());
@@ -104,8 +104,8 @@ public abstract class FacadeLoan<T> {
         LoanFee loanFee = null;
         OpaDTO opa = util.opa(productBankIdentifier);
         try {
-            AuxiliaresPK pk = new AuxiliaresPK(opa.getIdorigenp(), opa.getIdproducto(), opa.getIdauxiliar());
-            Auxiliares aux = em.find(Auxiliares.class, pk);
+            AuxiliarPK pk = new AuxiliarPK(opa.getIdorigenp(), opa.getIdproducto(), opa.getIdauxiliar());
+            Auxiliar aux = em.find(Auxiliar.class, pk);
             //Obtengo informacion con el sai_auxiliar hasta la fecha actual, si hay dudas checar el catalogo o atributos que devuelve la funcion
             String sai_auxiliar = "SELECT  sai_auxiliar(" + opa.getIdorigenp() + "," + opa.getIdproducto() + "," + opa.getIdauxiliar() + ",(SELECT date(fechatrabajo) FROM origenes limit 1))";
             Query RsSai = em.createNativeQuery(sai_auxiliar);
@@ -185,8 +185,8 @@ public abstract class FacadeLoan<T> {
             }
 
             //Busco el auxiliar 
-            AuxiliaresPK aux_pk = new AuxiliaresPK(opa.getIdorigenp(), opa.getIdproducto(), opa.getIdauxiliar());
-            Auxiliares a = em.find(Auxiliares.class, aux_pk);
+            AuxiliarPK aux_pk = new AuxiliarPK(opa.getIdorigenp(), opa.getIdproducto(), opa.getIdauxiliar());
+            Auxiliar a = em.find(Auxiliar.class, aux_pk);
 
             // Obtengo informacion con el sai_auxiliar hasta la fecha actual, si hay dudas
             // checar el catalogo o atributos que devuelve la funcion
@@ -265,8 +265,8 @@ public abstract class FacadeLoan<T> {
         List<LoanRate> listaRates = new ArrayList<>();
         //Consulto tasas
         try {
-            AuxiliaresPK aux_pk = new AuxiliaresPK(opa.getIdorigenp(), opa.getIdproducto(), opa.getIdauxiliar());
-            Auxiliares a = em.find(Auxiliares.class, aux_pk);
+            AuxiliarPK aux_pk = new AuxiliarPK(opa.getIdorigenp(), opa.getIdproducto(), opa.getIdauxiliar());
+            Auxiliar a = em.find(Auxiliar.class, aux_pk);
 
             String converted = "";//String.valueOf(convertToLocalDateTimeViaInstant(amm.getVence())+":00.000Z");
             LoanRate loanRate = new LoanRate();
@@ -302,8 +302,8 @@ public abstract class FacadeLoan<T> {
         OpaDTO opa = util.opa(productBankIdentifier);
         List<LoanPayment> listPayment = new ArrayList();
         try {
-            AuxiliaresPK aux_pk = new AuxiliaresPK(opa.getIdorigenp(), opa.getIdproducto(), opa.getIdauxiliar());
-            Auxiliares a = em.find(Auxiliares.class, aux_pk);
+            AuxiliarPK aux_pk = new AuxiliarPK(opa.getIdorigenp(), opa.getIdproducto(), opa.getIdauxiliar());
+            Auxiliar a = em.find(Auxiliar.class, aux_pk);
 
             String fechaActivacion = dateToString(a.getFechaAutorizacion());
 
@@ -333,8 +333,8 @@ public abstract class FacadeLoan<T> {
                         + " AND idproducto=" + opa.getIdproducto() + " AND idauxiliar=" + opa.getIdauxiliar()
                         + " AND date(fecha) ='" + fechaReal + "' AND replace(to_char(idorigenc,'099999')||to_char(idtipo,'09')||to_char(idpoliza,'09999'),' ','')='" + lista_pagos[1].toString().replace("-", "") + "'";
 
-                Query query_auxiliard_fecha_poliza = em.createNativeQuery(consulta_aux_por_fecha_poliza, AuxiliaresD.class);
-                AuxiliaresD aux_d = (AuxiliaresD) query_auxiliard_fecha_poliza.getSingleResult();
+                Query query_auxiliard_fecha_poliza = em.createNativeQuery(consulta_aux_por_fecha_poliza, AuxiliarD.class);
+                AuxiliarD aux_d = (AuxiliarD) query_auxiliard_fecha_poliza.getSingleResult();
 
                 String converted = "";
                 LoanPayment pago = new LoanPayment();
@@ -464,8 +464,8 @@ public abstract class FacadeLoan<T> {
         LoanFee loanFee = new LoanFee();
         System.out.println("Entrandooooooooooooo a proxima cuota");
         try {
-            AuxiliaresPK pk = new AuxiliaresPK(o, p, a);
-            Auxiliares aux = em.find(Auxiliares.class, pk);
+            AuxiliarPK pk = new AuxiliarPK(o, p, a);
+            Auxiliar aux = em.find(Auxiliar.class, pk);
             //Obtengo informacion con el sai_auxiliar hasta la fecha actual, si hay dudas checar el catalogo o atributos que devuelve la funcion(
             //Porque con el sai auxiliar obtengo fecha de la proxima amortizacion y voy a buscarla a la tabla de amortizaciones
             String sai_auxiliar = "SELECT * FROM sai_auxiliar(" + o + "," + p + "," + a + ",(SELECT date(fechatrabajo) FROM origenes limit 1))";            
@@ -641,8 +641,8 @@ public abstract class FacadeLoan<T> {
         //Identificador 1 es fees y 2 es payments
 
         try {
-            AuxiliaresPK aux_pk = new AuxiliaresPK(opa.getIdorigenp(), opa.getIdproducto(), opa.getIdauxiliar());
-            Auxiliares a = em.find(Auxiliares.class, aux_pk);
+            AuxiliarPK aux_pk = new AuxiliarPK(opa.getIdorigenp(), opa.getIdproducto(), opa.getIdauxiliar());
+            Auxiliar a = em.find(Auxiliar.class, aux_pk);
             String consulta = "";
             Query query = null;
             List<Object[]> lista_objetos = null;

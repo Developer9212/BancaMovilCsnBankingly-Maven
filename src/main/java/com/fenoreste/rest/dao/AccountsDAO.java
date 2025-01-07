@@ -1,9 +1,9 @@
 package com.fenoreste.rest.dao;
 
-import com.fenoreste.rest.entidades.Auxiliares;
+import com.fenoreste.rest.entidades.Auxiliar;
 
-public class AccountsDAO extends FacadeAccounts<Auxiliares>{
+public class AccountsDAO extends FacadeAccounts<Auxiliar>{
 	 public AccountsDAO() {
-		    super(Auxiliares.class);		  
+		    super(Auxiliar.class);		  
      } 
 	}

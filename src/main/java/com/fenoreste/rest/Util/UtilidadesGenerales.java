@@ -5,8 +5,8 @@
  */
 package com.fenoreste.rest.Util;
 
-import com.fenoreste.rest.entidades.Auxiliares;
-import com.fenoreste.rest.entidades.AuxiliaresPK;
+import com.fenoreste.rest.entidades.Auxiliar;
+import com.fenoreste.rest.entidades.AuxiliarPK;
 import com.fenoreste.rest.entidades.Origenes;
 import com.fenoreste.rest.entidades.Persona;
 import com.fenoreste.rest.entidades.PersonasPK;
@@ -91,7 +91,7 @@ public class UtilidadesGenerales {
         EntityManager em = AbstractFacade.conexion();
         try {
             Persona p = null;
-            Auxiliares a = null;
+            Auxiliar a = null;
             if(identificador==1){
             PersonasPK personasPk= new PersonasPK(idorigen, idgrupo,idsocio);
             p=em.find(Persona.class, personasPk);      
@@ -99,8 +99,8 @@ public class UtilidadesGenerales {
             idgrupo=p.getPersonasPK().getIdgrupo();
             idsocio=p.getPersonasPK().getIdsocio();
             }else{
-                AuxiliaresPK auxPk=new AuxiliaresPK(idorigen, idgrupo,idsocio);
-                a=em.find(Auxiliares.class,auxPk);
+                AuxiliarPK auxPk=new AuxiliarPK(idorigen, idgrupo,idsocio);
+                a=em.find(Auxiliar.class,auxPk);
                 idorigen=a.getIdorigen();
                 idgrupo=a.getIdgrupo();
                 idsocio=a.getIdsocio();
