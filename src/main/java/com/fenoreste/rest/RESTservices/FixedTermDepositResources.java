@@ -7,7 +7,6 @@ package com.fenoreste.rest.RESTservices;
 
 import com.fenoreste.rest.Request.FixedTermMethodPaymentDTO;
 import com.fenoreste.rest.Request.TermDataReqVo;
-import com.fenoreste.rest.ResponseDTO.TermDataResVo;
 import com.fenoreste.rest.ResponseDTO.DetallesInversionDTO;
 import com.fenoreste.rest.dao.FixedTermDepositDAO;
 import javax.ws.rs.GET;

@@ -1498,7 +1498,7 @@ public abstract class FacadeTransaction<T> {
                                                                                                             + " idorigen=" + ctaDestino.getIdorigen()
                                                                                                             + " AND idgrupo=" + ctaDestino.getIdgrupo()
                                                                                                             + " AND idsocio=" + ctaDestino.getIdsocio()
-                                                                                                            + " AND idproducto=182 AND estatus in(0,,1,2)";
+                                                                                                            + " AND idproducto=182 AND estatus in(0,1,2)";
 
                                                                                                     Query query_182 = em.createNativeQuery(busqueda_182, Auxiliar.class);
                                                                                                     Auxiliar a_182 = (Auxiliar) query_182.getSingleResult();
