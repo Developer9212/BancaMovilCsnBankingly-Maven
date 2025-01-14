@@ -1634,7 +1634,7 @@ public abstract class FacadeTransaction<T> {
 
                                                                                         if (montoDiario <= Double.parseDouble(String.valueOf(tabla.getDato1()))) {
                                                                                             if (ctaDestino.getIdgrupo() == 25) {//Validacion solo para juvenil
-                                                                                                String busqueda_182 = "SELECT CASE WHEN count(*) > 0 THEN count(*) ELSE 0 END FROM auxiliares WHERE"
+                                                                                                String busqueda_182 = "SELECT count(*) FROM auxiliares WHERE"
                                                                                                         + " idorigen = " + ctaDestino.getIdorigen()
                                                                                                         + " AND idgrupo = " + ctaDestino.getIdgrupo()
                                                                                                         + " AND idsocio = " + ctaDestino.getIdsocio()
