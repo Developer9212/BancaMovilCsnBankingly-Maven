@@ -1644,7 +1644,7 @@ public abstract class FacadeTransaction<T> {
                                                                                                 try{ 
                                                                                                     System.out.println(":!Consulta:"+busqueda_182);
                                                                                                     Query query_182 = em.createNativeQuery(busqueda_182);
-                                                                                                    total182 = Integer.parseInt(query_182.getSingleResult().toString());
+                                                                                                    total182 = Integer.parseInt(query_182.getSingleResult().toString());//DFDSFD
                                                                                                 }catch(Exception e){
                                                                                                      System.out.println(":::::::::::Error al ejecutar busqueda producto 182::::::::"+e.getMessage());
                                                                                                 }
