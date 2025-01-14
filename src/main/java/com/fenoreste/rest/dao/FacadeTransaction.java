@@ -1633,7 +1633,7 @@ public abstract class FacadeTransaction<T> {
                                                                                         tabla = util2.busquedaTabla(em, "bankingly_banca_movil", "maximodiario_menorjuvenil_tutorsocio");
 
                                                                                         if (montoDiario <= Double.parseDouble(String.valueOf(tabla.getDato1()))) {
-                                                                                            if (ctaDestino.getIdgrupo() == 25) {//Validacion solo para juvenildffdsf
+                                                                                            if (ctaDestino.getIdgrupo() == 25) {//Validacion solo para juvenil22dffdsf
                                                                                                 String busqueda_182 = "SELECT count(*) FROM auxiliares WHERE"
                                                                                                         + " idorigen = " + ctaDestino.getIdorigen()
                                                                                                         + " AND idgrupo = " + ctaDestino.getIdgrupo()
