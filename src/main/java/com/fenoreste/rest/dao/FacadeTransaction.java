@@ -1370,6 +1370,7 @@ public abstract class FacadeTransaction<T> {
                                                                 if (banderaProductosDeposito) {
 
                                                                     if (ctaDestino.getIdgrupo() == 20 || ctaDestino.getIdgrupo() == 25) {
+                                                                        System.out.println(":::::::::::::::::Tercero es menor o juvenil::::::::::::::::::::::::::::");
                                                                         Double montoMensual = 0.0;
                                                                         Double montoDiario = 0.0;
                                                                         Tabla tabla = null;
@@ -1456,6 +1457,7 @@ public abstract class FacadeTransaction<T> {
 
                                                                             //Si es socio
                                                                             if (auxiliarTutor != null) {
+                                                                                System.out.println(":::::::::::Tutor socio para tercero::::::::::::::");
                                                                                 //Busco cuanto tiene en la cuenta glabla(Ahorro) modificacion integrada el 02022025
                                                                                 //Modificando desarrollo el 02/01/2025 para menores y juveniles
                                                                                 if (ctaDestino.getAuxiliaresPK().getIdproducto() == 120 || ctaDestino.getAuxiliaresPK().getIdproducto() == 125) {
@@ -1591,7 +1593,7 @@ public abstract class FacadeTransaction<T> {
                                                                                     }
                                                                                 }*/
                                                                             } else {//No es socio
-
+                                                                                System.out.println("::::::::::::::tutor no socio::::::::::::::::");
                                                                                 tabla = util2.busquedaTabla(em, "valor_udi", fecha_trabajo.substring(0, 7).replace("/", ""));
                                                                                 double valorUdiMes = Double.parseDouble(tabla.getDato1());
                                                                                 Double udisMaximo = (ctaDestino.getSaldo().doubleValue() + monto) / valorUdiMes;
@@ -1631,9 +1633,10 @@ public abstract class FacadeTransaction<T> {
                                                                                         }
 
                                                                                         tabla = util2.busquedaTabla(em, "bankingly_banca_movil", "maximodiario_menorjuvenil_tutorsocio");
-
+                                                                                         
                                                                                         if (montoDiario <= Double.parseDouble(String.valueOf(tabla.getDato1()))) {
                                                                                             if (ctaDestino.getIdgrupo() == 25) {//Validacion solo para juvenil22dffdsf
+                                                                                                System.out.println(":::::::El socio es juvenil,vamnos a buscar el producto 182::::::::::::::");
                                                                                                 String busqueda_182 = "SELECT count(*) FROM auxiliares WHERE"
                                                                                                         + " idorigen = " + ctaDestino.getIdorigen()
                                                                                                         + " AND idgrupo = " + ctaDestino.getIdgrupo()
@@ -1641,8 +1644,8 @@ public abstract class FacadeTransaction<T> {
                                                                                                         + " AND idproducto=182 AND estatus in(0,1,2)";
                                                                                                 
                                                                                                int total182 = 0;
-                                                                                                try{ 
-                                                                                                    System.out.println(":!Consulta:"+busqueda_182);
+                                                                                               System.out.println(":::::Consulta:::"+busqueda_182);
+                                                                                                try{                                                                                                     
                                                                                                     Query query_182 = em.createNativeQuery(busqueda_182);
                                                                                                     total182 = Integer.parseInt(query_182.getSingleResult().toString());//DFDSFD
                                                                                                 }catch(Exception e){
