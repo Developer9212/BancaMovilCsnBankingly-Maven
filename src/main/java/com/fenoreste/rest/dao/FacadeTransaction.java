@@ -1497,15 +1497,22 @@ public abstract class FacadeTransaction<T> {
                                                                                             if ((montoDiario + monto) <= Double.parseDouble(tabla.getDato1())) {
                                                                                                 if (ctaDestino.getIdgrupo() == 25) {//Validacion solo para juvenil
                                                                                                     System.out.println(":::::Buscando producto 182 con juvenil tutor socio:::::::::::");
-                                                                                                    String busqueda_182 = "SELECT * FROM auxiliares WHERE"
-                                                                                                            + " idorigen=" + ctaDestino.getIdorigen()
-                                                                                                            + " AND idgrupo=" + ctaDestino.getIdgrupo()
-                                                                                                            + " AND idsocio=" + ctaDestino.getIdsocio()
+                                                                                                    String busqueda_182 = "SELECT count(*) FROM auxiliares WHERE"
+                                                                                                            + " idorigen = " + ctaDestino.getIdorigen()
+                                                                                                            + " AND idgrupo = " + ctaDestino.getIdgrupo()
+                                                                                                            + " AND idsocio = " + ctaDestino.getIdsocio()
                                                                                                             + " AND idproducto=182 AND estatus in(0,1,2)";
 
-                                                                                                    Query query_182 = em.createNativeQuery(busqueda_182, Auxiliar.class);
-                                                                                                    Auxiliar a_182 = (Auxiliar) query_182.getSingleResult();
-                                                                                                    if (a_182 != null) {
+                                                                                                    int total182 = 0;
+                                                                                                    System.out.println(":::::Consulta:::" + busqueda_182);
+                                                                                                    try {
+                                                                                                        Query query_182 = em.createNativeQuery(busqueda_182);
+                                                                                                        total182 = Integer.parseInt(query_182.getSingleResult().toString());//DFDSFD
+                                                                                                    } catch (Exception e) {
+                                                                                                        System.out.println(":::::::::::Error al ejecutar busqueda producto 182::::::::" + e.getMessage());
+                                                                                                    }
+
+                                                                                                    if (total182 > 0 ) {
                                                                                                         System.out.println("::::::::::::SOCIO JUVENIL NO SE LE PERMITE MOVIMIENTOS::::::::::::");
                                                                                                         message = "::::::::::::::::::::SOCIO JUVENIL NO SE LE PERMITE MOVIMIENTOS:::::::::::::::::::";
                                                                                                     } else {
@@ -1634,7 +1641,7 @@ public abstract class FacadeTransaction<T> {
                                                                                         }
 
                                                                                         tabla = util2.busquedaTabla(em, "bankingly_banca_movil", "maximodiario_menorjuvenil_tutorsocio");
-                                                                                         
+
                                                                                         if (montoDiario <= Double.parseDouble(String.valueOf(tabla.getDato1()))) {
                                                                                             if (ctaDestino.getIdgrupo() == 25) {//Validacion solo para juvenil22dffdsf
                                                                                                 System.out.println(":::::::El socio es juvenil tutor no socio,vamos a buscar el producto 182::::::::::::::");
@@ -1643,17 +1650,16 @@ public abstract class FacadeTransaction<T> {
                                                                                                         + " AND idgrupo = " + ctaDestino.getIdgrupo()
                                                                                                         + " AND idsocio = " + ctaDestino.getIdsocio()
                                                                                                         + " AND idproducto=182 AND estatus in(0,1,2)";
-                                                                                                
-                                                                                               int total182 = 0;
-                                                                                               System.out.println(":::::Consulta:::"+busqueda_182);
-                                                                                                try{                                                                                                     
+
+                                                                                                int total182 = 0;
+                                                                                                System.out.println(":::::Consulta:::" + busqueda_182);
+                                                                                                try {
                                                                                                     Query query_182 = em.createNativeQuery(busqueda_182);
                                                                                                     total182 = Integer.parseInt(query_182.getSingleResult().toString());//DFDSFD
-                                                                                                }catch(Exception e){
-                                                                                                     System.out.println(":::::::::::Error al ejecutar busqueda producto 182::::::::"+e.getMessage());
+                                                                                                } catch (Exception e) {
+                                                                                                    System.out.println(":::::::::::Error al ejecutar busqueda producto 182::::::::" + e.getMessage());
                                                                                                 }
-                                                                                                
-                                                                                                
+
                                                                                                 if (total182 > 0) {
                                                                                                     System.out.println("::::::::::::SOCIO JUVENIL NO SE LE PERMITE MOVIMIENTOS::::::::::::");
                                                                                                     message = "::::::::::::::::::::SOCIO JUVENIL NO SE LE PERMITE MOVIMIENTOS:::::::::::::::::::";
