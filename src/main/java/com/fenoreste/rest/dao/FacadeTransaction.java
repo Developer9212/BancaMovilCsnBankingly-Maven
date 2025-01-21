@@ -1496,6 +1496,7 @@ public abstract class FacadeTransaction<T> {
                                                                                             tabla = util2.busquedaTabla(em, "bankingly_banca_movil", "maximodiario_menorjuvenil_tutorsocio");
                                                                                             if ((montoDiario + monto) <= Double.parseDouble(tabla.getDato1())) {
                                                                                                 if (ctaDestino.getIdgrupo() == 25) {//Validacion solo para juvenil
+                                                                                                    System.out.println(":::::Buscando producto 182 con juvenil tutor socio:::::::::::");
                                                                                                     String busqueda_182 = "SELECT * FROM auxiliares WHERE"
                                                                                                             + " idorigen=" + ctaDestino.getIdorigen()
                                                                                                             + " AND idgrupo=" + ctaDestino.getIdgrupo()
@@ -1636,7 +1637,7 @@ public abstract class FacadeTransaction<T> {
                                                                                          
                                                                                         if (montoDiario <= Double.parseDouble(String.valueOf(tabla.getDato1()))) {
                                                                                             if (ctaDestino.getIdgrupo() == 25) {//Validacion solo para juvenil22dffdsf
-                                                                                                System.out.println(":::::::El socio es juvenil,vamnos a buscar el producto 182::::::::::::::");
+                                                                                                System.out.println(":::::::El socio es juvenil tutor no socio,vamos a buscar el producto 182::::::::::::::");
                                                                                                 String busqueda_182 = "SELECT count(*) FROM auxiliares WHERE"
                                                                                                         + " idorigen = " + ctaDestino.getIdorigen()
                                                                                                         + " AND idgrupo = " + ctaDestino.getIdgrupo()
