@@ -1536,70 +1536,7 @@ public abstract class FacadeTransaction<T> {
                                                                                         message = "CUENTA AHORRO MENOR EXCEDE LIMITE MAXIMO";
                                                                                     }
                                                                                 }
-
-                                                                                /*if (ctaDestino.getIdgrupo() == 25) {//Si es un juvenil Comentado el 03012025 por integracion de validacion solicitada
-                                                                                    
-                                                                                      if (ctaDestino.getAuxiliaresPK().getIdproducto() == 120) {
-                                                                                          
-                                                                                      }
-                                                                                    
-                                                                                    
-                                                                                    
-                                                                                    //Busco si lo que se le permite a un menor dirario no es mayor a lo que hay en la tabla  
-                                                                                    try {
-                                                                                        System.out.println("Buscando monto diario para juvenil...");
-                                                                                        monto_permitido_diario = em.createNativeQuery(consulta_permitido_diario);
-                                                                                        System.out.println("Ejecutando sentencia de busqueda juvenil....");
-                                                                                        monto_diario = Double.parseDouble(String.valueOf(monto_permitido_diario.getSingleResult()));
-                                                                                        System.out.println("Resultado de monto diario juvenil:" + monto_diario);
-                                                                                    } catch (Exception e) {
-                                                                                        System.out.println("Error al buscar monto diario para juvenil:" + e.getMessage());
-                                                                                        monto_diario = 0.0;
-                                                                                    }
-
-                                                                                    if ((monto_diario + monto) <= Double.parseDouble(tb_juveniles_permitido_diario.getDato1())) {
-                                                                                        //Ahora busco todos los movimientos para saber el total de usdis
-                                                                                        //Busco la tabla donde esta el total de udis
-                                                                                        try {
-                                                                                            System.out.println("Buscando udis mensual para juvenil...");
-                                                                                            udis_mensual = em.createNativeQuery(consulta_udis_permitido);
-                                                                                            System.out.println("Ejecutando sentencia busqueda udis mensual juvenil...");
-                                                                                            monto_udis_mensual = Double.parseDouble(String.valueOf(udis_mensual.getSingleResult())) / Double.parseDouble(tb_precio_udi_periodo.getDato1());
-                                                                                            System.out.println("Resultado udis mensual juvenil:" + monto_udis_mensual);
-                                                                                        } catch (Exception e) {
-                                                                                            System.out.println("Error al buscar udis mensual juvenil:" + e.getMessage());
-                                                                                            monto_udis_mensual = 0;
-                                                                                        }
-
-                                                                                        if (monto_udis_mensual <= Double.parseDouble(tb_juveniles_udis_mensual.getDato1())) {
-
-                                                                                            //Valido que si tiene el 180 no puede recibir depositos en el 125
-                                                                                            boolean Bandera_180 = false;
-                                                                                            try {
-                                                                                                String busqueda_180 = "SELECT * FROM auxiliares WHERE idorigen=" + ctaDestino.getIdorigen() + " AND idgrupo=" + ctaDestino.getIdgrupo() + " AND idsocio=" + ctaDestino.getIdsocio() + " AND idproducto=180";
-                                                                                                Query query_180 = em.createNativeQuery(busqueda_180, Auxiliar.class
-                                                                                                );
-                                                                                                Auxiliar a_180 = (Auxiliar) query_180.getSingleResult();
-                                                                                                if (a_180 != null) {
-                                                                                                    Bandera_180 = true;
-                                                                                                }
-                                                                                            } catch (Exception e) {
-                                                                                                Bandera_180 = false;
-                                                                                            }
-
-                                                                                            if (!Bandera_180) {
-                                                                                                message = message + " VALIDADO CON EXITO";
-                                                                                            } else {
-                                                                                                message = "VERIFIQUE EL GRUPO DE SOCIO";
-                                                                                            }
-                                                                                        } else {
-                                                                                            message = "MONTO EN UDIS TRASPASA AL PERMITIDO POR MES";
-                                                                                        }
-
-                                                                                    } else {
-                                                                                        message = "EL MONTO DIARIO PERMITIDO TRASPASA AL PERMITIDO";
-                                                                                    }
-                                                                                }*/
+                                                                                
                                                                             } else {//No es socio
                                                                                 System.out.println("::::::::::::::tutor no socio::::::::::::::::");
                                                                                 tabla = util2.busquedaTabla(em, "valor_udi", fecha_trabajo.substring(0, 7).replace("/", ""));
