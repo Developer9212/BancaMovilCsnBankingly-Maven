@@ -11,6 +11,7 @@ import com.fenoreste.rest.WsTDD.TarjetaDeDebito;
 import com.fenoreste.rest.entidades.AuxiliarPK;
 import com.fenoreste.rest.entidades.Productos;
 import com.fenoreste.rest.entidades.Auxiliar;
+import com.fenoreste.rest.entidades.Clabes_Interbancarias;
 import com.fenoreste.rest.entidades.Tabla;
 import com.fenoreste.rest.entidades.WsSiscoopFoliosTarjetasPK1;
 import com.syc.ws.endpoint.siscoop.BalanceQueryResponseDto;
@@ -65,6 +66,9 @@ public abstract class FacadeAccounts<T> {
                     saldo24 = responseSaldo.getAvailableAmount();
                     saldo48 = responseSaldo.getAvailableAmount();
                     saldo = responseSaldo.getAvailableAmount();
+                    
+                    Clabes_Interbancarias clabe = em.find(Clabes_Interbancarias.class,aux.getAuxiliaresPK());
+                    cuenta.setAccountOfficerName(clabe.getClabe());
                 } else {
                     saldosF = getSaldoAuxiliaresD(opa.getIdorigenp(), opa.getIdproducto(), opa.getIdauxiliar(), S24H, S48H);
                     if (pr.getTipoproducto() == 4 || pr.getTipoproducto() == 8) {
@@ -92,7 +96,7 @@ public abstract class FacadeAccounts<T> {
                             }
                         }
                     }
-
+                 cuenta.setAccountOfficerName(pr.getNombre());
                 }
 
             }
@@ -109,7 +113,7 @@ public abstract class FacadeAccounts<T> {
             String origen = util2.obtenerOrigen(aux.getAuxiliaresPK().getIdorigenp(), em);
             cuenta = new AccountDetailsDTO();
             cuenta.setAccountBankIdentifier(accountId);
-            cuenta.setAccountOfficerName(pr.getNombre());
+            //cuenta.setAccountOfficerName(pr.getNombre());
             cuenta.setAccountCountableBalance(aux.getSaldo());
             cuenta.setAccountAvailableBalance(aux.getSaldo());
             cuenta.setAccountBalance24Hrs(new BigDecimal(saldo24));
