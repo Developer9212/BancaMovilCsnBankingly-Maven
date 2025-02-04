@@ -40,7 +40,7 @@ public abstract class FacadeAccounts<T> {
     public AccountDetailsDTO GetAccountDetails(String accountId) {
         EntityManager em = AbstractFacade.conexion();
         OpaDTO opa = util.opa(accountId);
-        AccountDetailsDTO cuenta = null;
+        AccountDetailsDTO cuenta = AccountDetailsDTO();
         try {
             AuxiliarPK auxpk = new AuxiliarPK(opa.getIdorigenp(), opa.getIdproducto(), opa.getIdauxiliar());
             Auxiliar aux = em.find(Auxiliar.class, auxpk);
