@@ -1619,43 +1619,7 @@ public abstract class FacadeTransaction<T> {
                                                                                     System.out.println("::::::::::::::Cuenta ahorro para grupo:" + ctaDestino.getIdgrupo() + " excede limite maximo en UDIS:" + tabla.getDato1() + ":::::::::::");
                                                                                     message = "CUENTA AHORRO MENOR EXCEDE LIMITE MAXIMO EN UDIS";
                                                                                 }
-
-                                                                                /*
-                                                                                try {
-                                                                                    query = em.createNativeQuery(consultaSaldoAhorro);
-
-                                                                                    System.out.println("Calculando el permitido diario...");
-                                                                                    monto_permitido_diario = em.createNativeQuery(consulta_permitido_diario);
-                                                                                    System.out.println("Ejecutando sentencia de busqueda...");
-                                                                                    monto_diario = Double.parseDouble(String.valueOf(monto_permitido_diario.getSingleResult()));
-                                                                                    System.out.println("La busqueda de permitido diario fue de:" + monto_diario);
-                                                                                } catch (Exception e) {
-                                                                                    System.out.println("Error al buscar le maximo diario permitido:" + e.getMessage());
-                                                                                    monto_diario = 0.0;
-                                                                                }
-                                                                                if ((monto_diario + monto) <= Double.parseDouble(tb_menores_permitido_diario.getDato1())) {
-                                                                                    //Ahora busco todos los movimientos para saber el total de usdis
-                                                                                    //Busco la tabla donde esta el total de udis
-                                                                                    try {
-                                                                                        System.out.println("Buscando los udis mensual para menor...");
-                                                                                        udis_mensual = em.createNativeQuery(consulta_udis_permitido);
-                                                                                        System.out.println("Ejecutando consulta udis menor...");
-                                                                                        monto_udis_mensual = Double.parseDouble(String.valueOf(udis_mensual.getSingleResult())) / Double.parseDouble(tb_precio_udi_periodo.getDato1());
-                                                                                        System.out.println("Resultado udis menor es:" + monto_udis_mensual);
-                                                                                    } catch (Exception e) {
-                                                                                        System.out.println("Error al buscar udis para menor:" + e.getMessage());
-                                                                                        monto_udis_mensual = 0;
-                                                                                    }
-
-                                                                                    if (monto_udis_mensual <= Double.parseDouble(tb_menores_udis_mensual.getDato1())) {
-                                                                                        message = message + " VALIDADO CON EXITO";
-                                                                                    } else {
-                                                                                        message = "MONTO EN UDIS TRASPASA AL PERMITIDO POR MES";
-                                                                                    }
-
-                                                                                } else {
-                                                                                    message = "EL MONTO TRASPASA AL PERMITIDO DIARIO";
-                                                                                }*/
+                                                                                
                                                                             }
 
                                                                         } else {
