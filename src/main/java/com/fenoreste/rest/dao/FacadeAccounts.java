@@ -40,7 +40,7 @@ public abstract class FacadeAccounts<T> {
     public AccountDetailsDTO GetAccountDetails(String accountId) {
         EntityManager em = AbstractFacade.conexion();
         OpaDTO opa = util.opa(accountId);
-        AccountDetailsDTO cuenta = AccountDetailsDTO();
+        AccountDetailsDTO cuenta = new AccountDetailsDTO();
         try {
             AuxiliarPK auxpk = new AuxiliarPK(opa.getIdorigenp(), opa.getIdproducto(), opa.getIdauxiliar());
             Auxiliar aux = em.find(Auxiliar.class, auxpk);
@@ -111,7 +111,6 @@ public abstract class FacadeAccounts<T> {
             //System.out.println("ad:"+adpk);
             //Productos pr = em.find(Productos.class, aux.getAuxiliaresPK().getIdproducto());
             String origen = util2.obtenerOrigen(aux.getAuxiliaresPK().getIdorigenp(), em);
-            cuenta = new AccountDetailsDTO();
             cuenta.setAccountBankIdentifier(accountId);
             //cuenta.setAccountOfficerName(pr.getNombre());
             cuenta.setAccountCountableBalance(aux.getSaldo());
