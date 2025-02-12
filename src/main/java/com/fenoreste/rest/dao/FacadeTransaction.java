@@ -2060,7 +2060,7 @@ public abstract class FacadeTransaction<T> {
                                                 Tabla tb = util2.busquedaTabla(em, "bankingly_banca_movil", "grupo_retiro");
                                                 if (folio_origen_.getIdgrupo() == Integer.parseInt(tb.getDato1())) {
                                                     Tabla tb_minimo = util2.busquedaTabla(em, "bankingly_banca_movil", "spei_monto_minimo");
-                                                    if (orden.getMonto() >= Integer.parseInt(tb_minimo.getDato1())) {
+                                                    if (orden.getMonto() >= Double.parseDouble(tb_minimo.getDato1())) {
                                                         Tabla tb_maximo = util2.busquedaTabla(em, "bankingly_banca_movil", "spei_monto_maximo");
                                                         if (orden.getMonto() <= Integer.parseInt(tb_maximo.getDato1())) {
                                                             message = "VALIDADO CON EXITO";
