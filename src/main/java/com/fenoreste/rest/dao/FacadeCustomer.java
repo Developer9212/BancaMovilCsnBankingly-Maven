@@ -137,7 +137,7 @@ public abstract class FacadeCustomer<T> {
                         WsSiscoopFoliosTarjetasPK1 foliosPK = new WsSiscoopFoliosTarjetasPK1(a_tdd.getAuxiliaresPK().getIdorigenp(), a_tdd.getAuxiliaresPK().getIdproducto(), a_tdd.getAuxiliaresPK().getIdauxiliar());
 
                         double saldo = 0.0;
-                        BalanceQueryResponseDto saldoWS = new TarjetaDeDebito().saldoTDD(foliosPK);
+                        com.fenoreste.rest.WsTDD.BalanceQueryResponseDto saldoWS = new TarjetaDeDebito().saldoTDD(foliosPK);
                         if (saldoWS.getCode() >= 1) {
                             saldo = saldoWS.getAvailableAmount();
                             // SaldoTddPK saldoTddPK = new SaldoTddPK(a.getAuxiliaresPK().getIdorigenp(), a.getAuxiliaresPK().getIdproducto(), a.getAuxiliaresPK().getIdauxiliar());

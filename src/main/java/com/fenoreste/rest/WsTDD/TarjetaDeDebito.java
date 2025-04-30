@@ -6,6 +6,8 @@ import com.fenoreste.rest.entidades.Tabla;
 import com.fenoreste.rest.entidades.TablaPK;
 import com.fenoreste.rest.entidades.WsSiscoopFoliosTarjetas1;
 import com.fenoreste.rest.entidades.WsSiscoopFoliosTarjetasPK1;
+import com.syc.ws.endpoint.siscoop.DoWithdrawalAccountResponse;
+import com.syc.ws.endpoint.siscoop.LoadBalanceResponse;
 import javax.persistence.EntityManager;
 import consumo_tdd.Siscoop_TDD;
 import javax.persistence.Query;

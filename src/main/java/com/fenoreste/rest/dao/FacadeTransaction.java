@@ -1074,10 +1074,9 @@ public abstract class FacadeTransaction<T> {
                         WsSiscoopFoliosTarjetas1 tarjetas = new TarjetaDeDebito().buscaTarjetaTDD(foliosPK.getIdorigenp(), foliosPK.getIdproducto(), foliosPK.getIdauxiliar(), em);
                         try {
                             System.out.println("consultando saldo para idtarjeta:" + tarjetas.getIdtarjeta());
-                            BalanceQueryResponseDto saldoTDD = new TarjetaDeDebito().saldoTDD(tarjetas.getWsSiscoopFoliosTarjetasPK());
+                            com.fenoreste.rest.WsTDD.BalanceQueryResponseDto saldoTDD = new TarjetaDeDebito().saldoTDD(tarjetas.getWsSiscoopFoliosTarjetasPK());
                             saldo = saldoTDD.getAvailableAmount();
                             message = "TDD";
-                            //saldo = 200.0;
                             System.out.println("Saldo TDD:" + saldo);
 
                         } catch (Exception e) {
@@ -1273,7 +1272,7 @@ public abstract class FacadeTransaction<T> {
                         WsSiscoopFoliosTarjetas1 tarjetas = new TarjetaDeDebito().buscaTarjetaTDD(foliosPK.getIdorigenp(), foliosPK.getIdproducto(), foliosPK.getIdauxiliar(), em);
                         try {
                             System.out.println("consultando saldo para idtarjeta:" + tarjetas.getIdtarjeta());
-                            BalanceQueryResponseDto saldoTDD = new TarjetaDeDebito().saldoTDD(tarjetas.getWsSiscoopFoliosTarjetasPK());
+                            com.fenoreste.rest.WsTDD.BalanceQueryResponseDto saldoTDD = new TarjetaDeDebito().saldoTDD(tarjetas.getWsSiscoopFoliosTarjetasPK());
                             message = "DESDE TDD";
                             saldo = saldoTDD.getAvailableAmount();
                             //saldo = 200.0;
@@ -1449,7 +1448,7 @@ public abstract class FacadeTransaction<T> {
                                                                                 auxiliarTutor = (Auxiliar) query.getSingleResult();
                                                                             } catch (NoResultException e) {
                                                                                 // Manejar caso donde no hay resultados
-                                                                                System.out.println("::::::No se encontró un resultado tutor socio::::::");
+                                                                                System.out.println("::::::No se encontrï¿½ un resultado tutor socio::::::");
                                                                             }
 
                                                                             //Si es socio
@@ -1751,7 +1750,7 @@ public abstract class FacadeTransaction<T> {
                         WsSiscoopFoliosTarjetas1 tarjetas = new TarjetaDeDebito().buscaTarjetaTDD(foliosPK.getIdorigenp(), foliosPK.getIdproducto(), foliosPK.getIdauxiliar(), em);
                         try {
                             System.out.println("consultando saldo para idtarjeta:" + tarjetas.getIdtarjeta());
-                            BalanceQueryResponseDto saldoTDD = new TarjetaDeDebito().saldoTDD(tarjetas.getWsSiscoopFoliosTarjetasPK());
+                            com.fenoreste.rest.WsTDD.BalanceQueryResponseDto saldoTDD = new TarjetaDeDebito().saldoTDD(tarjetas.getWsSiscoopFoliosTarjetasPK());
                             message = "TDD";
                             saldo = saldoTDD.getAvailableAmount();
 
@@ -2022,7 +2021,7 @@ public abstract class FacadeTransaction<T> {
                                 try {
                                     System.out.println("consultando saldo para idtarjeta:" + tarjeta.getIdtarjeta());
                                     //Obtengo el saldo desde ws de el idTarjeta encontrada
-                                    BalanceQueryResponseDto saldo_tarjeta_de_debito = new TarjetaDeDebito().saldoTDD(tarjeta.getWsSiscoopFoliosTarjetasPK());
+                                    com.fenoreste.rest.WsTDD.BalanceQueryResponseDto saldo_tarjeta_de_debito = new TarjetaDeDebito().saldoTDD(tarjeta.getWsSiscoopFoliosTarjetasPK());
                                     message = "TDD";
                                     saldo = saldo_tarjeta_de_debito.getAvailableAmount();
                                     System.out.println("Saldo de la tarjeta de debito es:" + saldo);
