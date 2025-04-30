@@ -53,7 +53,7 @@ public class TransactionResources {
     @Produces({MediaType.APPLICATION_JSON})
     @Consumes({MediaType.APPLICATION_JSON})
     public Response insertTransaction(String cadena) throws IOException {
-        System.out.println("Cadena insert transaccion peticion:" + cadena);
+        System.out.println("Cadena insert transaccion peticion 1.1.1:" + cadena);
         BackendOperationResultDTO backendOperationResult = new BackendOperationResultDTO();
         backendOperationResult.setBackendCode("2");
         backendOperationResult.setBackendMessage("Error en transaccion");
