@@ -1906,7 +1906,7 @@ public abstract class FacadeTransaction<T> {
     }
     //Metodo para validar pago orden SPEI
 
-    public String validaOrdenSPEIs(RequestDataOrdenPagoDTO orden /*@Context UriInfo ui*/) throws MalformedURLException {
+    public String validaOrdenSPEI(RequestDataOrdenPagoDTO orden /*@Context UriInfo ui*/) throws MalformedURLException {
         System.out.println("Entrando a validar las ordenes SPEI");
         EntityManager em = AbstractFacade.conexion();
         OpaDTO opa = util.opa(orden.getClienteClabe());
