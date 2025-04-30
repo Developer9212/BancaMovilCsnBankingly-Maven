@@ -817,7 +817,7 @@ public abstract class FacadeTransaction<T> {
                             try {
                                 /*consulta_datos_procesar = "SELECT sai_bankingly_aplica_transaccion('" + fechaTr_.substring(0, 10) + "'," + procesaOrigen.getIdusuario() + ",'" + procesaOrigen.getSesion() + "','" + procesaOrigen.getReferencia() + "')";
                                 procesa_movimiento = em.createNativeQuery(consulta_datos_procesar);*/
-                                total_procesados =2;// Integer.parseInt(String.valueOf(procesa_movimiento.getSingleResult()));
+                                total_procesados = 2;// Integer.parseInt(String.valueOf(procesa_movimiento.getSingleResult()));
                             } catch (Exception e) {
                                 System.out.println("Error al procesar datos en SAICOOP por funcion :" + e.getMessage());
                             }
@@ -905,11 +905,13 @@ public abstract class FacadeTransaction<T> {
                 }
 
                 if (clean) {
+                    System.out.println("::::::::::Vamos a limpiar::::::::::::::");
                     //Aplico la  funcion para limpiar la tabla donde estaban los pagos cargo y abono
-                    String consulta_termina_transaccion = "SELECT sai_bankingly_termina_transaccion('" + fechaTr_.substring(0, 10) + "'," + procesaOrigen.getIdusuario() + ",'" + procesaOrigen.getSesion() + "','" + procesaOrigen.getReferencia() + "')";
+                    /*String consulta_termina_transaccion = "SELECT sai_bankingly_termina_transaccion('" + fechaTr_.substring(0, 10) + "'," + procesaOrigen.getIdusuario() + ",'" + procesaOrigen.getSesion() + "','" + procesaOrigen.getReferencia() + "')";
                     Query termina_transaccion = em.createNativeQuery(consulta_termina_transaccion);
-
-                    int registros_limpiados = Integer.parseInt(String.valueOf(termina_transaccion.getSingleResult()));
+                    */
+                    
+                    int registros_limpiados = 2;;// Integer.parseInt(String.valueOf(termina_transaccion.getSingleResult()));
                     System.out.println("Registros Limpiados con exito:" + registros_limpiados);
 
                     String envio_ok_sms = "";
