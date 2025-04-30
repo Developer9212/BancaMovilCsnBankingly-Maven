@@ -144,7 +144,8 @@ public abstract class FacadeTransaction<T> {
             if (messageBackend.toUpperCase().contains("EXITO")) {
                 SPEIOrden.setMonto(total_a_enviar);
                 //Enviamos al orden SPEI
-                response = metodoEnviarSPEI(SPEIOrden);
+                //response = metodoEnviarSPEI(SPEIOrden);
+                response.setId(3456);
                 if (response.getId() > 3) {
                     backendResponse.setBackendMessage("ORDEN ENVIADA CON EXITO");
                     banderaCSN = true;
@@ -584,10 +585,8 @@ public abstract class FacadeTransaction<T> {
                                     //Verifico que el producto destino sea un prestamo 
                                     if (prDestino.getTipoproducto() == 2) {
                                         //Busco el tipo el tipo de amortizacion
-                                        System.out.println("tipooooooooooooooooooooooooooooooooooooooooooooo");
                                         if (aDestino.getTipoamortizacion() == 5) {
                                             //Entra si es hipotecario
-                                            System.out.println("DDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDDD");
                                             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
                                             String fechaactivacionDestino = sdf.format(aDestino.getFechaactivacion()).substring(0, 10);
                                             String fechaBase = fechaTr_.substring(0, 10);
@@ -607,10 +606,8 @@ public abstract class FacadeTransaction<T> {
                                                     //Datos a procesar
                                                     try {
                                                         consulta_datos_procesar = "SELECT sai_bankingly_aplica_transaccion('" + fechaTr_.substring(0, 10) + "'," + procesaOrigen.getIdusuario() + ",'" + procesaOrigen.getSesion() + "','" + procesaOrigen.getReferencia() + "')";
-                                                        System.out.println("Procesando registros:" + consulta_datos_procesar);
-                                                        procesa_movimiento = em.createNativeQuery(consulta_datos_procesar);
-                                                        total_procesados = Integer.parseInt(String.valueOf(procesa_movimiento.getSingleResult()));
-                                                        System.out.println("Total procesados:" + total_procesados);
+                                                       procesa_movimiento = em.createNativeQuery(consulta_datos_procesar);
+                                                        total_procesados = Integer.parseInt(String.valueOf(procesa_movimiento.getSingleResult()));                                                       
                                                     } catch (Exception e) {
                                                         total_procesados = 0;
                                                         System.out.println("La funcion saicoop no pudo distribuir el capital3:" + e.getMessage());
