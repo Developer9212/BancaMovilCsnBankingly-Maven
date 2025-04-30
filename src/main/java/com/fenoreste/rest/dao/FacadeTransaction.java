@@ -144,8 +144,8 @@ public abstract class FacadeTransaction<T> {
             if (messageBackend.toUpperCase().contains("EXITO")) {
                 SPEIOrden.setMonto(total_a_enviar);
                 //Enviamos al orden SPEI
-                //response = metodoEnviarSPEI(SPEIOrden);
-                response.setId(378456);
+                //response = metodoEnviarSPEI(SPEIOrden);//En prod descomentar esta linea
+                response.setId(378456);//En Prod comentar esta linea y descomentar linea 818 donde se aplica funcion
                 if (response.getId() > 3) {
                     backendResponse.setBackendMessage("ORDEN ENVIADA CON EXITO");
                     banderaCSN = true;
@@ -815,9 +815,9 @@ public abstract class FacadeTransaction<T> {
                         Double tota_comision = ((comisiones) + (comisiones * 0.16));
                         if (bandera_retiro) {
                             try {
-                                consulta_datos_procesar = "SELECT sai_bankingly_aplica_transaccion('" + fechaTr_.substring(0, 10) + "'," + procesaOrigen.getIdusuario() + ",'" + procesaOrigen.getSesion() + "','" + procesaOrigen.getReferencia() + "')";
-                                procesa_movimiento = em.createNativeQuery(consulta_datos_procesar);
-                                total_procesados = Integer.parseInt(String.valueOf(procesa_movimiento.getSingleResult()));
+                                /*consulta_datos_procesar = "SELECT sai_bankingly_aplica_transaccion('" + fechaTr_.substring(0, 10) + "'," + procesaOrigen.getIdusuario() + ",'" + procesaOrigen.getSesion() + "','" + procesaOrigen.getReferencia() + "')";
+                                procesa_movimiento = em.createNativeQuery(consulta_datos_procesar);*/
+                                total_procesados =2;// Integer.parseInt(String.valueOf(procesa_movimiento.getSingleResult()));
                             } catch (Exception e) {
                                 System.out.println("Error al procesar datos en SAICOOP por funcion :" + e.getMessage());
                             }
