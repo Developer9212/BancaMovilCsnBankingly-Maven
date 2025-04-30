@@ -96,7 +96,7 @@ public abstract class FacadeTransaction<T> {
         System.out.println(opaOrigen.getIdorigenp() + "-" + opaOrigen.getIdproducto() + "-" + opaOrigen.getIdauxiliar());
 
         boolean banderaCSN = false;
-        ResponseSPEIDTO response = null;
+        ResponseSPEIDTO response = new ResponseSPEIDTO();
         String messageBackend = "";
         String mensajeBackendResult = "";
 
@@ -145,7 +145,7 @@ public abstract class FacadeTransaction<T> {
                 SPEIOrden.setMonto(total_a_enviar);
                 //Enviamos al orden SPEI
                 //response = metodoEnviarSPEI(SPEIOrden);
-                response.setId(3456);
+                response.setId(378456);
                 if (response.getId() > 3) {
                     backendResponse.setBackendMessage("ORDEN ENVIADA CON EXITO");
                     banderaCSN = true;
@@ -1373,55 +1373,7 @@ public abstract class FacadeTransaction<T> {
                                                                         Query query_fecha_trabajo = em.createNativeQuery("SELECT to_char(fechatrabajo,'yyyy/mm/dd') FROM origenes limit 1");
 
                                                                         String fecha_trabajo = String.valueOf(query_fecha_trabajo.getSingleResult());
-                                                                        /*
-                                                                        //Deposito en pesos mexicanos menores
-                                                                        Tabla tb_menores_permitido_diario = util2.busquedaTabla(em, "bankingly_banca_movil", "total_deposito_diario_menores");
-                                                                        //Total en udis
-                                                                        Tabla tb_menores_udis_mensual = util2.busquedaTabla(em, "bankingly_banca_movil", "total_udis_mensual_menores");
-                                                                        //Deposito en pesos mexicanos juveniles
-                                                                        Tabla tb_juveniles_permitido_diario = util2.busquedaTabla(em, "bankingly_banca_movil", "total_deposito_diario_juveniles");
-                                                                        //Deposito en udis juveniles
-                                                                        Tabla tb_juveniles_udis_mensual = util2.busquedaTabla(em, "bankingly_banca_movil", "total_udis_mensual_juveniles");
-
-                                                                        //Obtengo la fecha de trabajo
-                                                                       
-
-                                                                        //tb_precio_udi en el periodo
-                                                                        Tabla tb_precio_udi_periodo = util2.busquedaTabla(em, "valor_udi", fecha_trabajo.substring(0, 7).replace("/", ""));
-
-                                                                        //Construyo la consulta para buscar el monto diario de un menor o juvenil
-                                                                        String consulta_permitido_diario = "select (CASE WHEN sum(monto)>0 THEN sum(monto) else 0.0 END) from auxiliares_d"
-                                                                                + " inner join auxiliares a using(idorigenp,idproducto,idauxiliar)"
-                                                                                + " inner join productos using(idproducto)"
-                                                                                + " where estatus=2"
-                                                                                + " and a.idorigen=" + ctaDestino.getIdorigen()
-                                                                                + " and idgrupo=" + ctaDestino.getIdgrupo()
-                                                                                + " and idsocio=" + ctaDestino.getIdsocio()
-                                                                                + " and tipoproducto=0"
-                                                                                + " and date(fecha)='" + fecha_trabajo + "' and cargoabono=1";//(SELECT to_char(fechatrabajo,'yyyymm') from origenes limit 1)";
-
-                                                                        //Construyo consulta para buscar el total de depositos en el mes 
-                                                                        String consulta_udis_permitido = "select (CASE WHEN sum(monto)>0 THEN sum(monto) else 0.0 END) from auxiliares_d"
-                                                                                + " inner join auxiliares a using(idorigenp,idproducto,idauxiliar)"
-                                                                                + " inner join productos using(idproducto)"
-                                                                                + " where estatus=2"
-                                                                                + " and a.idorigen=" + ctaDestino.getIdorigen()
-                                                                                + " and idgrupo=" + ctaDestino.getIdgrupo()
-                                                                                + " and idsocio=" + ctaDestino.getIdsocio()
-                                                                                + " and tipoproducto=0"
-                                                                                + " and cargoabono=1"
-                                                                                + " and periodo='" + fecha_trabajo.substring(0, 7).replace("/", "") + "'";//(SELECT to_char(fechatrabajo,'yyyymm') from origenes limit 1)";
-
-                                                                        Query monto_permitido_diario = null;
-                                                                        double monto_diario = 0;
-                                                                        Query udis_mensual = null;
-                                                                        double monto_udis_mensual = 0;
-
                                                                         
-
-                                                                        System.out.println("consulta_deposito_diario:" + consulta_permitido_diario);
-                                                                        System.out.println("Consulta_udis_mensual:" + consulta_udis_permitido);*/
-
                                                                         //Busco el tutor del socio menor o juvenil
                                                                         String consultaReferencia = " SELECT * FROM referencias "
                                                                                 + " WHERE idorigen =" + ctaDestino.getIdorigen()
@@ -1624,18 +1576,8 @@ public abstract class FacadeTransaction<T> {
                                                                         }
 
                                                                     } else {//el resto                                                                        
-                                                                        //tb_precio_udi en el periodo
-                                                                        //Obtengo la fecha de trabajo
-                                                                        /*Query query_fecha_trabajo = em.createNativeQuery("SELECT to_char(fechatrabajo,'yyyy/mm/dd') FROM origenes limit 1");
-
-                                                                        String fecha_trabajo = String.valueOf(query_fecha_trabajo.getSingleResult());
-                                                                        Tabla tb_precio_udi_periodo = util2.busquedaTabla(em, "valor_udi", fecha_trabajo.substring(0, 7).replace("\\/", ""));
-                                                                        Tabla tb_udis_permitido_tercero = util2.busquedaTabla(em, "bankingly_banca_movil","max_udis_por_transferencia");//fecha_trabajo.substring(0, 7).replace("\\/", ""));
-                                                                        if((monto * Double.parseDouble(tb_precio_udi_periodo.getDato1())) <= Double.parseDouble(tb_udis_permitido_tercero.getDato1())){
-                                                                         */ message = message + " VALIDADO CON EXITO";
-                                                                        /*}else{
-                                                                          message = "El monto de su transferencia traspasa el permitido diario";  
-                                                                        } */
+                                                                        message = message + " VALIDADO CON EXITO";
+                                                                       
                                                                     }
 
                                                                 } else {
@@ -1813,11 +1755,6 @@ public abstract class FacadeTransaction<T> {
                                             //Me aseguro que el producto destino tercero sea un prestamo
                                             if (productoDestino.getTipoproducto() == 2) {
 
-                                                //valido el minimo o maximo para banca movil
-                                                /*if (minMax(monto).toUpperCase().contains("VALIDO")) {
-                                                    //Valido el monto maximo por dia
-                                                    if (MaxPordia(opaOrigen, monto)) {
-                                                 */
                                                 Origenes origenMatriz = util2.busquedaMatriz();
                                                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
                                                 String fecha_intento_liquidar = sdf.format(origenMatriz.getFechatrabajo());
@@ -1969,7 +1906,7 @@ public abstract class FacadeTransaction<T> {
     }
     //Metodo para validar pago orden SPEI
 
-    public String validaOrdenSPEI(RequestDataOrdenPagoDTO orden /*@Context UriInfo ui*/) throws MalformedURLException {
+    public String validaOrdenSPEIs(RequestDataOrdenPagoDTO orden /*@Context UriInfo ui*/) throws MalformedURLException {
         System.out.println("Entrando a validar las ordenes SPEI");
         EntityManager em = AbstractFacade.conexion();
         OpaDTO opa = util.opa(orden.getClienteClabe());
