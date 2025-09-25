@@ -101,7 +101,7 @@ public abstract class FacadeTerceros<T> {
                     productosTerceros.setUserDocumentId_documentNumber(String.valueOf(dtoInput.getUserDocumentId().getDocumentNumber()));
                     productosTerceros.setUserDocumentId_documentType(String.valueOf(dtoInput.getUserDocumentId().getDocumentType()));
                     productosTerceros.setUserDocumentId_integrationProperties(dtoInput.getUserDocumentId().getIntegrationProperties());
-                    
+
                     try {
                         em.getTransaction().begin();
                         em.persist(productosTerceros);
@@ -153,83 +153,132 @@ public abstract class FacadeTerceros<T> {
 
     }
 
-    public ThirdPartyProductDTO cosultaProductosTerceros(String productNumber, Integer productTypeId, userDocumentIdDTO documento, Integer thirdPartyProductType,String username) {
+    public ThirdPartyProductDTO cosultaProductosTerceros(String productNumber, Integer productTypeId, userDocumentIdDTO documento, Integer thirdPartyProductType, String username, boolean isOtherBank) {
         EntityManager em = AbstractFacade.conexion();
         ThirdPartyProductDTO dto = new ThirdPartyProductDTO();
         try {
-            Auxiliar a = validarTercero(productNumber, productTypeId);
-            if (a != null) {
-                if (a.getEstatus() == 2) {
-                    userDocumentIdDTO userDocument = new userDocumentIdDTO();
-                    Bank bancoProductoTercero = new Bank();
-                    Bank corresponsalBank = new Bank();
-                    Productos pr = em.find(Productos.class, a.getAuxiliaresPK().getIdproducto());
-                    String ogs = String.format("%06d", a.getIdorigen()) + String.format("%02d", a.getIdgrupo()) + String.format("%06d", a.getIdsocio());
-                    ArrayList<String> listaPt = new ArrayList<>();
-                    listaPt.add(ogs);
-                    dto.setClientBankIdentifiers(listaPt);
-                    dto.setThirdPartyProductNumber(String.valueOf(thirdPartyProductType));
-                    dto.setThirdPartyProductBankIdentifier(productNumber);
-                    dto.setAlias(pr.getNombre());
-                    dto.setCurrencyId("484");//Identificador de moneda 1 es local
-                    dto.setTransactionSubType(2);
-                    dto.setThirdPartyProductType(1);
 
-                    Productos_bankingly prod = em.find(Productos_bankingly.class, a.getAuxiliaresPK().getIdproducto());
-                    dto.setProductType(prod.getProductTypeId());//el tipo de producto
+            Auxiliar a = null;
+            if (!isOtherBank) {
+                a = validarTercero(productNumber, productTypeId);
+            }
 
-                    PersonasPK personaPK = new PersonasPK(a.getIdorigen(), a.getIdgrupo(), a.getIdsocio());
-                    Persona p = em.find(Persona.class, personaPK);
-                    dto.setOwnerName(p.getNombre() + " " + p.getAppaterno() + " " + p.getApmaterno());
+            if (!isOtherBank) {
+                if (a != null) {
+                    if (a.getEstatus() == 2) {
+                        userDocumentIdDTO userDocument = new userDocumentIdDTO();
+                        Bank bancoProductoTercero = new Bank();
+                        Bank corresponsalBank = new Bank();
+                        Productos pr = em.find(Productos.class, a.getAuxiliaresPK().getIdproducto());
+                        String ogs = String.format("%06d", a.getIdorigen()) + String.format("%02d", a.getIdgrupo()) + String.format("%06d", a.getIdsocio());
+                        ArrayList<String> listaPt = new ArrayList<>();
+                        listaPt.add(ogs);
+                        dto.setClientBankIdentifiers(listaPt);
+                        dto.setThirdPartyProductNumber(String.valueOf(thirdPartyProductType));
+                        dto.setThirdPartyProductBankIdentifier(productNumber);
+                        dto.setAlias(pr.getNombre());
+                        dto.setCurrencyId("484");//Identificador de moneda 1 es local
+                        dto.setTransactionSubType(2);
+                        dto.setThirdPartyProductType(1);
 
-                    //Otenemos el nombre del pais de la persona
-                    Colonias c = em.find(Colonias.class, p.getIdcolonia());
-                    Municipios m = em.find(Municipios.class, c.getIdmunicipio());
-                    Estados e = em.find(Estados.class, m.getIdestado());
-                    Paises pa = em.find(Paises.class, e.getIdpais());
-                    dto.setOwnerCountryId("484");//Moneda nacional interncional cambia de codigo a 840
-                    boolean bandera = true;
-                    String email = "";
-                    //Buscamos en la tabla infomracion de terceros para obtener el email
-                    try {
-                        //Para evitar cualquier error usamos el ciclo por si el tercero no esta en la lista es nuevo 
-                        ProductosTercero tercero = em.find(ProductosTercero.class, productNumber);
-                        email = tercero.getBeneficiaryemail();
-                    } catch (Exception ex) {
-                        bandera = false;
-                        System.out.println("Error al buscar el tercero en el archivo bankingly:" + ex.getMessage());
+                        Productos_bankingly prod = em.find(Productos_bankingly.class, a.getAuxiliaresPK().getIdproducto());
+                        dto.setProductType(prod.getProductTypeId());//el tipo de producto
+
+                        PersonasPK personaPK = new PersonasPK(a.getIdorigen(), a.getIdgrupo(), a.getIdsocio());
+                        Persona p = em.find(Persona.class, personaPK);
+                        dto.setOwnerName(p.getNombre() + " " + p.getAppaterno() + " " + p.getApmaterno());
+
+                        //Otenemos el nombre del pais de la persona
+                        Colonias c = em.find(Colonias.class, p.getIdcolonia());
+                        dto.setOwnerCountryId("484");//Moneda nacional interncional cambia de codigo a 840
+                        boolean bandera = true;
+                        String email = "";
+                        //Buscamos en la tabla infomracion de terceros para obtener el email
+                        try {
+                            //Para evitar cualquier error usamos el ciclo por si el tercero no esta en la lista es nuevo 
+                            ProductosTercero tercero = em.find(ProductosTercero.class, productNumber);
+                            email = tercero.getBeneficiaryemail();
+                        } catch (Exception ex) {
+                            bandera = false;
+                            System.out.println("Error al buscar el tercero en el archivo bankingly:" + ex.getMessage());
+                        }
+
+                        if (!email.equals("")) {
+                            dto.setOwnerEmail(email);//p.getEmail()); 
+                        } else {
+                            dto.setOwnerEmail(p.getEmail());
+                        }
+                        dto.setOwnerCity(c.getNombre());
+                        dto.setOwnerAddress(c.getNombre() + "," + p.getNumeroext() + "," + p.getNumeroint());
+                        //Creamos y llenamos documento para el titular del producto de tercero
+                        userDocumentIdDTO ownerDocumentId = new userDocumentIdDTO();
+                        ownerDocumentId.setDocumentNumber(p.getPersonasPK().getIdorigen() + p.getPersonasPK().getIdgrupo() + p.getPersonasPK().getIdsocio());//Se a solicitado a Bankingly
+                        ownerDocumentId.setDocumentType(3);//Se a solicitado a Bankingly
+                        dto.setOwnerDocumentId(ownerDocumentId);
+                        dto.setOwnerPhoneNumber(p.getCelular());
+                        //Llenamos user document Id
+                        userDocument.setDocumentNumber(p.getPersonasPK().getIdorigen() + p.getPersonasPK().getIdgrupo() + p.getPersonasPK().getIdsocio());//
+                        userDocument.setDocumentType(3);
+                        dto.setUserDocumentId(userDocument);
+                        //Llenamos el banco de tercero
+                        bancoProductoTercero.setBankId(a.getAuxiliaresPK().getIdorigenp());
+                        bancoProductoTercero.setCountryId("484");
+                        Origenes o = em.find(Origenes.class, a.getAuxiliaresPK().getIdorigenp());
+                        bancoProductoTercero.setDescription(o.getNombre());
+                        bancoProductoTercero.setRoutingCode(null);
+                        bancoProductoTercero.setHeadQuartersAddress(o.getCalle() + "," + o.getNumeroint() + "," + o.getNumeroext());
+                        dto.setBank(bancoProductoTercero);
+                        dto.setCorrespondentBank(corresponsalBank);
+
+                        //Vamos a guardar el producto tercero para saber la fecha en la que se dio de alta
+                        insertarTerceroActivado(productNumber, bandera, username, "TERCERO LOCAL", false);
                     }
-
-                    if (!email.equals("")) {
-                        dto.setOwnerEmail(email);//p.getEmail()); 
-                    } else {
-                        dto.setOwnerEmail(p.getEmail());
-                    }
-                    dto.setOwnerCity(c.getNombre());
-                    dto.setOwnerAddress(c.getNombre() + "," + p.getNumeroext() + "," + p.getNumeroint());
-                    //Creamos y llenamos documento para el titular del producto de tercero
-                    userDocumentIdDTO ownerDocumentId = new userDocumentIdDTO();
-                    ownerDocumentId.setDocumentNumber(p.getPersonasPK().getIdorigen() + p.getPersonasPK().getIdgrupo() + p.getPersonasPK().getIdsocio());//Se a solicitado a Bankingly
-                    ownerDocumentId.setDocumentType(3);//Se a solicitado a Bankingly
-                    dto.setOwnerDocumentId(ownerDocumentId);
-                    dto.setOwnerPhoneNumber(p.getCelular());
-                    //Llenamos user document Id
-                    userDocument.setDocumentNumber(p.getPersonasPK().getIdorigen() + p.getPersonasPK().getIdgrupo() + p.getPersonasPK().getIdsocio());//
-                    userDocument.setDocumentType(3);
-                    dto.setUserDocumentId(userDocument);
-                    //Llenamos el banco de tercero
-                    bancoProductoTercero.setBankId(a.getAuxiliaresPK().getIdorigenp());
-                    bancoProductoTercero.setCountryId("484");
-                    Origenes o = em.find(Origenes.class, a.getAuxiliaresPK().getIdorigenp());
-                    bancoProductoTercero.setDescription(o.getNombre());
-                    bancoProductoTercero.setRoutingCode(null);
-                    bancoProductoTercero.setHeadQuartersAddress(o.getCalle() + "," + o.getNumeroint() + "," + o.getNumeroext());
-                    dto.setBank(bancoProductoTercero);
-                    dto.setCorrespondentBank(corresponsalBank);
-
-                    //Vamos a guardar el producto tercero para saber la fecha en la que se dio de alta
-                    insertarTerceroActivado(productNumber, bandera,username );
                 }
+            } else {
+                userDocumentIdDTO userDocument = new userDocumentIdDTO();
+                Bank bancoProductoTercero = new Bank();
+                Bank corresponsalBank = new Bank();
+                ArrayList<String> listaPt = new ArrayList<>();
+                listaPt.add(productNumber);
+                dto.setClientBankIdentifiers(listaPt);
+                dto.setThirdPartyProductNumber(String.valueOf(thirdPartyProductType));
+                dto.setThirdPartyProductBankIdentifier(productNumber);
+                dto.setAlias("DEBITO");
+                dto.setCurrencyId("484");//Identificador de moneda 1 es local
+                dto.setTransactionSubType(2);
+                dto.setThirdPartyProductType(1);
+                dto.setProductType(0);//el tipo de producto
+
+                dto.setOwnerName("SIN NOMBRE");
+
+                //Otenemos el nombre del pais de la persona
+                dto.setOwnerCountryId("484");//Moneda nacional interncional cambia de codigo a 840
+                boolean bandera = true;
+                dto.setOwnerEmail("otrobanco@gmail.com");//p.getEmail()); 
+
+                dto.setOwnerCity("MONTERREY NUEVO LEON");
+                dto.setOwnerAddress("");
+                //Creamos y llenamos documento para el titular del producto de tercero
+                userDocumentIdDTO ownerDocumentId = new userDocumentIdDTO();
+                ownerDocumentId.setDocumentNumber(0);//Se a solicitado a Bankingly
+                ownerDocumentId.setDocumentType(3);//Se a solicitado a Bankingly
+                dto.setOwnerDocumentId(ownerDocumentId);
+                dto.setOwnerPhoneNumber("");
+                //Llenamos user document Id
+                userDocument.setDocumentNumber(0);//
+                userDocument.setDocumentType(3);
+                dto.setUserDocumentId(userDocument);
+                //Llenamos el banco de tercero
+                bancoProductoTercero.setBankId(0);
+                bancoProductoTercero.setCountryId("484");
+                bancoProductoTercero.setDescription("TERCERO FUERA DE LA ENTIDAD");
+                bancoProductoTercero.setRoutingCode(null);
+                bancoProductoTercero.setHeadQuartersAddress("");
+                dto.setBank(bancoProductoTercero);
+                dto.setCorrespondentBank(corresponsalBank);
+
+                //Vamos a guardar el producto tercero para saber la fecha en la que se dio de alta
+                insertarTerceroActivado(productNumber, bandera, username, "OTROS BANCOS", true);
             }
 
         } catch (Exception e) {
@@ -276,42 +325,55 @@ public abstract class FacadeTerceros<T> {
 
     }
 
-    public boolean insertarTerceroActivado(String opaTercero, boolean existe, String usuario) {//Existe bandera que sirve para saber si el tercero ya esta en la lista 
+    public boolean insertarTerceroActivado(String opaTercero, boolean existe, String usuario, String comentario, boolean isOtherBank) {//Existe bandera que sirve para saber si el tercero ya esta en la lista 
         boolean bandera = false;
-        System.out.println("Guardando la activacion del tercero");
+        System.out.println("Guardando la activacion del tercero ::_");
         EntityManager em = AbstractFacade.conexion();
         try {
-            int o = Integer.parseInt(opaTercero.substring(0, 6));
-            int p = Integer.parseInt(opaTercero.substring(6, 11));
-            int a = Integer.parseInt(opaTercero.substring(11, 19));
+            TerceroActivacion tercero = new TerceroActivacion();
+             TerceroActivacionPK Pk = new TerceroActivacionPK();
+            if (!isOtherBank) {
+                int o = Integer.parseInt(opaTercero.substring(0, 6));
+                int p = Integer.parseInt(opaTercero.substring(6, 11));
+                int a = Integer.parseInt(opaTercero.substring(11, 19));
+                Pk = new TerceroActivacionPK(o, p, a, usuario);
+
+                if (!existe) {//Nos aseguramos que no exista el mismo tercero para un socio
+                    try {
+                        tercero = em.find(TerceroActivacion.class, Pk);
+                    } catch (Exception e) {
+
+                    }
+                }
+            } else {
+                Pk = new TerceroActivacionPK(0, 0, 0, usuario);
+                try {
+                    String consulta = "SELECT * FROM productos_terceros_activacion WHERE idcuenta='" + opaTercero + "'";
+                    Query terceroQuery = em.createNativeQuery(consulta);
+                    tercero = (TerceroActivacion) terceroQuery.getSingleResult();
+                } catch (Exception e) {
+                    System.out.println("::::::::Error al validar tercero po idCuenta:::::::" + e.getMessage());
+                }
+            }
 
             SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 
-            TerceroActivacionPK Pk = new TerceroActivacionPK(o, p, a, usuario);
-            TerceroActivacion tercero = new TerceroActivacion();
-            if (!existe) {
-                try {
-                    tercero = em.find(TerceroActivacion.class, Pk);
-                } catch (Exception e) {
-                    
-                }
+            if (tercero == null) {
+                Date fecha = sdf.parse(em.createNativeQuery("SELECT to_char((SELECT now()), 'DD/MM/YYYY HH24:MI:SS')").getSingleResult().toString());
+                tercero = new TerceroActivacion();
+                tercero.setPk(Pk);
+                tercero.setFecharegistro(fecha);
+                tercero.setComentario(comentario);
+                tercero.setIdcuentaOtroBanco(opaTercero);
+            }
 
-                if (tercero == null) {
-                    Date fecha = sdf.parse(em.createNativeQuery("SELECT to_char((SELECT now()), 'DD/MM/YYYY HH24:MI:SS')").getSingleResult().toString());
-                    tercero = new TerceroActivacion();
-                    tercero.setPk(Pk);
-                    tercero.setFecharegistro(fecha);
-                }
-
-            } 
-            
             em.getTransaction().begin();
             em.persist(tercero);
             em.getTransaction().commit();
 
             bandera = true;
         } catch (Exception e) {
-            System.out.println("Error al registrar activacion de tercero:" + e.getMessage());
+            System.out.println("::Error al registrar activacion de tercero:" + e.getMessage());
         } finally {
             em.close();
         }

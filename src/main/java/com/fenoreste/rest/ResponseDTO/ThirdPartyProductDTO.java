@@ -5,14 +5,16 @@
  */
 package com.fenoreste.rest.ResponseDTO;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
  *
  * @author wilmer
  */
-public class ThirdPartyProductDTO {
-
+public class ThirdPartyProductDTO implements Serializable{
+     
+    private static final long serialVersionUID = 1L;
     ArrayList<String> clientBankIdentifiers;
     String thirdPartyProductNumber;
     String thirdPartyProductBankIdentifier;

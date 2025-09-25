@@ -62,7 +62,7 @@ public class LoanResources {
             }
 
             OpaDTO opa = util2.opa(productBankIdentifier);
-            if (util.validacionSopar(opa.getIdorigenp(), opa.getIdproducto(), opa.getIdauxiliar(), 2)) {
+            if (util.validacionSopar(opa.getIdorigenp(), opa.getIdproducto(), opa.getIdauxiliar(), 2,"")) {
                 Error.put("ERROR", "SOCIO BLOQUEADO");
                 return Response.status(Response.Status.UNAUTHORIZED).entity(Error).build();
             }
@@ -117,7 +117,7 @@ public class LoanResources {
         }
 
         OpaDTO opa = util2.opa(productBankIdentifier);
-        if (util.validacionSopar(opa.getIdorigenp(), opa.getIdproducto(), opa.getIdauxiliar(), 2)) {
+        if (util.validacionSopar(opa.getIdorigenp(), opa.getIdproducto(), opa.getIdauxiliar(), 2,"")) {
             Error.put("ERROR", "SOCIO BLOQUEADO");
             return Response.status(Response.Status.UNAUTHORIZED).entity(Error).build();
         }
@@ -173,7 +173,7 @@ public class LoanResources {
             }
 
             OpaDTO opa = util2.opa(productBankIdentifier);
-            if (util.validacionSopar(opa.getIdorigenp(), opa.getIdproducto(), opa.getIdauxiliar(), 2)) {
+            if (util.validacionSopar(opa.getIdorigenp(), opa.getIdproducto(), opa.getIdauxiliar(), 2,"")) {
                 Error.put("ERROR", "SOCIO BLOQUEADO");
                 return Response.status(Response.Status.UNAUTHORIZED).entity(Error).build();
             }
@@ -234,7 +234,7 @@ public class LoanResources {
         }
 
         OpaDTO opa = util2.opa(productBankIdentifier);
-        if (util.validacionSopar(opa.getIdorigenp(), opa.getIdproducto(), opa.getIdauxiliar(), 2)) {
+        if (util.validacionSopar(opa.getIdorigenp(), opa.getIdproducto(), opa.getIdauxiliar(), 2,"")) {
             Error.put("ERROR", "SOCIO BLOQUEADO");
             return Response.status(Response.Status.UNAUTHORIZED).entity(Error).build();
         }
@@ -286,7 +286,7 @@ public class LoanResources {
         }
 
         OpaDTO opa = util2.opa(productBankIdentifier);
-        if (util.validacionSopar(opa.getIdorigenp(), opa.getIdproducto(), opa.getIdauxiliar(), 2)) {
+        if (util.validacionSopar(opa.getIdorigenp(), opa.getIdproducto(), opa.getIdauxiliar(), 2,"")) {
             Error.put("ERROR", "SOCIO BLOQUEADO");
             return Response.status(Response.Status.UNAUTHORIZED).entity(Error).build();
         }

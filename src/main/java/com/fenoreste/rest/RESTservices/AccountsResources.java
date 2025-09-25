@@ -46,7 +46,7 @@ public class AccountsResources {
         }
 
         OpaDTO opa = util2.opa(accountId);
-        if (util.validacionSopar(opa.getIdorigenp(), opa.getIdproducto(), opa.getIdauxiliar(), 2)) {
+        if (util.validacionSopar(opa.getIdorigenp(), opa.getIdproducto(), opa.getIdauxiliar(), 2,"")) {
             Json_De_Error.put("ERROR", "SOCIO BLOQUEADO");
             return Response.status(Response.Status.UNAUTHORIZED).entity(Json_De_Error).build();
         }
@@ -108,7 +108,7 @@ public class AccountsResources {
                 }
             }
             OpaDTO opa = util2.opa(accountId);
-            if (util.validacionSopar(opa.getIdorigenp(), opa.getIdproducto(), opa.getIdauxiliar(), 2)) {
+            if (util.validacionSopar(opa.getIdorigenp(), opa.getIdproducto(), opa.getIdauxiliar(), 2,"")) {
                 Json_De_Error.put("ERROR", "SOCIO BLOQUEADO");
                 return Response.status(Response.Status.UNAUTHORIZED).entity(Json_De_Error).build();
             }
@@ -179,7 +179,7 @@ public class AccountsResources {
             int count = 0;
 
             OpaDTO opa = util2.opa(ProductBankIdentifier);
-            if (util.validacionSopar(opa.getIdorigenp(), opa.getIdproducto(), opa.getIdauxiliar(), 2)) {
+            if (util.validacionSopar(opa.getIdorigenp(), opa.getIdproducto(), opa.getIdauxiliar(), 2,"")) {
                 Error.put("ERROR", "SOCIO BLOQUEADO");
                 return Response.status(Response.Status.UNAUTHORIZED).entity(Error).build();
             }

@@ -6,10 +6,6 @@
 package com.fenoreste.rest.RESTservices;
 
 import com.fenoreste.rest.Util.AbstractFacade;
-import com.fenoreste.rest.dao.CustomerDAO;
-import com.fenoreste.rest.entidades.Auxiliar;
-import com.fenoreste.rest.entidades.Persona;
-import com.fenoreste.rest.entidades.Banca_movil_usuarios;
 import com.github.cliftonlabs.json_simple.JsonObject;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -30,7 +26,7 @@ import org.json.JSONObject;
  */
 @Path("/Test")
 public class TestResources {
-
+/*
     @POST
     @Path("/auth")    
     @Produces({MediaType.APPLICATION_JSON})
@@ -48,7 +44,7 @@ public class TestResources {
             Banca_movil_usuarios user=(Banca_movil_usuarios) q.getSingleResult();
             /*jsonOb.put("user",user.getUsername());
             jsonOb.put("id",user.getSocio());*/
-            em.close();
+           /* em.close();
         } catch (Exception e) {
             jsonOb.put("user","null");
             System.out.println("Error al buscar user:"+e.getMessage());
@@ -60,6 +56,6 @@ public class TestResources {
         return Response.status(Response.Status.OK).entity(jsonOb).build();
         
     }
-    
+    */
 
 }

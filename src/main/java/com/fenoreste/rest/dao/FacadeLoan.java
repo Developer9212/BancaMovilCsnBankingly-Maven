@@ -720,19 +720,5 @@ public abstract class FacadeLoan<T> {
         }
         return bandera_;
     }
-    
-    public static void main(String[] args) {
-         TimeZone.setDefault(TimeZone.getTimeZone("America/Mexico_City"));
-        EntityManager em = AbstractFacade.conexion();
-       
-            String sql = "SELECT date(fechatrabajo) from origenes limit 1";
-            
-               Query querys = em.createNativeQuery(sql);
-                String r = querys.getSingleResult().toString();
-                
-                System.out.println("RRRR:"+r);
-                System.out.println("Date:"+new Date());
-        
-    }
 
 }

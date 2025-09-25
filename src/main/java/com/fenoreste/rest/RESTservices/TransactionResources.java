@@ -150,7 +150,7 @@ public class TransactionResources {
                 Si el request que nos llego es el correcto procedemos
           ======================================================================*/
         try {
-             if (!dao.actividad_horario()) {
+            if (!dao.actividad_horario()) {
                 backendOperationResult.setBackendMessage("<html><body><b>VERIFIQUE SU HORARIO DE ACTIVIDAD FECHA,HORA O CONTACTE A SU PROVEEEDOR</b></body></html>");
             } else {
                 System.out.println("Accediendo a trasnferencias con subTransactionType=" + dto.getSubTransactionTypeId() + ",TransactionId:" + dto.getTransactionTypeId());
@@ -174,45 +174,42 @@ public class TransactionResources {
 
                 //Vamos a buscar la transaccion con el id
                 boolean bandera = false;
-                
-               
-                    Transferencia transferencia = daoMovs.buscarUltimoMovimiento(dto.getClientBankIdentifier());
-                    //daoMovs.guardar(mov);
-                    if (transferencia.getTransactionid() != null) {
-                        //convertimos la fecha 
-                        Date hoy = new Date();//fechaParser(dto.getValueDate());
-                        if (transferencia.getFechaejecucion().toGMTString().substring(0, 11).equals(hoy.toGMTString().substring(0, 11))) {
-                            System.out.println("Transaccion en la misma fecha mov.:" + transferencia.getFechaejecucion().toGMTString().substring(0, 11) + ",hoy:" + hoy.toGMTString().substring(0, 11));
-                            TimeUnit timeHora = TimeUnit.HOURS;
-                            TimeUnit timeMinutos = TimeUnit.MINUTES;
-                            TimeUnit timeSegundos = TimeUnit.SECONDS;
-                            long diff = 0;
-                            long differenceHour = 0;
-                            long differenceMinutos = 0;
-                            long differenceSegundos = 0;
-                            System.out.println("Hora actual:" + hoy);
-                            System.out.println("Hora ultimo mov:"+ transferencia.getFechaejecucion());
-                            diff = hoy.getTime() - transferencia.getFechaejecucion().getTime();
-                            differenceHour = timeHora.convert(diff, TimeUnit.MILLISECONDS);                            
-                            differenceMinutos = timeMinutos.convert(diff, TimeUnit.MILLISECONDS);
-                            differenceSegundos = timeSegundos.convert(diff, TimeUnit.MILLISECONDS);
-                            System.out.println("total hora:" + differenceHour + ",Total Minuto:" + differenceMinutos + ",total segundos:" + differenceSegundos + " de la ultima transaccion...");
-                            if (differenceHour > 0 || differenceMinutos > 0 || differenceSegundos > 4) {
-                                System.out.println("Ya pasaron 2 o mas segundos de tu ultima transaccion.....");
-                                bandera = true;
-                            } else {
-                                System.out.println("Error tu ultima transaccion fue hace 4 segundos");
-                                backendOperationResult.setBackendMessage("<HTML>Tienes una transaccion con menos de 2 segundos.</HTML>");
-                            }
-                        } else {
+
+                Transferencia transferencia = daoMovs.buscarUltimoMovimiento(dto.getClientBankIdentifier());
+                //daoMovs.guardar(mov);
+                if (transferencia.getTransactionid() != null) {
+                    //convertimos la fecha 
+                    Date hoy = new Date();//fechaParser(dto.getValueDate());
+                    if (transferencia.getFechaejecucion().toGMTString().substring(0, 11).equals(hoy.toGMTString().substring(0, 11))) {
+                        System.out.println("Transaccion en la misma fecha mov.:" + transferencia.getFechaejecucion().toGMTString().substring(0, 11) + ",hoy:" + hoy.toGMTString().substring(0, 11));
+                        TimeUnit timeHora = TimeUnit.HOURS;
+                        TimeUnit timeMinutos = TimeUnit.MINUTES;
+                        TimeUnit timeSegundos = TimeUnit.SECONDS;
+                        long diff = 0;
+                        long differenceHour = 0;
+                        long differenceMinutos = 0;
+                        long differenceSegundos = 0;
+                        //System.out.println("Hora actual:" + hoy);
+                        //System.out.println("Hora ultimo mov:" + transferencia.getFechaejecucion());
+                        diff = hoy.getTime() - transferencia.getFechaejecucion().getTime();
+                        differenceHour = timeHora.convert(diff, TimeUnit.MILLISECONDS);
+                        differenceMinutos = timeMinutos.convert(diff, TimeUnit.MILLISECONDS);
+                        differenceSegundos = timeSegundos.convert(diff, TimeUnit.MILLISECONDS);
+                        //System.out.println("total hora:" + differenceHour + ",Total Minuto:" + differenceMinutos + ",total segundos:" + differenceSegundos + " de la ultima transaccion...");
+                        if (differenceHour > 0 || differenceMinutos > 0 || differenceSegundos > 4) {
+                            System.out.println("Ya pasaron 2 o mas segundos de tu ultima transaccion.....");
                             bandera = true;
+                        } else {
+                            System.out.println("Error tu ultima transaccion fue hace 4 segundos");
+                            backendOperationResult.setBackendMessage("<HTML>Tienes una transaccion con menos de 2 segundos.</HTML>");
                         }
                     } else {
-                        System.out.println("Primera transferencia.................");
-                      
                         bandera = true;
                     }
-                
+                } else {
+                    System.out.println("Primera transferencia.................");
+                    bandera = true;
+                }
 
                 if (bandera) {
                     //Si subtransactionType es 1 y transactionType es 1: El tipo de transaccion es es entre mis cuentas
@@ -224,11 +221,11 @@ public class TransactionResources {
                     if (dto.getSubTransactionTypeId() == 2 && dto.getTransactionTypeId() == 1) {
                         //Descomentar cuando se le de su gana 
                         String mensaje = validarTerceroOperar(dto.getCreditProductBankIdentifier(), dto.getUsername());
-                        //if (mensaje.toUpperCase().contains("EXITOSO")) {
-                        backendOperationResult = dao.transferencias(dto, 2, null);
-                        //} else {
-                        // backendOperationResult.setBackendMessage(mensaje);
-                        //}
+                        if (mensaje.toUpperCase().contains("EXITOSO")) {
+                            backendOperationResult = dao.transferencias(dto, 2, null);
+                        } else {
+                            backendOperationResult.setBackendMessage(mensaje);
+                        }
                     }
                     //Si subtransactionType es 9 y transactionType es 6: El tipo de transaccion es es un pago a prestamos  propio
                     if (dto.getSubTransactionTypeId() == 9 && dto.getTransactionTypeId() == 6) {
@@ -237,38 +234,43 @@ public class TransactionResources {
                     //Si es un pago a prestamo tercero 
                     if (dto.getSubTransactionTypeId() == 10 && dto.getTransactionTypeId() == 6) {
                         String mensaje = validarTerceroOperar(dto.getCreditProductBankIdentifier(), dto.getUsername());
-                        //  if (mensaje.toUpperCase().contains("EXITOSO")) {
-                        backendOperationResult = dao.transferencias(dto, 4, null);
-                        //} else {
-                        backendOperationResult.setBackendMessage(mensaje);
-                        // }                    
+                        if (mensaje.toUpperCase().contains("EXITOSO")) {
+                            backendOperationResult = dao.transferencias(dto, 4, null);
+                        } else {
+                            backendOperationResult.setBackendMessage(mensaje);
+                        }
                     }
-                    //Si es una trasnferencia SPEI
+                    //Si es una transferencia SPEI Salida
                     if (dto.getSubTransactionTypeId() == 3 && dto.getTransactionTypeId() == 1) {
 
-                        if (!dao.actividad_horario_spei()) {
-                            backendOperationResult.setBackendMessage("<html><body><b>Horario para envío de SPEI fuera de horario de servicio</b></body></html>");
-                        } else {
-                            //Consumimos mis servicios de SPEI que tengo en otro proyecto(CSN0)
-                            RequestDataOrdenPagoDTO ordenReque = new RequestDataOrdenPagoDTO();
-                            ordenReque.setClienteClabe(dto.getDebitProductBankIdentifier());//Opa origen como cuenta clabe en el metodo spei se busca la clave
-                            ordenReque.setConceptoPago(dto.getDescription());
-                            ordenReque.setCuentaBeneficiario(dto.getCreditProductBankIdentifier());//La clabe del beneficiario
-                            ordenReque.setInstitucionContraparte(dto.getDestinationBank());
-                            ordenReque.setMonto(dto.getAmount());
-                            ordenReque.setNombreBeneficiario(dto.getDestinationName());
-                            ordenReque.setRfcCurpBeneficiario(dto.getDestinationDocumentId().getDocumentNumber());
-                            ordenReque.setOrdernante(dto.getClientBankIdentifier());
-                            String[] location = dto.getLocation().split(",");
-                            ordenReque.setLongitud(location[1]);
-                            ordenReque.setLatitud(location[0]);
+                        String mensaje = validarTerceroOperar(dto.getCreditProductBankIdentifier(), dto.getUsername());
+                        if (mensaje.toUpperCase().contains("EXITOSO")) {
+                            if (!dao.actividad_horario_spei()) {
+                                backendOperationResult.setBackendMessage("<html><body><b>Horario para envío de SPEI fuera de horario de servicio</b></body></html>");
+                            } else {
+                                //Consumimos mis servicios de SPEI que tengo en otro proyecto(CSN0)
+                                RequestDataOrdenPagoDTO ordenReque = new RequestDataOrdenPagoDTO();
+                                ordenReque.setClienteClabe(dto.getDebitProductBankIdentifier());//Opa origen como cuenta clabe en el metodo spei se busca la clave
+                                ordenReque.setConceptoPago(dto.getDescription());
+                                ordenReque.setCuentaBeneficiario(dto.getCreditProductBankIdentifier());//La clabe del beneficiario
+                                ordenReque.setInstitucionContraparte(dto.getDestinationBank());
+                                ordenReque.setMonto(dto.getAmount());
+                                ordenReque.setNombreBeneficiario(dto.getDestinationName());
+                                ordenReque.setRfcCurpBeneficiario(dto.getDestinationDocumentId().getDocumentNumber());
+                                ordenReque.setOrdernante(dto.getClientBankIdentifier());
+                                String[] location = dto.getLocation().split(",");
+                                ordenReque.setLongitud(location[1]);
+                                ordenReque.setLatitud(location[0]);
 
-                            backendOperationResult = dao.transferencias(dto, 5, ordenReque);
+                                backendOperationResult = dao.transferencias(dto, 5, ordenReque);
+                            }
+                        } else {
+                            backendOperationResult.setBackendMessage(mensaje);
                         }
 
                     }
                 }
-            }  
+            }
             response_json_3.put("integrationProperties", null);
             response_json_3.put("backendCode", backendOperationResult.getBackendCode());
             response_json_3.put("backendMessage", backendOperationResult.getBackendMessage());

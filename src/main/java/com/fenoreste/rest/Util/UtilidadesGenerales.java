@@ -7,6 +7,7 @@ package com.fenoreste.rest.Util;
 
 import com.fenoreste.rest.entidades.Auxiliar;
 import com.fenoreste.rest.entidades.AuxiliarPK;
+import com.fenoreste.rest.entidades.UsuarioBanca;
 import com.fenoreste.rest.entidades.Origenes;
 import com.fenoreste.rest.entidades.Persona;
 import com.fenoreste.rest.entidades.PersonasPK;
@@ -28,7 +29,7 @@ public class UtilidadesGenerales {
             String actividad = "SELECT sai_bankingly_servicio_activo_inactivo()";
             Query query = em.createNativeQuery(actividad);
             bandera = (boolean) query.getSingleResult();
-            
+
         } catch (Exception e) {
             System.out.println("Error al recuperar el tiempo de actividad:" + e.getMessage());
         }
@@ -86,55 +87,63 @@ public class UtilidadesGenerales {
         return tb;
     }
 
-    public boolean validacionSopar(int idorigen, int idgrupo, int idsocio,int identificador) {
-        boolean bandera_sopar = false;        
+    public boolean validacionSopar(int idorigen, int idgrupo, int idsocio, int identificador, String username) {
+        boolean bandera_sopar = false;
         EntityManager em = AbstractFacade.conexion();
         try {
             Persona p = null;
             Auxiliar a = null;
-            if(identificador==1){
-            PersonasPK personasPk= new PersonasPK(idorigen, idgrupo,idsocio);
-            p=em.find(Persona.class, personasPk);      
-            idorigen=p.getPersonasPK().getIdorigen();
-            idgrupo=p.getPersonasPK().getIdgrupo();
-            idsocio=p.getPersonasPK().getIdsocio();
-            }else{
-                AuxiliarPK auxPk=new AuxiliarPK(idorigen, idgrupo,idsocio);
-                a=em.find(Auxiliar.class,auxPk);
-                idorigen=a.getIdorigen();
-                idgrupo=a.getIdgrupo();
-                idsocio=a.getIdsocio();
+
+            if (username.isEmpty()) {
+                if (identificador == 1) {
+                    PersonasPK personasPk = new PersonasPK(idorigen, idgrupo, idsocio);
+                    p = em.find(Persona.class, personasPk);
+                    idorigen = p.getPersonasPK().getIdorigen();
+                    idgrupo = p.getPersonasPK().getIdgrupo();
+                    idsocio = p.getPersonasPK().getIdsocio();
+                } else {
+                    AuxiliarPK auxPk = new AuxiliarPK(idorigen, idgrupo, idsocio);
+                    a = em.find(Auxiliar.class, auxPk);
+                    idorigen = a.getIdorigen();
+                    idgrupo = a.getIdgrupo();
+                    idsocio = a.getIdsocio();
+                }
+            }else{//Para alta tercero pero a otros bancos(Spei salida)
+                String consultaUser = "SELECT * FROM banca_movil_usuarios WHERE alias_usuario='"+username+"'";
+                Query queryUser = em.createNativeQuery(consultaUser);
+                UsuarioBanca usuario = (UsuarioBanca) queryUser.getSingleResult();
+                idorigen = usuario.getPersonasPK().getIdorigen();
+                idgrupo = usuario.getPersonasPK().getIdgrupo();
+                idsocio = usuario.getPersonasPK().getIdsocio();
             }
-             
+
             Tabla tb_sopar = busquedaTabla(em, "bankingly_banca_movil", "sopar");
             String consulta_sopar = "SELECT CASE WHEN count(*) > 0 THEN count(*) ELSE 0 END FROM sopar WHERE idorigen=" + idorigen + " AND idgrupo=" + idgrupo + " AND idsocio=" + idsocio + " AND tipo='" + tb_sopar.getDato2() + "'";
             Query query_sopar = em.createNativeQuery(consulta_sopar);
             int count_sopar = Integer.parseInt(String.valueOf(query_sopar.getSingleResult()));
-            if(count_sopar>0){
-                bandera_sopar=true;
+            if (count_sopar > 0) {
+                bandera_sopar = true;
             }
         } catch (Exception e) {
-            System.out.println("Error al generar validaciones en tabla sopar:"+e.getMessage());
+            System.out.println("Error al generar validaciones en tabla sopar:" + e.getMessage());
         }
         em.close();
         return bandera_sopar;
 
     }
-    
-    public Origenes busquedaMatriz(){
+
+    public Origenes busquedaMatriz() {
         EntityManager em = AbstractFacade.conexion();
         Origenes origen_matriz = null;
         try {
             String sql = "SELECT * FROM origenes WHERE matriz=0";
-            Query query_sql = em.createNativeQuery(sql,Origenes.class);
+            Query query_sql = em.createNativeQuery(sql, Origenes.class);
             origen_matriz = (Origenes) query_sql.getSingleResult();
-            
+
         } catch (Exception e) {
-            System.out.println("Error al buscar la matriz:"+e.getMessage());
+            System.out.println("Error al buscar la matriz:" + e.getMessage());
         }
         return origen_matriz;
     }
-    
-    
 
 }

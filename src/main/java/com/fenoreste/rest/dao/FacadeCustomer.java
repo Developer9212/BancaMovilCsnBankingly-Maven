@@ -14,21 +14,18 @@ import com.fenoreste.rest.entidades.Tabla;
 import com.fenoreste.rest.entidades.TablaPK;
 import com.fenoreste.rest.entidades.WsClabeActivacion;
 import com.fenoreste.rest.entidades.WsSiscoopFoliosTarjetasPK1;
-import com.fenoreste.rest.entidades.Banca_movil_usuarios;
-import com.fenoreste.rest.entidades.Banca_movil_usuarios_saicoop;
+import com.fenoreste.rest.entidades.UsuarioBanca;
 import com.syc.ws.endpoint.siscoop.BalanceQueryResponseDto;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.security.SecureRandom;
 import java.util.Date;
-import java.util.List;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import org.json.JSONObject;
 
 public abstract class FacadeCustomer<T> {
 
-    List<Object[]> lista = null;
     UtilidadesGenerales util = new UtilidadesGenerales();
 
     public FacadeCustomer(Class<T> entityClass) {
@@ -105,7 +102,7 @@ public abstract class FacadeCustomer<T> {
         String mensaje = "";
         EntityManager em = AbstractFacade.conexion();
         boolean bandera = false;
-        String consulta = "";
+        System.out.println(":::::::::::::::::::Vamos a validar datos:::::::::::::::::::::");
         try {
             //Busco la tabla donde guarda el producto para banca movil
             TablaPK tablasPK = new TablaPK("bankingly_banca_movil", "producto_banca_movil");
@@ -115,6 +112,8 @@ public abstract class FacadeCustomer<T> {
             String busquedaFolio = "SELECT * FROM auxiliares WHERE idorigen=" + idorigen + " AND idgrupo=" + idgrupo + " AND idsocio=" + idsocio + " AND idproducto=" + tablaProducto.getDato1() + " AND estatus=0";
             Query busquedaFolioQuery = em.createNativeQuery(busquedaFolio, Auxiliar.class);
             Auxiliar a = (Auxiliar) busquedaFolioQuery.getSingleResult();
+            
+            System.out.println(":::::::::::::::::::::::Se encontro el auxiliar:::::::::::::::::");
 
             //Si ya tiene el producto para banca movil activo
             if (a != null) {
@@ -133,11 +132,11 @@ public abstract class FacadeCustomer<T> {
                                 + " AND idproducto=" + Integer.parseInt(tb_producto_tdd.getDato1()) + " AND estatus=2";
                         Query auxiliar = em.createNativeQuery(busqueda133, Auxiliar.class);
                         Auxiliar a_tdd = (Auxiliar) auxiliar.getSingleResult();
-
+                        System.out.println(":::::::::::::::Auxiliar TDD:"+a_tdd+"::::::::::::::::::::::::::::");
                         WsSiscoopFoliosTarjetasPK1 foliosPK = new WsSiscoopFoliosTarjetasPK1(a_tdd.getAuxiliaresPK().getIdorigenp(), a_tdd.getAuxiliaresPK().getIdproducto(), a_tdd.getAuxiliaresPK().getIdauxiliar());
 
                         double saldo = 0.0;
-                        com.fenoreste.rest.WsTDD.BalanceQueryResponseDto saldoWS = new TarjetaDeDebito().saldoTDD(foliosPK);
+                        BalanceQueryResponseDto saldoWS = new TarjetaDeDebito().saldoTDD(foliosPK);
                         if (saldoWS.getCode() >= 1) {
                             saldo = saldoWS.getAvailableAmount();
                             // SaldoTddPK saldoTddPK = new SaldoTddPK(a.getAuxiliaresPK().getIdorigenp(), a.getAuxiliaresPK().getIdproducto(), a.getAuxiliaresPK().getIdauxiliar());
@@ -146,9 +145,10 @@ public abstract class FacadeCustomer<T> {
                             System.out.println("Error al consumir web service para saldo de TDD");
                         }
                         if (saldo >= Double.parseDouble(tb_producto_tdd.getDato2())) {
+                            System.out.println(":::::::::Saldo normal seguimos a validar sopar:::::::::::::::::::::::::::");
                             //S tiene el saldoque se encesita en la tdd
                             //Ahora verificamos que no se un socio bloqueado buscamos en la lista sopar
-                            if (!util.validacionSopar(a_tdd.getAuxiliaresPK().getIdorigenp(), a_tdd.getAuxiliaresPK().getIdproducto(), a_tdd.getAuxiliaresPK().getIdauxiliar(), 2)) {
+                            if (!util.validacionSopar(a_tdd.getAuxiliaresPK().getIdorigenp(), a_tdd.getAuxiliaresPK().getIdproducto(), a_tdd.getAuxiliaresPK().getIdauxiliar(), 2,"")) {
                                 //Ahora verifico que el socio tenga clabe para SPEI 
                                 AuxiliarPK clave_llave = new AuxiliarPK(a_tdd.getAuxiliaresPK().getIdorigenp(), a_tdd.getAuxiliaresPK().getIdproducto(), a_tdd.getAuxiliaresPK().getIdauxiliar());
                                 Clabes_Interbancarias clabe_folio = em.find(Clabes_Interbancarias.class, clave_llave);
@@ -223,8 +223,8 @@ public abstract class FacadeCustomer<T> {
         try {
             
             String sql_alias = "SELECT * FROM banca_movil_usuarios WHERE idorigen="+p.getPersonasPK().getIdorigen()+" AND idgrupo="+p.getPersonasPK().getIdgrupo()+" AND idsocio="+p.getPersonasPK().getIdsocio()+" AND estatus=true limit 1";
-            Query query_alias = em.createNativeQuery(sql_alias,Banca_movil_usuarios_saicoop.class);
-            Banca_movil_usuarios_saicoop userDB =  userDB = (Banca_movil_usuarios_saicoop) query_alias.getSingleResult();
+            Query query_alias = em.createNativeQuery(sql_alias,UsuarioBanca.class);
+            UsuarioBanca userDB =  userDB = (UsuarioBanca) query_alias.getSingleResult();
                     
             if (userDB != null) {
                 if (userDB.isEstatus()) {

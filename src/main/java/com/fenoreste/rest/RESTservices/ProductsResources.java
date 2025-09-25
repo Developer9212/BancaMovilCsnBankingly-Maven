@@ -85,7 +85,7 @@ public class ProductsResources {
         }
 
         OgsDTO ogs = util2.ogs(ClientBankIdentifiers);
-        if (util.validacionSopar(ogs.getIdorigen(), ogs.getIdgrupo(), ogs.getIdsocio(), 1)) {
+        if (util.validacionSopar(ogs.getIdorigen(), ogs.getIdgrupo(), ogs.getIdsocio(), 1,"")) {
             jsonError.put("ERROR", "SOCIO BLOQUEADO");
             return Response.status(Response.Status.BAD_REQUEST).entity(jsonError).build();
         }
@@ -144,7 +144,7 @@ public class ProductsResources {
         }
 
         OgsDTO ogs = util2.ogs(ClientBankIdentifiers);
-        if (util.validacionSopar(ogs.getIdorigen(), ogs.getIdgrupo(), ogs.getIdsocio(), 1)) {
+        if (util.validacionSopar(ogs.getIdorigen(), ogs.getIdgrupo(), ogs.getIdsocio(), 1,"")) {
             jsonError.put("ERROR", "SOCIO BLOQUEADO");
             return Response.status(Response.Status.BAD_REQUEST).entity(jsonError).build();
         }
@@ -202,7 +202,7 @@ public class ProductsResources {
             productBankIdentifier_ = request_.getString("productBankIdentifier");
 
             OgsDTO ogs = util2.ogs(clientBankIdentifier_);
-            if (util.validacionSopar(ogs.getIdorigen(), ogs.getIdgrupo(), ogs.getIdsocio(), 1)) {
+            if (util.validacionSopar(ogs.getIdorigen(), ogs.getIdgrupo(), ogs.getIdsocio(), 1,"")) {
                 json.put("ERROR", "SOCIO BLOQUEADO");
                 return Response.status(Response.Status.BAD_REQUEST).entity(json).build();
             }

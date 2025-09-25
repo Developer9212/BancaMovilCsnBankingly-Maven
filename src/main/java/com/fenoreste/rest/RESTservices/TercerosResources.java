@@ -141,7 +141,7 @@ public class TercerosResources {
         }
 
         OpaDTO opa = util2.opa(dtoTercero.getThirdPartyProductBankIdentifier());
-        if (util.validacionSopar(opa.getIdorigenp(), opa.getIdproducto(), opa.getIdauxiliar(), 2)) {
+        if (util.validacionSopar(opa.getIdorigenp(), opa.getIdproducto(), opa.getIdauxiliar(), 2, "")) {
             jsonR.put("ERROR", "SOCIO BLOQUEADO");
             return Response.status(Response.Status.BAD_REQUEST).entity(jsonR).build();
         }
@@ -162,12 +162,12 @@ public class TercerosResources {
     @Produces({MediaType.APPLICATION_JSON + ";charset=utf-8"})
     @Consumes({javax.ws.rs.core.MediaType.APPLICATION_JSON + ";charset=utf-8"})
     public Response altaTerceros(String cadena) {
-        System.out.println("Peticion tercero:"+cadena);
+        System.out.println("Peticion tercero:" + cadena);
         JSONObject jsonRequest = new JSONObject(cadena);
         String productNumber_ = "";
         Integer productTypeId_ = 0;
         Integer thirdPartyProductType_ = 0;
-        String username  = "";
+        String username = "";
         //validamos que nuestro request este bien formado
         try {
             productNumber_ = jsonRequest.getString("productNumber");
@@ -179,32 +179,50 @@ public class TercerosResources {
             thirdPartyProductType_ = jsonRequest.getInt("thirdPartyProductType");
             username = jsonRequest.getString("userName");
         } catch (Exception e) {
-            
+
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
         }
 
         TercerosDAO dao = new TercerosDAO();
 
         JsonObject error = new JsonObject();
+
         if (!dao.actividad_horario()) {
             error.put("ERROR", "VERIFIQUE SU HORARIO DE ACTIVIDAD FECHA,HORA O CONTACTE A SU PROVEEEDOR");
             return Response.status(Response.Status.BAD_REQUEST).entity(error).build();
         }
 
         OpaDTO opa = util2.opa(productNumber_);
-        if (util.validacionSopar(opa.getIdorigenp(), opa.getIdproducto(), opa.getIdauxiliar(), 2)) {
-            error.put("ERROR", "SOCIO BLOQUEADO");
-            return Response.status(Response.Status.BAD_REQUEST).entity(error).build();
+        boolean spei=false;
+        if (productNumber_.length() == 19) {
+            if (util.validacionSopar(opa.getIdorigenp(), opa.getIdproducto(), opa.getIdauxiliar(), 2, "")) {
+                error.put("ERROR", "SOCIO BLOQUEADO");
+                return Response.status(Response.Status.BAD_REQUEST).entity(error).build();
+            }
+
+        } else {
+            
+            if (util.validacionSopar(opa.getIdorigenp(), opa.getIdproducto(), opa.getIdauxiliar(), 2, username)) {
+                error.put("ERROR", "SOCIO BLOQUEADO");
+                return Response.status(Response.Status.BAD_REQUEST).entity(error).build();
+            }
+            spei=true;
         }
 
-        userDocumentIdDTO documento = new userDocumentIdDTO();
         try {
-            ThirdPartyProductDTO dto = dao.cosultaProductosTerceros(productNumber_, productTypeId_, documento, thirdPartyProductType_,username);
+            ThirdPartyProductDTO dto = new ThirdPartyProductDTO();
+            userDocumentIdDTO documento = new userDocumentIdDTO();
+            if(!spei){
+                dto = dao.cosultaProductosTerceros(productNumber_, productTypeId_, documento, thirdPartyProductType_, username,false);
+            }else{
+                dto = dao.cosultaProductosTerceros(productNumber_, productTypeId_, documento, thirdPartyProductType_, username,true);
+            }
+            
             JsonObject third = new JsonObject();
             third.put("productOwnerAndCurrency", dto);
             return Response.status(Response.Status.OK).entity(third).build();
         } catch (Exception e) {
-            System.out.println("Error:" + e.getMessage());
+            System.out.println("Error al buscar tercero:" + e.getMessage());
 
         }
         return null;

@@ -62,7 +62,7 @@ public abstract class FacadeAccounts<T> {
                 Tabla tb_producto_tdd = util2.busquedaTabla(em, "bankingly_banca_movil", "producto_tdd");
                 if (aux.getAuxiliaresPK().getIdproducto() == Integer.parseInt(tb_producto_tdd.getDato1())) {
                     WsSiscoopFoliosTarjetasPK1 foliosPK = new WsSiscoopFoliosTarjetasPK1(aux.getAuxiliaresPK().getIdorigenp(), aux.getAuxiliaresPK().getIdproducto(), aux.getAuxiliaresPK().getIdauxiliar());
-                    com.fenoreste.rest.WsTDD.BalanceQueryResponseDto responseSaldo = wsTDD.saldoTDD(foliosPK);
+                    BalanceQueryResponseDto responseSaldo = wsTDD.saldoTDD(foliosPK);
                     saldo24 = responseSaldo.getAvailableAmount();
                     saldo48 = responseSaldo.getAvailableAmount();
                     saldo = responseSaldo.getAvailableAmount();
