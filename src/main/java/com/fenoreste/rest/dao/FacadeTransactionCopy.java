@@ -72,7 +72,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  *
  * @author Elliot
  */
-public abstract class FacadeTransaction<T> {
+public abstract class FacadeTransactionCopy<T> {
 
     Utilidades util = new Utilidades();
     UtilidadesGenerales util2 = new UtilidadesGenerales();
@@ -80,7 +80,7 @@ public abstract class FacadeTransaction<T> {
     @Autowired
     private TarjetaDeDebito tarjetaDeDebito;
 
-    public FacadeTransaction(Class<T> entityClass) {
+    public FacadeTransactionCopy(Class<T> entityClass) {
     }
 
     //El identificador de trasnferencia me dice 1=entre mis cuentas 2=a terceros 3=Pago a prestamos
@@ -97,7 +97,7 @@ public abstract class FacadeTransaction<T> {
         System.out.println(opaOrigen.getIdorigenp() + "-" + opaOrigen.getIdproducto() + "-" + opaOrigen.getIdauxiliar());
 
         boolean banderaCSN = false;
-        ResponseSPEIDTO response= new ResponseSPEIDTO();
+        ResponseSPEIDTO responses= new ResponseSPEIDTO();
         String messageBackend = "";
         String mensajeBackendResult = "";
 
@@ -132,7 +132,9 @@ public abstract class FacadeTransaction<T> {
             }
         } else if (identificadorTransferencia == 5) {             
             
-            //Valido la transferencia y devuelvo el mensaje que se produce            
+            //Valido la transferencia y devuelvo el mensaje que se produce
+            //Busco la cuenta spei en tablas solo capital
+            tb_spei_cuenta = util2.busquedaTabla(em, "bankingly_banca_movil", "cuenta_spei");
             //Busco la cuenta spei en tablas solo para comisiones                    
             tb_spei_cuenta_comisiones = util2.busquedaTabla(em, "bankingly_banca_movil", "cuenta_spei_comisiones");
             comisiones = Double.parseDouble(tb_spei_cuenta_comisiones.getDato2());
@@ -236,7 +238,7 @@ public abstract class FacadeTransaction<T> {
                 //Obtener HH:mm:ss.microsegundos
                 String fechaArray[] = timestamp.toString().substring(0, 10).split("-");
                 String fReal = fechaArray[2] + "/" + fechaArray[1] + "/" + fechaArray[0];
-                String referencia= String.valueOf(rn) + "" + String.valueOf(transaction.getSubtransactiontypeid()) + "" + String.valueOf(transaction.getTransactiontypeid() + "" + fReal.replace("/", ""));
+                String referencias= String.valueOf(rn) + "" + String.valueOf(transaction.getSubtransactiontypeid()) + "" + String.valueOf(transaction.getTransactiontypeid() + "" + fReal.replace("/", ""));
 
                 //Leemos fechatrabajo e idusuario
                 String fechaTrabajo = "SELECT to_char(fechatrabajo,'yyyy-MM-dd HH:mm:ss') FROM ORIGENES LIMIT 1";
@@ -258,15 +260,13 @@ public abstract class FacadeTransaction<T> {
                 Procesa_pago_movimientos procesaOrigen = new Procesa_pago_movimientos();
 
                 //Preoaro el registro del abono
-                Procesa_pago_movimientos procesaDestino = new Procesa_pago_movimientos();
+                Procesa_pago_movimientos procesaDestinos = new Procesa_pago_movimientos();
 
                 OpaDTO opaD = null;
                 Auxiliar aDestino = null;
                 //Si es un spei lo identifico porque aqui va a una cuenta contable
 
                 if (identificadorTransferencia == 5) {//tipo de orden SPEI
-                    //Busco la cuenta spei en tablas solo capital
-                    tb_spei_cuenta = util2.busquedaTabla(em, "bankingly_banca_movil", "cuenta_spei");
                     Tabla tb_usuario_spei = util2.busquedaTabla(em, "bankingly_banca_movil", "usuario_spei");
 
                     //Tablas pra cuenta del iva de comisiones spei
@@ -2326,7 +2326,7 @@ public abstract class FacadeTransaction<T> {
 
     }
 
-    //Metodo solo para CSN aplicando reglas6666
+    //Metodo solo para CSN aplicando reglas
     private String validarTransferenciaCSN(TransactionModel transactionOWN, int identificadorTransferencia, RequestDataOrdenPagoDTO SPEIOrden) {
         EntityManager em = AbstractFacade.conexion();
         String mensaje = "";

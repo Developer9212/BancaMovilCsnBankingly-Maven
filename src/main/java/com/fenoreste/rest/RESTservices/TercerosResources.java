@@ -40,7 +40,7 @@ public class TercerosResources {
     @POST
     @Produces({MediaType.APPLICATION_JSON + ";charset=utf-8"})
     @Consumes({javax.ws.rs.core.MediaType.APPLICATION_JSON + ";charset=utf-8"})
-    public Response validarTerceros(String cadena) {
+    public Response validarTerceros(String cadena) {//Guarda el tercero ya sea dentro o fuera de la identidad
         System.out.println("Request Terceros:" + cadena);
 
         ArrayList<String> clientBankIdentifiers_ = new ArrayList<>();
@@ -147,8 +147,11 @@ public class TercerosResources {
         }
 
         try {
-            BackendOperationResultDTO response = dao.validarProductoTerceros(dtoTercero);
             JsonObject jsonResponse = new JsonObject();
+            BackendOperationResultDTO response = dao.validarProductoTerceros(dtoTercero);
+            if(response.isIsError()){
+               response.setBackendMessage("Sucedio un error al validar terccero");
+            }            
             jsonResponse.put("BackendOperationResult", response);
             return Response.status(Response.Status.OK).entity(jsonResponse).build();
         } catch (Exception e) {
@@ -161,7 +164,7 @@ public class TercerosResources {
     @POST
     @Produces({MediaType.APPLICATION_JSON + ";charset=utf-8"})
     @Consumes({javax.ws.rs.core.MediaType.APPLICATION_JSON + ";charset=utf-8"})
-    public Response altaTerceros(String cadena) {
+    public Response altaTerceros(String cadena) {//solo busca el tercero sin guardar o guardar pero ya se esta haciendo la operacion
         System.out.println("Peticion tercero:" + cadena);
         JSONObject jsonRequest = new JSONObject(cadena);
         String productNumber_ = "";
@@ -192,17 +195,18 @@ public class TercerosResources {
             return Response.status(Response.Status.BAD_REQUEST).entity(error).build();
         }
 
-        OpaDTO opa = util2.opa(productNumber_);
+       
         boolean spei=false;
-        if (productNumber_.length() == 19) {
+        if (thirdPartyProductType_ == 1) {
+             OpaDTO opa = util2.opa(productNumber_);
             if (util.validacionSopar(opa.getIdorigenp(), opa.getIdproducto(), opa.getIdauxiliar(), 2, "")) {
                 error.put("ERROR", "SOCIO BLOQUEADO");
                 return Response.status(Response.Status.BAD_REQUEST).entity(error).build();
             }
 
-        } else {
-            
-            if (util.validacionSopar(opa.getIdorigenp(), opa.getIdproducto(), opa.getIdauxiliar(), 2, username)) {
+        } else if(thirdPartyProductType_ == 2) {
+             System.out.println(":::::::::::Tercero a otro banco::::::::::::::::"+productNumber_);
+            if (util.validacionSopar(0,0,0, 2, username)) {
                 error.put("ERROR", "SOCIO BLOQUEADO");
                 return Response.status(Response.Status.BAD_REQUEST).entity(error).build();
             }

@@ -13,6 +13,7 @@ import com.fenoreste.rest.Util.Authorization;
 import com.fenoreste.rest.dao.TransactionDAO;
 import com.fenoreste.rest.ResponseDTO.VaucherDTO;
 import com.fenoreste.rest.dao.EntradaMovsDAO;
+import com.fenoreste.rest.dao.TercerosDAO;
 import com.fenoreste.rest.entidades.MovimientoEntrada;
 import com.fenoreste.rest.entidades.Tabla;
 import com.fenoreste.rest.entidades.TablaPK;
@@ -26,6 +27,7 @@ import java.text.Normalizer;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.concurrent.TimeUnit;
+import javax.transaction.Transactional;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -47,6 +49,8 @@ public class TransactionResources {
     String basePath = "";
     TransactionDAO dao = new TransactionDAO();
     EntradaMovsDAO daoMovs = new EntradaMovsDAO();
+    
+     TercerosDAO daoTecero = new TercerosDAO();
 
     @Path("/Insert")
     @POST
@@ -220,12 +224,12 @@ public class TransactionResources {
                     //Si subtransactionType es 2 y transactionType es 1: El tipo de transaccion es a terceros  dentro de la entidad
                     if (dto.getSubTransactionTypeId() == 2 && dto.getTransactionTypeId() == 1) {
                         //Descomentar cuando se le de su gana 
-                        String mensaje = validarTerceroOperar(dto.getCreditProductBankIdentifier(), dto.getUsername());
-                        if (mensaje.toUpperCase().contains("EXITOSO")) {
+                        //String mensaje = validarTerceroOperar(dto.getCreditProductBankIdentifier(), dto.getUsername(),false);
+                        //if (mensaje.toUpperCase().contains("EXITOSO")) {
                             backendOperationResult = dao.transferencias(dto, 2, null);
-                        } else {
-                            backendOperationResult.setBackendMessage(mensaje);
-                        }
+                        //} else {
+                          //  backendOperationResult.setBackendMessage(mensaje);
+                        //}
                     }
                     //Si subtransactionType es 9 y transactionType es 6: El tipo de transaccion es es un pago a prestamos  propio
                     if (dto.getSubTransactionTypeId() == 9 && dto.getTransactionTypeId() == 6) {
@@ -233,22 +237,22 @@ public class TransactionResources {
                     }
                     //Si es un pago a prestamo tercero 
                     if (dto.getSubTransactionTypeId() == 10 && dto.getTransactionTypeId() == 6) {
-                        String mensaje = validarTerceroOperar(dto.getCreditProductBankIdentifier(), dto.getUsername());
-                        if (mensaje.toUpperCase().contains("EXITOSO")) {
+                       // String mensaje = validarTerceroOperar(dto.getCreditProductBankIdentifier(), dto.getUsername(),false);
+                       // if (mensaje.toUpperCase().contains("EXITOSO")) {
                             backendOperationResult = dao.transferencias(dto, 4, null);
-                        } else {
-                            backendOperationResult.setBackendMessage(mensaje);
-                        }
+                       // } else {
+                         //   backendOperationResult.setBackendMessage(mensaje);
+                       // }
                     }
                     //Si es una transferencia SPEI Salida
                     if (dto.getSubTransactionTypeId() == 3 && dto.getTransactionTypeId() == 1) {
-
-                        String mensaje = validarTerceroOperar(dto.getCreditProductBankIdentifier(), dto.getUsername());
+                        System.out.println(":::::::::::Procesando espei salida:::::::::::::::::::::");
+                        String mensaje = validarTerceroOperar(dto.getCreditProductBankIdentifier(), dto.getUsername(),true);
                         if (mensaje.toUpperCase().contains("EXITOSO")) {
                             if (!dao.actividad_horario_spei()) {
                                 backendOperationResult.setBackendMessage("<html><body><b>Horario para envío de SPEI fuera de horario de servicio</b></body></html>");
                             } else {
-                                //Consumimos mis servicios de SPEI que tengo en otro proyecto(CSN0)
+                                //Consumimos mis servicios de SPEI que tengo en otro proyecto(CSN)
                                 RequestDataOrdenPagoDTO ordenReque = new RequestDataOrdenPagoDTO();
                                 ordenReque.setClienteClabe(dto.getDebitProductBankIdentifier());//Opa origen como cuenta clabe en el metodo spei se busca la clave
                                 ordenReque.setConceptoPago(dto.getDescription());
@@ -368,8 +372,9 @@ public class TransactionResources {
         }
         return limpio.toLowerCase();
     }
-
-    private String validarTerceroOperar(String opa, String username) {
+     
+    @Transactional
+    private String validarTerceroOperar(String opa, String username,boolean otroBanco) {
         String mensaje = "";
         try {
             TerceroActivacion tercero = null;
@@ -382,17 +387,34 @@ public class TransactionResources {
             long differenceHour = 0;
             long differenceMinutos = 0;
             Tabla tabla = null;
-            if (dao.validacionTerceroActivo(opa, username) != null) {
-                tercero = dao.validacionTerceroActivo(opa, username);
+            
+            boolean b = false;
+            tercero = dao.validacionTerceroActivo(opa, username,otroBanco);
+            if(tercero != null){
+                b = true;
+            }else{
+               //daoTecero.insertarTerceroActivado(, b, username, mensaje, otroBanco)
+               b= true;
+                try {
+                    daoTecero.insertarTerceroActivado(opa, false, username, "TERCERO LOCAL", otroBanco);
+                } catch (Exception e) {
+                    System.out.println("::::::::::::::::::Error Insertando Tercero::::::::");
+                }
+                    
+            }            
+            
+            if (b) {
+                System.out.println(":::::::::::::::::::::Validaciones correctas para tercero:::::::::::::::::::::");
+                tercero = dao.validacionTerceroActivo(opa, username,otroBanco);
                 diff = dao.fechaServidorTimestamp().getTime() - tercero.getFecharegistro().getTime();
                 differenceDay = timeDay.convert(diff, TimeUnit.MILLISECONDS);
                 differenceHour = timeHora.convert(diff, TimeUnit.MILLISECONDS);
                 differenceMinutos = timeMinutos.convert(diff, TimeUnit.MILLISECONDS);
                 TablaPK pk = new TablaPK("bankingly_banca_movil", "timer_tercero_transaccion");
                 tabla = dao.busquedaTabla(pk);
-
                 System.out.println("El total de dias del registro tercero es: " + differenceDay + " el total de horas es: " + differenceHour + " el total de minutos es: " + differenceMinutos);
                 if (differenceMinutos > Integer.parseInt(tabla.getDato1())) {
+                    
                     mensaje = "Exitoso";
                 } else {
                     mensaje = "EL DESTINATARIO ESTARA ACTIVO EN: " + (Integer.parseInt(tabla.getDato1()) - differenceMinutos) + " Minutos";
@@ -402,7 +424,7 @@ public class TransactionResources {
                 mensaje = "DESTINATARIO NO IDENTIFICADO EN EL CORE";
             }
         } catch (Exception e) {
-            System.out.println("ERROR AL VALIDAR REGISTRO TERCERO:" + e.getMessage());
+            System.out.println(":::::ERROR AL VALIDAR REGISTRO TERCERO::::::" + e.getMessage());
         }
         return mensaje;
 

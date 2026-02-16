@@ -1,0 +1,60 @@
+{
+    "clientBankIdentifiers":[
+        "1929930339933939"
+    ],
+    "thirdPartyProductNumber":"345345435435",
+    "thirdPartyProductBankIdentifier":"4646465456",
+    "alias":"ahorro",
+    "currencyId":"terero",
+    "transactionSubType":0,
+    "thirdPartyProductType":0,
+    "productType":0,
+    "ownerName":"String",
+    "ownerCountryId":"",
+    "ownerCity":"",
+    "ownerAddress":"",
+    "ownerPhoneNumber":"",
+    "ownerDocumentId":{
+        "documentNumber":0,
+        "documentType":0,
+        "integrationProperties":""
+    },
+    "bank":{
+        "bankId":0,
+        "countryId":"",
+        "description":"",
+        "headQuartersAddress":"",
+        "routingCode":""        
+    },
+    "correspondentBank":{
+         "bankId":0,
+        "countryId":"",
+        "description":"",
+        "headQuartersAddress":"",
+        "routingCode":""  
+    },
+    "userDocumentId":{
+        "documentNumber":0,
+        "documentType":0,
+        "integrationProperties":""
+    },
+
+    
+    
+    
+    
+    
+    
+    
+    
+    "integrationProperties":"",
+    "backendCode":"",
+    "backendMessage":"",
+    "backendReference":"",
+    "isError":false,
+    "transactionIdenty":""
+
+
+
+}
+

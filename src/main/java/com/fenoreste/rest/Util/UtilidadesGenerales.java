@@ -108,17 +108,23 @@ public class UtilidadesGenerales {
                     idgrupo = a.getIdgrupo();
                     idsocio = a.getIdsocio();
                 }
-            }else{//Para alta tercero pero a otros bancos(Spei salida)
-                String consultaUser = "SELECT * FROM banca_movil_usuarios WHERE alias_usuario='"+username+"'";
-                Query queryUser = em.createNativeQuery(consultaUser);
-                UsuarioBanca usuario = (UsuarioBanca) queryUser.getSingleResult();
-                idorigen = usuario.getPersonasPK().getIdorigen();
-                idgrupo = usuario.getPersonasPK().getIdgrupo();
-                idsocio = usuario.getPersonasPK().getIdsocio();
-            }
+            } else {//Para alta tercero pero a otros bancos(Spei salida)
+                try {
+                    System.out.println(":::::::::::::::::::Validando sopar para cuando es tercero a otro banco::::::::::::::::::");
+                    String consultaUser = "SELECT * FROM banca_movil_usuarios WHERE alias_usuario='" + username + "'";
+                    System.out.println("::::::::Consulta sopar:" + consultaUser);
+                    Query queryUser = em.createNativeQuery(consultaUser);
+                    UsuarioBanca usuario = (UsuarioBanca) queryUser.getSingleResult();
+                    idorigen = usuario.getPersonasPK().getIdorigen();
+                    idgrupo = usuario.getPersonasPK().getIdgrupo();
+                    idsocio = usuario.getPersonasPK().getIdsocio();
+                } catch (Exception e) {
+                }
 
+            }
             Tabla tb_sopar = busquedaTabla(em, "bankingly_banca_movil", "sopar");
             String consulta_sopar = "SELECT CASE WHEN count(*) > 0 THEN count(*) ELSE 0 END FROM sopar WHERE idorigen=" + idorigen + " AND idgrupo=" + idgrupo + " AND idsocio=" + idsocio + " AND tipo='" + tb_sopar.getDato2() + "'";
+
             Query query_sopar = em.createNativeQuery(consulta_sopar);
             int count_sopar = Integer.parseInt(String.valueOf(query_sopar.getSingleResult()));
             if (count_sopar > 0) {
@@ -126,8 +132,12 @@ public class UtilidadesGenerales {
             }
         } catch (Exception e) {
             System.out.println("Error al generar validaciones en tabla sopar:" + e.getMessage());
+        }finally{
+            if (em.isOpen()) {
+                em.close();
+            }
         }
-        em.close();
+       
         return bandera_sopar;
 
     }
@@ -142,6 +152,10 @@ public class UtilidadesGenerales {
 
         } catch (Exception e) {
             System.out.println("Error al buscar la matriz:" + e.getMessage());
+        }finally{
+            if (em.isOpen()) {
+                em.close();
+            }
         }
         return origen_matriz;
     }

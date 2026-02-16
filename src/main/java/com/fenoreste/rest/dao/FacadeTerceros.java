@@ -34,6 +34,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import javax.persistence.Query;
 
 /**
@@ -65,11 +66,11 @@ public abstract class FacadeTerceros<T> {
                 try {
                     prod = (ProductosTerceros) query.getSingleResult();
                 } catch (Exception e) {
-                    System.out.println("Message:" + e.getMessage());
+                    System.out.println("Error al buscar producto tercero:" + e.getMessage());
                 }
                 if (prod != null) {
                     backendMessage = "Error,producto ya esta registrado...";
-                    System.out.println("back:" + backendMessage);
+                    System.out.println("Error,producto ya esta registrado..." + backendMessage);
                 } else {
                     productosTerceros.setThirdPartyProductBankIdentifier(dtoInput.getThirdPartyProductBankIdentifier());
                     productosTerceros.setClientBankIdentifiers(dtoInput.getClientBankIdentifiers().get(i));
@@ -119,9 +120,12 @@ public abstract class FacadeTerceros<T> {
                         }*/
                     }
                 }
-                if (i == dtoInput.getClientBankIdentifiers().size() - 1 && backendMessage.equals("")) {
+                /*if (i == dtoInput.getClientBankIdentifiers().size() - 1 && backendMessage.equals("")) {
                     b = true;
                     backendMessage = "Producto registrado con exito...";
+                }*/
+                if (dtoInput.getClientBankIdentifiers().size() >= 16) {
+                    b = true;
                 }
 
             }
@@ -145,9 +149,11 @@ public abstract class FacadeTerceros<T> {
         } catch (Exception e) {
             e.printStackTrace();
 
-            System.out.println("Error:" + e.getMessage());
+            System.out.println("Error al validar tercero:" + e.getMessage());
         } finally {
-            em.close();
+            if (em.isOpen()) {
+                em.close();
+            }
         }
         return dtoResult;
 
@@ -282,10 +288,12 @@ public abstract class FacadeTerceros<T> {
             }
 
         } catch (Exception e) {
-            System.out.println("Error:" + e.getMessage());
+            System.out.println("::::::::::::::::::::::::Error en metodo validar tercero:::::::::::::::::::::" + e.getMessage());
 
         } finally {
-            em.close();
+            if (em.isOpen()) {
+                em.close();
+            }
         }
         return dto;
 
@@ -319,7 +327,9 @@ public abstract class FacadeTerceros<T> {
         } catch (Exception e) {
             System.out.println("Error validando producto de tercero :" + e.getMessage());
         } finally {
-            em.close();
+            if (em.isOpen()) {
+                em.close();
+            }
         }
         return null;
 
@@ -327,55 +337,63 @@ public abstract class FacadeTerceros<T> {
 
     public boolean insertarTerceroActivado(String opaTercero, boolean existe, String usuario, String comentario, boolean isOtherBank) {//Existe bandera que sirve para saber si el tercero ya esta en la lista 
         boolean bandera = false;
-        System.out.println("Guardando la activacion del tercero ::_");
+        System.out.println("Guardando la activacion del tercero ::" + opaTercero + "," + usuario + "," + comentario);
         EntityManager em = AbstractFacade.conexion();
         try {
             TerceroActivacion tercero = new TerceroActivacion();
-             TerceroActivacionPK Pk = new TerceroActivacionPK();
+            TerceroActivacionPK pk = new TerceroActivacionPK();
+            em.getTransaction().begin();
             if (!isOtherBank) {
                 int o = Integer.parseInt(opaTercero.substring(0, 6));
                 int p = Integer.parseInt(opaTercero.substring(6, 11));
                 int a = Integer.parseInt(opaTercero.substring(11, 19));
-                Pk = new TerceroActivacionPK(o, p, a, usuario);
+                pk = new TerceroActivacionPK(o, p, a, usuario);
 
-                if (!existe) {//Nos aseguramos que no exista el mismo tercero para un socio
+                if (!existe) {//Segundo filtro para no repetir usuario para un mismo socio
                     try {
-                        tercero = em.find(TerceroActivacion.class, Pk);
-                    } catch (Exception e) {
+                        tercero = em.find(TerceroActivacion.class, pk);
+                        if (tercero != null) {
+                            em.remove(tercero);
+                        }
 
+                    } catch (Exception e) {
+                        System.out.println("::::::::::::::::No existe tercero registrado para usuario:" + tercero);
                     }
                 }
             } else {
-                Pk = new TerceroActivacionPK(0, 0, 0, usuario);
+                pk = new TerceroActivacionPK(0, 0, 0, usuario);
                 try {
-                    String consulta = "SELECT * FROM productos_terceros_activacion WHERE idcuenta='" + opaTercero + "'";
-                    Query terceroQuery = em.createNativeQuery(consulta);
+                    String consulta = "SELECT * FROM productos_terceros_activacion WHERE idcuentaotrobanco = '"+opaTercero+"'";
+                    Query terceroQuery = em.createNativeQuery(consulta, TerceroActivacion.class);                   
                     tercero = (TerceroActivacion) terceroQuery.getSingleResult();
+                    em.remove(tercero);
+
+                } catch (NoResultException e) {
+                    System.out.println("::::::::No existe tercero registrado para la cuenta: " + opaTercero);
                 } catch (Exception e) {
-                    System.out.println("::::::::Error al validar tercero po idCuenta:::::::" + e.getMessage());
+                    System.out.println("::::::::Error al eliminar tercero: " + e.getMessage());
                 }
             }
 
             SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
 
-            if (tercero == null) {
-                Date fecha = sdf.parse(em.createNativeQuery("SELECT to_char((SELECT now()), 'DD/MM/YYYY HH24:MI:SS')").getSingleResult().toString());
-                tercero = new TerceroActivacion();
-                tercero.setPk(Pk);
-                tercero.setFecharegistro(fecha);
-                tercero.setComentario(comentario);
-                tercero.setIdcuentaOtroBanco(opaTercero);
-            }
+            Date fecha = sdf.parse(em.createNativeQuery("SELECT to_char((SELECT now()), 'DD/MM/YYYY HH24:MI:SS')").getSingleResult().toString());
+            //Pk = new TerceroActivacionPK(0, 0, 0, usuario);
+            tercero = new TerceroActivacion();
+            tercero.setPk(pk);
+            tercero.setFecharegistro(fecha);
+            tercero.setComentario(comentario);
+            tercero.setIdcuentaOtroBanco(opaTercero);
 
-            em.getTransaction().begin();
             em.persist(tercero);
             em.getTransaction().commit();
 
-            bandera = true;
         } catch (Exception e) {
-            System.out.println("::Error al registrar activacion de tercero:" + e.getMessage());
+            System.out.println(":::::::::Error al registrar activacion de tercero::::::::" + e.getMessage());
         } finally {
-            em.close();
+            if (em.isOpen()) {
+                em.close();
+            }
         }
         return bandera;
 
@@ -426,7 +444,9 @@ public abstract class FacadeTerceros<T> {
             System.out.println("Error al verificar el horario de actividad");
 
         } finally {
-            em.close();
+            if (em.isOpen()) {
+                em.close();
+            }
         }
 
         return bandera_;

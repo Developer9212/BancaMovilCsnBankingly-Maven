@@ -13,11 +13,13 @@ import com.syc.ws.endpoint.siscoop.BalanceQueryResponseDto;
 import javax.persistence.EntityManager;
 import consumo_tdd.Siscoop_TDD;
 import javax.persistence.Query;
+import org.springframework.stereotype.Service;
 
 /**
  *
  * @author Elliot
  */
+@Service
 public class TarjetaDeDebito {
 
     // CONSULTA Y ACTUALIZA EL SALDO DE LA TarjetaDeDebito
@@ -55,7 +57,7 @@ public class TarjetaDeDebito {
     }
 
     public WsSiscoopFoliosTarjetas1 buscaTarjetaTDD(int idorigenp, int idproducto, int idauxiliar, EntityManager em) {
-        System.out.println("Buscando idtarjeta:"+idorigenp+",idproducto:"+idproducto+","+idauxiliar);
+        System.out.println("Buscando idtarjeta:" + idorigenp + ",idproducto:" + idproducto + "," + idauxiliar);
         WsSiscoopFoliosTarjetasPK1 foliosPK1 = new WsSiscoopFoliosTarjetasPK1(idorigenp, idproducto, idauxiliar);
         WsSiscoopFoliosTarjetas1 wsSiscoopFoliosTarjetas = new WsSiscoopFoliosTarjetas1();
         try {
@@ -66,7 +68,7 @@ public class TarjetaDeDebito {
                     + "         AND w.idproducto = ?"
                     + "         AND w.idauxiliar = ?"
                     + "          AND td.fecha_vencimiento > (select distinct fechatrabajo from origenes limit 1)";
-            System.out.println("Consulta tarjeta:"+consulta);
+            System.out.println("Consulta tarjeta:" + consulta);
             Query query = em.createNativeQuery(consulta, WsSiscoopFoliosTarjetas1.class);
             query.setParameter(1, idorigenp);
             query.setParameter(2, idproducto);
@@ -87,60 +89,61 @@ public class TarjetaDeDebito {
 
     public BalanceQueryResponseDto saldoTDD(WsSiscoopFoliosTarjetasPK1 foliosPK) {
         BalanceQueryResponseDto response = new BalanceQueryResponseDto();
-        
-        EntityManager em=AbstractFacade.conexion();
+
+        EntityManager em = AbstractFacade.conexion();
         WsSiscoopFoliosTarjetas1 tarjeta = em.find(WsSiscoopFoliosTarjetas1.class, foliosPK);
-        System.out.println("Buscando el saldo para la tarjeta:"+tarjeta.getIdtarjeta());
-        try {           
-            if (tarjeta.getActiva()) { 
+        System.out.println("Buscando el saldo para la tarjeta:" + tarjeta.getIdtarjeta());
+        try {
+            if (tarjeta.getActiva()) {
                 /*response.setAvailableAmount(200000);                     
                 response.setCode(1);
                 response.setDescription("activa");*/
-            
+
                 response = conexionSiscoop().getSiscoop().getBalanceQuery(tarjeta.getIdtarjeta());
             } else {
                 response.setDescription("La tarjeta esta inactiva: " + tarjeta.getIdtarjeta());
             }
         } catch (Exception e) {
             System.out.println("Error al buscar Saldo TDD:" + e.getMessage());
-            response.setDescription("Tarjeta Inactiva");                        
-        }        
+            response.setDescription("Tarjeta Inactiva");
+        }
         return response;
     }
 
     public boolean retiroTDD(WsSiscoopFoliosTarjetas1 tarjeta, Double monto) {
         LoadBalanceResponse.Return loadBalanceResponse = new LoadBalanceResponse.Return();
         DoWithdrawalAccountResponse.Return doWithdrawalAccountResponse = new DoWithdrawalAccountResponse.Return();
-        System.out.println("Retirando de tarjeta:"+tarjeta.getIdtarjeta());
+        System.out.println("Retirando de tarjeta:" + tarjeta.getIdtarjeta());
         boolean retiro = false;
         try {
             if (tarjeta.getActiva()) {
-                //doWithdrawalAccountResponse.setBalance(200);
-                //doWithdrawalAccountResponse.setCode(1);
-                
-              doWithdrawalAccountResponse = conexionSiscoop().getSiscoop().doWithdrawalAccount(tarjeta.getIdtarjeta(), monto);
+                /*doWithdrawalAccountResponse.setBalance(200);
+                doWithdrawalAccountResponse.setCode(1);*/
+
+                doWithdrawalAccountResponse = conexionSiscoop().getSiscoop().doWithdrawalAccount(tarjeta.getIdtarjeta(), monto);
+                System.out.println("::::::::::::::Codigo de respuesta en el retiro::::::::" + doWithdrawalAccountResponse.getCode());
                 if (doWithdrawalAccountResponse.getCode() == 0) {
                     // 0 = Existe error
                     //retiro = false;
-                    retiro=false;
+                    retiro = false;
                 } else {
                     retiro = true;
                 }
             }
         } catch (Exception e) {
-            retiro =  errorRetiroDespositoSYC(loadBalanceResponse, e);
-            e.getStackTrace();            
+            retiro = errorRetiroDespositoSYC(loadBalanceResponse, e);
+            e.getStackTrace();
         }
         return retiro;
     }
 
     // REALIZA EL DEPOSITO DE LA TARJETA TDD
     public boolean depositoTDD(WsSiscoopFoliosTarjetas1 tarjeta, Double monto) {
-        System.out.println("Depositando a tarjeta:"+tarjeta.getIdtarjeta());
+        System.out.println("Depositando a tarjeta:" + tarjeta.getIdtarjeta());
         LoadBalanceResponse.Return loadBalanceResponse = new LoadBalanceResponse.Return();
         boolean deposito = false;
         if (tarjeta.getActiva()) {
-            try {                
+            try {
                 loadBalanceResponse = conexionSiscoop().getSiscoop().loadBalance(tarjeta.getIdtarjeta(), monto);
                 //loadBalanceResponse.setCode(1);
                 if (loadBalanceResponse.getCode() == 0) {
@@ -168,6 +171,7 @@ public class TarjetaDeDebito {
                 System.out.println("Conectando ws ALestra....");
                 //1.-Usuario,2.-contraseña,3.-host,4.-puerto,5.-wsdl
                 conexionWSTDD = new consumo_tdd.Siscoop_TDD(crendenciales.getDato1(), crendenciales.getDato2(), parametros.getDato1(), parametros.getDato3(), parametros.getDato2());
+                System.out.println("::::::::::Respuesta en la conexion alestra:" + conexionWSTDD);
                 //conexionWSTDD = new (parametros.getDato1(), parametros.getDato2());
 
             }

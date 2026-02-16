@@ -27,8 +27,8 @@ public class TerceroActivacion implements Serializable{
     @EmbeddedId
     private TerceroActivacionPK Pk;
     @Temporal(TemporalType.TIMESTAMP)
-    private Date fecharegistro;  
-    @Column(name="idcuenta")
+    private Date fecharegistro;    
+    @Column(name="idcuentaotrobanco")
     private String idcuentaOtroBanco;
     private String comentario;
 
@@ -67,6 +67,9 @@ public class TerceroActivacion implements Serializable{
         this.comentario = comentario;
     }
 
+    
+    
+    
     
     
     
