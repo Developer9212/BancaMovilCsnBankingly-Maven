@@ -3,12 +3,10 @@ package com.fenoreste.rest.dao;
 import com.fenoreste.rest.Util.UtilidadesGenerales;
 import com.fenoreste.rest.DTO.OgsDTO;
 import com.fenoreste.rest.DTO.OpaDTO;
-import com.fenoreste.rest.DTO.TablasDTO;
 import com.fenoreste.rest.ResponseDTO.ProductBankStatementDTO;
 import com.fenoreste.rest.Util.AbstractFacade;
 import com.fenoreste.rest.ResponseDTO.ProductsConsolidatePositionDTO;
 import com.fenoreste.rest.ResponseDTO.ProductsDTO;
-import com.fenoreste.rest.Util.s;
 import com.fenoreste.rest.Util.Utilidades;
 import com.fenoreste.rest.WsTDD.TarjetaDeDebito;
 import com.fenoreste.rest.entidades.Auxiliar;
@@ -41,9 +39,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
@@ -141,7 +136,7 @@ public abstract class FacadeProductos<T> {
                 productTypeId = "";
                 descripcion = "";
             }
-            System.out.println("Lista:" + ListagetP);
+            
             em.clear();
         } catch (Exception e) {
             System.out.println("Error Producido en buscar producto:" + e.getMessage());
@@ -165,7 +160,7 @@ public abstract class FacadeProductos<T> {
                 String consulta = "SELECT * FROM auxiliares "
                         + " WHERE idorigenp=" + opa.getIdorigenp() + " AND idproducto=" + opa.getIdproducto() + " AND idauxiliar=" + opa.getIdauxiliar()
                         + " AND  idorigen=" + ogs.getIdorigen() + " AND idgrupo=" + ogs.getIdgrupo() + " AND idsocio=" + ogs.getIdsocio() + " AND estatus=2";
-                System.out.println("consulta:" + consulta);
+                
                 Query query = em.createNativeQuery(consulta, Auxiliar.class);
                 List<Auxiliar> lista_folios = query.getResultList();
 
@@ -241,7 +236,7 @@ public abstract class FacadeProductos<T> {
                     } else if (tipo_cuenta_bankingly.getProductTypeId() == 5) {//Si es un prestamo tipo 5 loan en catalogo de cuentas
                         //Corro sai_auxiliar
                         String sai_auxiliar = "SELECT sai_auxiliar(" + a.getAuxiliaresPK().getIdorigenp() + "," + a.getAuxiliaresPK().getIdproducto() + "," + a.getAuxiliaresPK().getIdauxiliar() + ",(SELECT date(fechatrabajo) FROM origenes limit 1))";
-                        System.out.println("Sai_Prestamo:" + sai_auxiliar);
+                        
                         Query ejecutar_sai = em.createNativeQuery(sai_auxiliar);
                         String sai_respuesta = ejecutar_sai.getSingleResult().toString();
                         //Particionamos el resultado de sai donde esta la pipa para obtener los valores de cada ṕocision
@@ -259,7 +254,7 @@ public abstract class FacadeProductos<T> {
                                 + " AND idauxiliar=" + a.getAuxiliaresPK().getIdauxiliar()
                                 + " AND todopag=true";
 
-                        System.out.println("Consulta Prestamo:" + consulta1);
+                        
                         Query query_amortizaciones = em.createNativeQuery(consulta1);
                         cuotas_pagadas = Integer.parseInt(query_amortizaciones.getSingleResult().toString());
 
@@ -300,7 +295,7 @@ public abstract class FacadeProductos<T> {
                     ListaReturn.add(dto);
                 }
             }
-            System.out.println("Lista:" + ListaReturn);
+            
 
         } catch (Exception e) {
             System.out.println("Error produucido en consilidated position:" + e.getMessage());
@@ -322,7 +317,7 @@ public abstract class FacadeProductos<T> {
             try {
                 String BusquedaProducto = "SELECT * FROM auxiliares a WHERE idorigenp=" + opa.getIdorigenp() + " AND idproducto=" + opa.getIdproducto() + " AND idauxiliar=" + opa.getIdauxiliar()
                         + " AND idorigen=" + ogs.getIdorigen() + " AND idgrupo=" + ogs.getIdgrupo() + " AND idsocio=" + ogs.getIdsocio() + " AND estatus=2";
-                System.out.println("Consulta:" + BusquedaProducto);
+                
                 Query queryB = em.createNativeQuery(BusquedaProducto, Auxiliar.class);
                 Auxiliar a = (Auxiliar) queryB.getSingleResult();
                 if (a != null) {
@@ -355,7 +350,7 @@ public abstract class FacadeProductos<T> {
                 }
                 
                 for (int i = 0; i < total_estados; i++) {
-                    System.out.println("siiiiiiiiiiiiiiiii:" + i);
+                    
                     ProductBankStatementDTO estadoCuenta = new ProductBankStatementDTO();
                     ff = String.valueOf(localDate.plusMonths(-i));
                     fi = String.valueOf(localDate.plusMonths(-i - 1));
@@ -372,16 +367,16 @@ public abstract class FacadeProductos<T> {
                         LocalDateTime fec_ini = LocalDateTime.parse(fi);
                         fi = String.valueOf(fec_ini.plusMonths(+1));
                     }
-                    System.out.println("FECHAS INICIO " + fi + " FECHA FIN " + ff);
+                    
 
                     //System.out.println("LocaDate:"+localDate);
-                    System.out.println("yyyy/MM/dd HH:mm:ss-> " + dtf.format(LocalDateTime.now()));
+                    
 
                     //Busco si hay movimientos si no mejor no llamos a estados de cuenta porque va a tronar
                     String busqueda_mov = "SELECT case when count(*)>0 then 1 else 0 end FROM auxiliares_d WHERE idorigenp=" + opa.getIdorigenp() + " AND idproducto=" + opa.getIdproducto() + " AND idauxiliar=" + opa.getIdauxiliar()
                             + " AND date(fecha) between '" + fi.substring(0, 10) + "' AND '" + ff.substring(0, 10) + "'";
 
-                    System.out.println("Busqueda_mov:" + busqueda_mov);
+                    
                     int count_mov = 0;
                     try {
                         Query query_count_mov = em.createNativeQuery(busqueda_mov);
@@ -419,7 +414,7 @@ public abstract class FacadeProductos<T> {
         } finally {
             em.close();
         }
-        System.out.println("ListaECuenta:" + listaEstadosDeCuenta);
+        
         return listaEstadosDeCuenta;
     }
 
@@ -464,7 +459,7 @@ public abstract class FacadeProductos<T> {
             nombre_txt = NProducto + "-" + FInicio.substring(0, 10).replace("-", "") + "" + FFinal.substring(0, 10).replace("-", "") + hora.replace(":", "") + String.valueOf(numeroAleatorio) + ".txt";
         }
 
-        System.out.println("nombreTxt:" + nombre_txt);
+        
         EntityManager em = AbstractFacade.conexion();
         File file = null;
         try {
@@ -476,7 +471,7 @@ public abstract class FacadeProductos<T> {
 
             /*Solo para pruebas buscar si hay movimientos en el mes que se esta generando para no tronar con la funcion*/
             String consulta = "SELECT sai_estado_" + NProducto.replace("e_", "") + "(" + o + "," + p + "," + a + ",'" + FInicio + "','" + FFinal + "')";
-            System.out.println("Consulta Statements:" + consulta);
+            
             Query query = em.createNativeQuery(consulta);
             contenido = String.valueOf(query.getSingleResult());
             file = new File(fichero_txt);
@@ -590,20 +585,20 @@ public abstract class FacadeProductos<T> {
         String home = System.getProperty("user.home");
         String separador = System.getProperty("file.separator");
         String actualRuta = home + separador + "Banca" + separador;
-        System.out.println("Ruta:" + actualRuta);
+        
         return actualRuta;
     }
 
     public static Date str(String fecha) {
         Date date = null;
         try {
-            System.out.println("fecha:" + fecha);
+            
             SimpleDateFormat formato = new SimpleDateFormat("yyyy/MM/dd");
             date = formato.parse(fecha);
         } catch (Exception ex) {
             System.out.println("Error al convertir fecha:" + ex.getMessage());
         }
-        System.out.println("date:" + date);
+        
         return date;
     }
 

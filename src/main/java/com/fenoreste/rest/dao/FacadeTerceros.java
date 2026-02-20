@@ -17,10 +17,7 @@ import com.fenoreste.rest.Util.Utilidades;
 import com.fenoreste.rest.entidades.Auxiliar;
 import com.fenoreste.rest.entidades.AuxiliarPK;
 import com.fenoreste.rest.entidades.Colonias;
-import com.fenoreste.rest.entidades.Estados;
-import com.fenoreste.rest.entidades.Municipios;
 import com.fenoreste.rest.entidades.Origenes;
-import com.fenoreste.rest.entidades.Paises;
 import com.fenoreste.rest.entidades.Persona;
 import com.fenoreste.rest.entidades.PersonasPK;
 import com.fenoreste.rest.entidades.Productos;
@@ -57,7 +54,7 @@ public abstract class FacadeTerceros<T> {
             String backendMessage = "";
             ProductosTerceros productosTerceros = new ProductosTerceros();
 
-            System.out.println("size:" + dtoInput.getClientBankIdentifiers().size());
+            
             boolean b = false;
             ProductosTerceros prod = null;
             for (int i = 0; i < dtoInput.getClientBankIdentifiers().size(); i++) {

@@ -5,14 +5,9 @@
  */
 package com.fenoreste.rest.dao;
 
-import com.fenoreste.rest.DTO.OgsDTO;
-import com.fenoreste.rest.DTO.OpaDTO;
 import com.fenoreste.rest.Util.AbstractFacade;
 import com.fenoreste.rest.Util.Utilidades;
 import com.fenoreste.rest.Util.UtilidadesGenerales;
-import com.fenoreste.rest.entidades.Auxiliar;
-import com.fenoreste.rest.entidades.AuxiliarPK;
-import com.fenoreste.rest.entidades.MovimientoEntrada;
 import com.fenoreste.rest.entidades.Transferencia;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
@@ -34,7 +29,7 @@ public abstract class FacadeEntradaMovs<T> {
 
     public Transferencia buscarUltimoMovimiento(String ogs) {
         Transferencia movimiento = new Transferencia();
-        System.out.println("Ogs:"+ogs);
+        
         try {
             EntityManager em = AbstractFacade.conexion();
             String sql = "SELECT * FROM transferencias_bankingly WHERE clientbankidentifier='" + ogs + "' ORDER BY fechaejecucion DESC LIMIT 1";

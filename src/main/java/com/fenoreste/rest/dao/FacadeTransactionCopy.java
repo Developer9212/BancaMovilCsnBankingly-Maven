@@ -97,14 +97,14 @@ public abstract class FacadeTransactionCopy<T> {
         System.out.println(opaOrigen.getIdorigenp() + "-" + opaOrigen.getIdproducto() + "-" + opaOrigen.getIdauxiliar());
 
         boolean banderaCSN = false;
-        ResponseSPEIDTO responses= new ResponseSPEIDTO();
+        ResponseSPEIDTO response= new ResponseSPEIDTO();
         String messageBackend = "";
         String mensajeBackendResult = "";
 
         banderaCSN = false;
         boolean banderaTDD = false;
 
-        Tabla tb_spei_cuentas = null;
+        Tabla tb_spei_cuenta = null;
         Tabla tb_spei_cuenta_comisiones = null;
         Double comisiones = 0.0;
         Double total_a_enviar = 0.0;
@@ -238,7 +238,7 @@ public abstract class FacadeTransactionCopy<T> {
                 //Obtener HH:mm:ss.microsegundos
                 String fechaArray[] = timestamp.toString().substring(0, 10).split("-");
                 String fReal = fechaArray[2] + "/" + fechaArray[1] + "/" + fechaArray[0];
-                String referencias= String.valueOf(rn) + "" + String.valueOf(transaction.getSubtransactiontypeid()) + "" + String.valueOf(transaction.getTransactiontypeid() + "" + fReal.replace("/", ""));
+                String referencia= String.valueOf(rn) + "" + String.valueOf(transaction.getSubtransactiontypeid()) + "" + String.valueOf(transaction.getTransactiontypeid() + "" + fReal.replace("/", ""));
 
                 //Leemos fechatrabajo e idusuario
                 String fechaTrabajo = "SELECT to_char(fechatrabajo,'yyyy-MM-dd HH:mm:ss') FROM ORIGENES LIMIT 1";
@@ -260,7 +260,7 @@ public abstract class FacadeTransactionCopy<T> {
                 Procesa_pago_movimientos procesaOrigen = new Procesa_pago_movimientos();
 
                 //Preoaro el registro del abono
-                Procesa_pago_movimientos procesaDestinos = new Procesa_pago_movimientos();
+                Procesa_pago_movimientos procesaDestino = new Procesa_pago_movimientos();
 
                 OpaDTO opaD = null;
                 Auxiliar aDestino = null;
@@ -1980,7 +1980,7 @@ public abstract class FacadeTransactionCopy<T> {
     }
 
     //Se consume un servicio que yo desarrolle donde consumo API STP en caso de CSN si alguuien mas usara SPEI desarrollaria otro proyecto especficamente para la caja
-    private ResponseSPEIDTO metodoEnviarSPEIs(RequestDataOrdenPagoDTO orden) {
+    private ResponseSPEIDTO metodoEnviarSPEI(RequestDataOrdenPagoDTO orden) {
 
         URL urlEndpoint = null;
         String output = "";

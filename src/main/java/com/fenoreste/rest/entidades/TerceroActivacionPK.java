@@ -6,6 +6,7 @@
 package com.fenoreste.rest.entidades;
 
 import java.io.Serializable;
+import java.util.Objects;
 import javax.persistence.Column;
 import javax.persistence.Embeddable;
 
@@ -69,6 +70,6 @@ public class TerceroActivacionPK implements Serializable {
         this.usuariobanca = usuariobanca;
     }
     
-    
+    @Override public boolean equals(Object o) { if (this == o) return true; if (!(o instanceof TerceroActivacionPK)) return false; TerceroActivacionPK that = (TerceroActivacionPK) o; return idorigenpt.equals(that.idorigenpt) && idproductot.equals(that.idproductot) && idauxiliart.equals(that.idauxiliart) && usuariobanca.equals(that.usuariobanca); } @Override public int hashCode() { return Objects.hash(idorigenpt, idproductot, idauxiliart, usuariobanca); }
     
 }

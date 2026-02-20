@@ -68,7 +68,6 @@ public class CustomerResources {
         String UserName = JsonRequest_.getString("userName");
         CustomerDAO metodos = new CustomerDAO();
         
-        System.out.println("Cadena peticion busqueda personas:"+cadenaJson);
         
         String mensaje_error="";
         if (!metodos.actividad_horario()) {
@@ -89,7 +88,7 @@ public class CustomerResources {
             if (persona.getPersonasPK() != null) {
                 //Validamos que el socio ya halla asistido a sucursal a aperturar el producto para banca movil
                 String validaciones_datos_ = metodos.validaciones_datos(persona.getPersonasPK().getIdorigen(), persona.getPersonasPK().getIdgrupo(), persona.getPersonasPK().getIdsocio(), UserName);
-                System.out.println("validaciones datos:" + validaciones_datos_);
+                
                 
                 if (validaciones_datos_.contains("EXITO")) {
                     ClientByDocumentDTO cliente = null;

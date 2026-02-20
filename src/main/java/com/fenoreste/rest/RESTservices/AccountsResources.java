@@ -55,11 +55,10 @@ public class AccountsResources {
             //Reccorremos el accountId para veru que solo sean numeros que trae
             for (int i = 0; i < accountId.length(); i++) {
                 if (Character.isLetter(accountId.charAt(i))) {
-                    bande = false;
-                    System.out.println("Charat:" + accountId.charAt(i));
+                    bande = false;                    
                 }
             }
-            System.out.println("Bande:" + bande);
+            
             //Si no trae letras en Identificador de producto(OPA) y la longitud es igual a lo que se maneja en la caja 
             if (bande == true && accountId.length() == 19) {
                 AccountDetailsDTO cuenta = null;
@@ -91,7 +90,7 @@ public class AccountsResources {
     @Produces({MediaType.APPLICATION_JSON + ";charset=utf-8"})
     @Consumes({MediaType.APPLICATION_JSON + ";charset=utf-8"})
     public Response getAccountLast5Movements(String cadenaJson) {
-        System.out.println("Cadena Json:" + cadenaJson);
+        
         JSONObject jsonRecibido = new JSONObject(cadenaJson);
         JsonObject Json_De_Error = new JsonObject();
         String accountId = jsonRecibido.getString("productBankIdentifier");
@@ -142,7 +141,7 @@ public class AccountsResources {
     @Produces({MediaType.APPLICATION_JSON + ";charset=utf-8"})
     @Consumes({MediaType.APPLICATION_JSON + ";charset=utf-8"})
     public Response getAccountMovements(String cadenaJson) {
-        System.out.println("===============ENTRANDO A MOVEMENTS=================");
+        
         AccountsDAO dao = new AccountsDAO();
         String ProductBankIdentifier = "";
         String DateFromFilter = null;
@@ -186,7 +185,7 @@ public class AccountsResources {
 
             try {
                 List<AccountMovementsDTO> MiListaDTO = null;
-                System.out.println("MOVEMENTS fechas:" + DateFromFilter + " - " + DateToFilter);
+                
                 MiListaDTO = dao.getAccountMovements(ProductBankIdentifier, DateFromFilter, DateToFilter, PageSize, PageStartIndex, orderBy, canal);
                 com.github.cliftonlabs.json_simple.JsonObject j = new com.github.cliftonlabs.json_simple.JsonObject();
 

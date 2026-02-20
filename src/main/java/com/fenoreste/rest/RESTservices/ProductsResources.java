@@ -116,7 +116,7 @@ public class ProductsResources {
     public Response getProductsConsolidatedPosition(String cadena) {
 
         /*SOLO FALTA DEL CATALOGO CAN TRANSACT ID*/
-        System.out.println("Cadena:" + cadena);
+        
         String ClientBankIdentifiers = "", ProductBankIdentifiers = "";
         JsonObject jsonError = new JsonObject();
         List<String> productsBank = new ArrayList<String>();
@@ -136,7 +136,7 @@ public class ProductsResources {
                 JSONObject jPB = jsonPB.getJSONObject(x);
                 ProductBankIdentifiers = jPB.getString("value");
 
-                System.out.println("ProductBankIdentifiers:" + ProductBankIdentifiers);
+                
                 productsBank.add(ProductBankIdentifiers);
             }
         } catch (Exception e) {
@@ -258,7 +258,7 @@ public class ProductsResources {
         }
         try {
             String filePath = ruta() + fileId + ".pdf";
-            System.out.println("fiklePAth:" + filePath);
+            
             File fileA = new File(filePath);
             if (fileA.exists()) {
                 byte[] input_file = Files.readAllBytes(Paths.get(filePath));
@@ -312,7 +312,7 @@ public class ProductsResources {
                 ThreadEliminarArchivos eli = new ThreadEliminarArchivos();
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
                 String fechaTrabajo = sdf.format(util.busquedaMatriz().getFechatrabajo());
-                System.out.println("Fechatrabajo :"+fechaTrabajo+",FechaTb:"+fecha);
+                
                 if(!fechaTrabajo.equals(fecha)){
                     eli.removerTabla();
                 }

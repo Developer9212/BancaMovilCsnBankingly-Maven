@@ -75,7 +75,7 @@ public class UtilidadesGenerales {
 
     public Tabla busquedaTabla(EntityManager em, String idtabla, String idelemento) {
         Tabla tb = null;
-        System.out.println("Buscando la tabla idtabla:" + idtabla + " idelemento:" + idelemento);
+        
         try {
             TablaPK tbPK = new TablaPK(idtabla, idelemento);
             tb = em.find(Tabla.class, tbPK);
@@ -83,7 +83,7 @@ public class UtilidadesGenerales {
             System.out.println("Error al buscar tabla:" + e.getMessage());
             return tb;
         }
-        System.out.println("la Tabla encontrada es=" + tb);
+        
         return tb;
     }
 
@@ -110,9 +110,9 @@ public class UtilidadesGenerales {
                 }
             } else {//Para alta tercero pero a otros bancos(Spei salida)
                 try {
-                    System.out.println(":::::::::::::::::::Validando sopar para cuando es tercero a otro banco::::::::::::::::::");
+                    
                     String consultaUser = "SELECT * FROM banca_movil_usuarios WHERE alias_usuario='" + username + "'";
-                    System.out.println("::::::::Consulta sopar:" + consultaUser);
+                    
                     Query queryUser = em.createNativeQuery(consultaUser);
                     UsuarioBanca usuario = (UsuarioBanca) queryUser.getSingleResult();
                     idorigen = usuario.getPersonasPK().getIdorigen();

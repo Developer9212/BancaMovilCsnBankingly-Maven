@@ -75,7 +75,6 @@ public class LoanResources {
         try {
             LoanDTO loan = dao.Loan(productBankIdentifier);
             JsonObject j = new JsonObject();
-            System.out.println("Loan : " + loan);
             j.put("Loan", loan);
             return Response.status(Response.Status.OK).entity(j).build();
         } catch (Exception e) {

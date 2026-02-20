@@ -186,7 +186,7 @@ public abstract class FacadeAccounts<T> {
 
                 ListaDTO.add(cuenta);
             }
-            System.out.println("SALIENDO DE LAS 5 MOVEMENTS ======================");
+            
 
         } catch (Exception e) {
             System.out.println("Error en GetAccountLast5Movements:" + e.getMessage());
@@ -287,7 +287,7 @@ public abstract class FacadeAccounts<T> {
             } else if (pageNumber > 1) {
             inicioB = ((pageNumber * pageSizes) - pageSizes);
             }*/
-            System.out.println("La consulta es:" + consulta);
+            
             inicioB = ((pageNumber * pageSizes) - pageSizes);
             if (inicioB < 0) {
                 inicioB = 0;
@@ -449,7 +449,7 @@ public abstract class FacadeAccounts<T> {
                         + "         WHERE replace((to_char(idorigenp,'099999')||to_char(idproducto,'09999')||to_char(idauxiliar,'09999999')),' ','')='" + productBankIdentifier + "'";
 
             }
-            System.out.println("DE LASTMOVEMENTS CONSULTA:" + consulta);
+            
             Query query = em.createNativeQuery(consulta);
             int c = 0;
             c = Integer.parseInt(String.valueOf(query.getSingleResult()));

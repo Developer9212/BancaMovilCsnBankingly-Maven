@@ -1,24 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <persistence version="2.0" xmlns="http://java.sun.com/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/persistence              http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd">
+    
   <persistence-unit name="conexion" transaction-type="RESOURCE_LOCAL">
-    <!--<provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>             -->
-    <class>com.fenoreste.rest.entidades.Persona</class>
+    <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
+    <class>com.fenoreste.rest.entidades.TerceroActivacion</class>
+     <class>com.fenoreste.rest.entidades.Persona</class>
     <class>com.fenoreste.rest.entidades.tablas</class>
     <class>com.fenoreste.rest.entidades.Colonias</class>
     <class>com.fenoreste.rest.entidades.AuxiliarD</class>
     <class>com.fenoreste.rest.entidades.Auxiliar</class>
-    <class>com.fenoreste.rest.entidades.TerceroActivacion</class>
     <exclude-unlisted-classes>false</exclude-unlisted-classes>
     <properties>
-      <!--     <property name="eclipselink.jdbc.read-connections.min" value="1000"/> 
-            <property name="eclipselink.jdbc.write-connections.min" value="1"/> 
-            <property name="eclipselink.logging.timestamp" value="false"/> 
-            <property name="eclipselink.logging.session" value="false"/> 
-            <property name="eclipselink.logging.timestamp" value="100"/>
-            <property name="eclipselink.cache.shared.default" value="false" />
--->
+        <property name="javax.persistence.jdbc.driver" value="org.postgresql.Driver"/>
+        <!-- No pongas aquí usuario/contraseña porque ya los pasas en JPAUtil -->
     </properties>
-  </persistence-unit>
+</persistence-unit>
+
 </persistence>
 <!--
 <?xml version="1.0" encoding="UTF-8"?>

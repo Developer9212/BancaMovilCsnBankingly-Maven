@@ -13,13 +13,12 @@ import com.syc.ws.endpoint.siscoop.BalanceQueryResponseDto;
 import javax.persistence.EntityManager;
 import consumo_tdd.Siscoop_TDD;
 import javax.persistence.Query;
-import org.springframework.stereotype.Service;
 
 /**
  *
  * @author Elliot
  */
-@Service
+
 public class TarjetaDeDebito {
 
     // CONSULTA Y ACTUALIZA EL SALDO DE LA TarjetaDeDebito
@@ -120,8 +119,7 @@ public class TarjetaDeDebito {
                 /*doWithdrawalAccountResponse.setBalance(200);
                 doWithdrawalAccountResponse.setCode(1);*/
 
-                doWithdrawalAccountResponse = conexionSiscoop().getSiscoop().doWithdrawalAccount(tarjeta.getIdtarjeta(), monto);
-                System.out.println("::::::::::::::Codigo de respuesta en el retiro::::::::" + doWithdrawalAccountResponse.getCode());
+                doWithdrawalAccountResponse = conexionSiscoop().getSiscoop().doWithdrawalAccount(tarjeta.getIdtarjeta(), monto);                
                 if (doWithdrawalAccountResponse.getCode() == 0) {
                     // 0 = Existe error
                     //retiro = false;
@@ -167,11 +165,10 @@ public class TarjetaDeDebito {
             //Tabla para obtener usuario y contraseña
             Tabla crendenciales = util.busquedaTabla(em, "bankingly_banca_movil", "wsdl_credenciales");
             Tabla parametros = util.busquedaTabla(em, "bankingly_banca_movil", "wsdl_parametros");
-            if (parametros != null) {
-                System.out.println("Conectando ws ALestra....");
+            if (parametros != null) {                
                 //1.-Usuario,2.-contraseña,3.-host,4.-puerto,5.-wsdl
                 conexionWSTDD = new consumo_tdd.Siscoop_TDD(crendenciales.getDato1(), crendenciales.getDato2(), parametros.getDato1(), parametros.getDato3(), parametros.getDato2());
-                System.out.println("::::::::::Respuesta en la conexion alestra:" + conexionWSTDD);
+                
                 //conexionWSTDD = new (parametros.getDato1(), parametros.getDato2());
 
             }

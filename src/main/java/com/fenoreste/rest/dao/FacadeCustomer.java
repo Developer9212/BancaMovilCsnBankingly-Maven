@@ -74,7 +74,7 @@ public abstract class FacadeCustomer<T> {
         } else if (clientType == 2) {
             IdentClientType = "rfc";
         }
-        System.out.println("Last name................................." + LastName);
+        
 
         Persona persona = new Persona();
         String consulta = "";
@@ -102,7 +102,7 @@ public abstract class FacadeCustomer<T> {
         String mensaje = "";
         EntityManager em = AbstractFacade.conexion();
         boolean bandera = false;
-        System.out.println(":::::::::::::::::::Vamos a validar datos:::::::::::::::::::::");
+        
         try {
             //Busco la tabla donde guarda el producto para banca movil
             TablaPK tablasPK = new TablaPK("bankingly_banca_movil", "producto_banca_movil");
@@ -113,7 +113,7 @@ public abstract class FacadeCustomer<T> {
             Query busquedaFolioQuery = em.createNativeQuery(busquedaFolio, Auxiliar.class);
             Auxiliar a = (Auxiliar) busquedaFolioQuery.getSingleResult();
             
-            System.out.println(":::::::::::::::::::::::Se encontro el auxiliar:::::::::::::::::");
+            
 
             //Si ya tiene el producto para banca movil activo
             if (a != null) {
@@ -132,7 +132,7 @@ public abstract class FacadeCustomer<T> {
                                 + " AND idproducto=" + Integer.parseInt(tb_producto_tdd.getDato1()) + " AND estatus=2";
                         Query auxiliar = em.createNativeQuery(busqueda133, Auxiliar.class);
                         Auxiliar a_tdd = (Auxiliar) auxiliar.getSingleResult();
-                        System.out.println(":::::::::::::::Auxiliar TDD:"+a_tdd+"::::::::::::::::::::::::::::");
+                        
                         WsSiscoopFoliosTarjetasPK1 foliosPK = new WsSiscoopFoliosTarjetasPK1(a_tdd.getAuxiliaresPK().getIdorigenp(), a_tdd.getAuxiliaresPK().getIdproducto(), a_tdd.getAuxiliaresPK().getIdauxiliar());
 
                         double saldo = 0.0;
@@ -157,20 +157,20 @@ public abstract class FacadeCustomer<T> {
                                         String cuenta = String.format("%06d", clabe_folio.getAux_pk().getIdorigenp()) + "" + String.format("%05d", clabe_folio.getAux_pk().getIdproducto()) + "" + String.format("%08d", clabe_folio.getAux_pk().getIdauxiliar());
                                         Tabla tb_activar_registra_cuenta_persona_fisica = util.busquedaTabla(em, "bankingly_banca_movil", "activa_desactiva_registra_cuenta");
                                         if (Integer.parseInt(tb_activar_registra_cuenta_persona_fisica.getDato1()) == 1) {
-                                            System.out.println("Registrando persona fisica");
+                                            
                                             JSONObject request = new JSONObject();
                                             request.put("productBankIdentifier", cuenta);
                                             System.out.println("Peticion inserta persona fisica:"+request);
                                             
                                             Tabla tb_path = util.busquedaTabla(em, "bankingly_banca_movil", "registra_cuenta_spei");
                                             
-                                            System.out.println("Http endpoint:"+tb_path.getDato2());
+                                            
                                             HttpConsumo consumo = new HttpConsumo(tb_path.getDato2(), request.toString());
                                            String respuesta_consumo = consumo.consumo();
                                             JSONObject respuesta_registra_orden = new JSONObject(respuesta_consumo);
                                             bandera = true;
                                             
-                                           System.out.println("Respuesta registra persona fisica:" + respuesta_registra_orden);
+                                           
                                         } else {
                                             bandera = true;
                                         }
@@ -278,7 +278,7 @@ public abstract class FacadeCustomer<T> {
 
         try {
             String busqueda_folio = "SELECT * FROM ws_siscoop_clabe_interbancaria WHERE clabe='" + cuenta + "'";
-            System.out.println("Busqueda Folio:" + busqueda_folio);
+            
             Auxiliar a = null;
             try {
                 Query query = em.createNativeQuery(busqueda_folio, Clabes_Interbancarias.class);
@@ -363,7 +363,7 @@ public abstract class FacadeCustomer<T> {
             char rndChar = DATA_FOR_RANDOM_STRING.charAt(rndCharAt);
             cadena = cadena + rndChar;
         }
-        System.out.println("Cadena:" + cadena);
+        
         return cadena;
     }
 
@@ -382,10 +382,10 @@ public abstract class FacadeCustomer<T> {
 
     public String valida_caracteres_speciales(String cadena) {
         cadena = cadena.toLowerCase();
-        System.out.println("Cadena original:" + cadena);
+        
         for (int i = 0; i < cadena.length(); i++) {
             char c = cadena.charAt(i);
-            System.out.println("el caracter es:" + c);
+            
             if (cadena.charAt(i) == ' ' || Character.isLetter(c) || Character.isDigit(c)) {
 
                 switch (c) {
@@ -417,7 +417,7 @@ public abstract class FacadeCustomer<T> {
 
             //System.out.println("El caracter en la posicion "+i+"es:"+cadena.charAt(i)+" y su valor ascii es:"+ascii);
         }
-        System.out.println("la cadena es:" + cadena.trim());
+        
 
         return cadena;
     }

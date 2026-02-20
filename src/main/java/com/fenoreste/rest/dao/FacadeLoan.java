@@ -30,7 +30,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Random;
-import java.util.TimeZone;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 
@@ -119,7 +118,6 @@ public abstract class FacadeLoan<T> {
                     + " AND idamortizacion=" + feeNumber;
                     //+ " AND idorigenp+idproducto+idauxiliar+idamortizacion=" + feeNumber;
 
-            System.out.println("La consulta es para la amortizacion es:" + consultaA);
             Query queryA = em.createNativeQuery(consultaA, Amortizaciones.class);
             Amortizaciones amm = (Amortizaciones) queryA.getSingleResult();
             Double iovencido = Double.parseDouble(list.get(6).toString()) + Double.parseDouble(list.get(17).toString());
@@ -195,11 +193,10 @@ public abstract class FacadeLoan<T> {
             String cadena_sai_auxiliar = RsSai.getSingleResult().toString();
             String[] parametros_sai = cadena_sai_auxiliar.split("\\|");
             List lista_parametros_sai = Arrays.asList(parametros_sai);
-            System.out.println("El sai auxiliar es:" + cadena_sai_auxiliar);
 
             //Obtenemos el iva para el producto segun la sucursal
             String consulta_iva_segun_sucursal = "SELECT sai_iva_segun_sucursal(" + opa.getIdorigenp() + ", idproducto," + a.getTipoamortizacion() + ") FROM productos WHERE idproducto=" + opa.getIdproducto();
-            System.out.println("Consulta para iva_sucursal :" + consulta_iva_segun_sucursal);
+            
             Query query_calculo_iva_sucursal = em.createNativeQuery(consulta_iva_segun_sucursal);
             String iva_segun_sucursal = String.valueOf(query_calculo_iva_sucursal.getSingleResult());
 
@@ -210,7 +207,7 @@ public abstract class FacadeLoan<T> {
 
             //Traemos una lista de objetos de amortizaciones que se muestran en SAICoop
             String consulta_amortizaciones_saicoop = "SELECT * FROM sai_tabla_amortizaciones_t0_calculada('amortizaciones'," + opa.getIdorigenp() + "," + opa.getIdproducto() + "," + opa.getIdauxiliar() + ",(SELECT to_char(date(fechatrabajo),'yyyy-MM-dd') FROM origenes LIMIT 1)," + iva + "," + imTotal.doubleValue() + ",'" + lista_parametros_sai.get(10).toString() + "')" + complemento;
-            System.out.println("Consulta amortizaciones saicoop:" + consulta_amortizaciones_saicoop);
+            
             Query query_amortizaciones_saicoop = em.createNativeQuery(consulta_amortizaciones_saicoop);
             if (channelId != 5) {
                 query_amortizaciones_saicoop.setFirstResult(pageStartIndex);
@@ -310,7 +307,7 @@ public abstract class FacadeLoan<T> {
             List<Object[]> lista_objetos = null;
             //Ejecuto la funcion para devolver los pagos en libretas
             String consulta_pagos = "SELECT * FROM sai_estado_de_cuenta_libretas(" + opa.getIdorigenp() + "," + opa.getIdproducto() + "," + opa.getIdauxiliar() + ",'" + fechaActivacion + "',(SELECT date(fechatrabajo) FROM origenes LIMIT 1),0) WHERE replace(cargo,',','')::numeric=0";
-            System.out.println("Consulta:" + consulta_pagos);
+          
             //Ejecuto la funcion
             Query query_funcion_pagos = em.createNativeQuery(consulta_pagos);
             if (channelId != 5) {
@@ -338,7 +335,6 @@ public abstract class FacadeLoan<T> {
 
                 String converted = "";
                 LoanPayment pago = new LoanPayment();
-                System.out.println("Fecha pago:" + lista_pagos[0]);
                 if (aux_d.getCargoabono() == 1) {
 
                     Timestamp ts = new Timestamp(f.getTime());
@@ -453,7 +449,6 @@ public abstract class FacadeLoan<T> {
         } finally {
             em.close();
         }
-        System.out.println("El total de abonos vencidos es:" + abonosVencidos);
         return abonosVencidos;
     }
 
@@ -462,7 +457,6 @@ public abstract class FacadeLoan<T> {
         EntityManager em = AbstractFacade.conexion();
         //Obejeto para cuota
         LoanFee loanFee = new LoanFee();
-        System.out.println("Entrandooooooooooooo a proxima cuota");
         try {
             AuxiliarPK pk = new AuxiliarPK(o, p, a);
             Auxiliar aux = em.find(Auxiliar.class, pk);
@@ -484,16 +478,13 @@ public abstract class FacadeLoan<T> {
             try {
                 Query calculo_adelanto_intereses = em.createNativeQuery(sai_adelanto_de_interes);
                 intereses_creciente_adelanto = Double.parseDouble(String.valueOf(calculo_adelanto_intereses.getSingleResult()));
-                System.out.println("Rresultado de intereses adelanto creciente:"+intereses_creciente_adelanto);
             } catch (Exception e) {
                 System.out.println("Error al buscar intereses en creciente:"+e.getMessage());
             }
 
             int idamortizacion = 0;
             int estatus_amortizacion = 0;//El estatus de la amortizacion
-            System.out.println("Buscando el tipo de cartera");
             if (posiciones_sai.get(13).toString().equals("C")) {
-                System.out.println("Es cartera corriente");
                 //Obtengo la amortizacion que se vence
                 String consultaA = "SELECT * FROM amortizaciones WHERE idorigenp=" + o
                         + " AND idproducto=" + p
@@ -511,7 +502,6 @@ public abstract class FacadeLoan<T> {
                     estatus_amortizacion = 2;
                 }
                 idamortizacion = amm.getAmortizacionesPK().getIdamortizacion();
-                System.out.println("El idamortizacion es:"+idamortizacion);
                 //Double montovencido = Double.parseDouble(list.get(4).toString());
             } else {
                 //Obtengo el idamortizacion que no hay que cubrir
@@ -522,7 +512,6 @@ public abstract class FacadeLoan<T> {
                 System.out.println("consulta_amortizacion_moroso:" + consulta_id_amortizaciones);
                 Query id_amortizacion = em.createNativeQuery(consulta_id_amortizaciones);
                 idamortizacion = Integer.parseInt(String.valueOf(id_amortizacion.getSingleResult()));
-                System.out.println("Es vencido y el idamortizacion es:"+idamortizacion);
             }
 
             //Para obtener el total de la proxima cuota  total corro la funcion de pago completo
@@ -537,7 +526,6 @@ public abstract class FacadeLoan<T> {
             try {
                 Query query_sai_bankingly_prestamo_cuanto = em.createNativeQuery(sai_bankingly_prestamo_cuanto);
                 String cadena_cuanto_prestamo = query_sai_bankingly_prestamo_cuanto.getSingleResult().toString();
-                System.out.println("funcion prestamo cuanto:"+cadena_cuanto_prestamo);
                 String[] partes_cuanto_prestamo = cadena_cuanto_prestamo.split("\\|");
                 List lista_posiciones_cuanto_prestamo = Arrays.asList(partes_cuanto_prestamo);
                 montoCuota = Double.parseDouble(String.valueOf(lista_posiciones_cuanto_prestamo.get(1)))
@@ -569,7 +557,7 @@ public abstract class FacadeLoan<T> {
             loanFee.setOthersAmount(othersAmount);//Otros conceptos asociados seguros si tiene hipotecario
             loanFee.setTotalAmount(montoCuota);//Monto total de la cuota
 
-            System.out.println("Proxima cuota : " + loanFee);
+          
             
         } catch (Exception e) {
             System.out.println("Error en obtener la proxima cuota:" + e.getMessage());
@@ -662,11 +650,10 @@ public abstract class FacadeLoan<T> {
                 String cadena_sai_auxiliar = RsSai.getSingleResult().toString();
                 String[] parametros_sai = cadena_sai_auxiliar.split("\\|");
                 List lista_parametros_sai = Arrays.asList(parametros_sai);
-                System.out.println("El sai auxiliar es:" + cadena_sai_auxiliar);
 
                 //Obtenemos el iva para el producto segun la sucursal
                 String consulta_iva_segun_sucursal = "SELECT sai_iva_segun_sucursal(" + opa.getIdorigenp() + ", idproducto," + a.getTipoamortizacion() + ") FROM productos WHERE idproducto=" + opa.getIdproducto();
-                System.out.println("Consulta para iva_sucursal :" + consulta_iva_segun_sucursal);
+                
                 Query query_calculo_iva_sucursal = em.createNativeQuery(consulta_iva_segun_sucursal);
                 String iva_segun_sucursal = String.valueOf(query_calculo_iva_sucursal.getSingleResult());
 
@@ -690,7 +677,6 @@ public abstract class FacadeLoan<T> {
                 cont = lista_objetos.size();
             }
 
-            System.out.println("cont:" + cont);
         } catch (Exception e) {
             System.out.println("Error al obtener contador general:" + e.getMessage());
             return 0;
