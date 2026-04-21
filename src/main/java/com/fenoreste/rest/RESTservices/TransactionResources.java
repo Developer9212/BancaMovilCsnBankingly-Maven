@@ -267,9 +267,9 @@ public class TransactionResources {
                                 ordenReque.setLongitud(location[1]);
                                 ordenReque.setLatitud(location[0]);
 
-                                Random random = new Random();
-                                int claveRastreo = 10000000 + random.nextInt(90000000); // entre 10000000 y 99999999 System.out.println("Número aleatorio: " + numero);
-                                ordenReque.setClaveRastreo(String.valueOf(claveRastreo));
+                               
+                                //int claveRastreo = dao.claveRastreo();// 10000000 + random.nextInt(90000000); // entre 10000000 y 99999999 System.out.println("Número aleatorio: " + numero);
+                                ordenReque.setClaveRastreo(dao.claveRastreo());
                                 
                                 backendOperationResult = dao.transferencias(dto, 5, ordenReque);
                             }
@@ -411,6 +411,7 @@ public class TransactionResources {
             if (b) {
                 System.out.println(":::::::::::::::::::::Validaciones correctas para tercero:::::::::::::::::::::");
                 tercero = dao.validacionTerceroActivo(opa, username, otroBanco);
+                System.out.println(":::::::TErecero:"+tercero);
                 diff = dao.fechaServidorTimestamp().getTime() - tercero.getFecharegistro().getTime();
                 differenceDay = timeDay.convert(diff, TimeUnit.MILLISECONDS);
                 differenceHour = timeHora.convert(diff, TimeUnit.MILLISECONDS);
@@ -419,7 +420,6 @@ public class TransactionResources {
                 tabla = dao.busquedaTabla(pk);
                 System.out.println("El total de dias del registro tercero es: " + differenceDay + " el total de horas es: " + differenceHour + " el total de minutos es: " + differenceMinutos);
                 if (differenceMinutos > Integer.parseInt(tabla.getDato1())) {
-
                     mensaje = "Exitoso";
                 } else {
                     mensaje = "EL DESTINATARIO ESTARA ACTIVO EN: " + (Integer.parseInt(tabla.getDato1()) - differenceMinutos) + " Minutos";

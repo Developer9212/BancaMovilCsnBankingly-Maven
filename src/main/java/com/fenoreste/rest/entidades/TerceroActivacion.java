@@ -67,6 +67,11 @@ public class TerceroActivacion implements Serializable{
         this.comentario = comentario;
     }
 
+    @Override
+    public String toString() {
+        return "TerceroActivacion{" + "Pk=" + Pk + ", fecharegistro=" + fecharegistro + ", idcuentaOtroBanco=" + idcuentaOtroBanco + ", comentario=" + comentario + '}';
+    }
+
     
     
     

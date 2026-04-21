@@ -209,7 +209,7 @@ public abstract class FacadeLoan<T> {
             String consulta_amortizaciones_saicoop = "SELECT * FROM sai_tabla_amortizaciones_t0_calculada('amortizaciones'," + opa.getIdorigenp() + "," + opa.getIdproducto() + "," + opa.getIdauxiliar() + ",(SELECT to_char(date(fechatrabajo),'yyyy-MM-dd') FROM origenes LIMIT 1)," + iva + "," + imTotal.doubleValue() + ",'" + lista_parametros_sai.get(10).toString() + "')" + complemento;
             
             Query query_amortizaciones_saicoop = em.createNativeQuery(consulta_amortizaciones_saicoop);
-            if (channelId != 5) {
+            if (channelId == 1) {//Solo pagina cuando es WEB
                 query_amortizaciones_saicoop.setFirstResult(pageStartIndex);
                 query_amortizaciones_saicoop.setMaxResults(pageSize);
             }

@@ -5,7 +5,6 @@
  */
 package com.fenoreste.rest.RESTservices;
 
-import com.fenoreste.rest.DTO.OgsDTO;
 import com.fenoreste.rest.DTO.OpaDTO;
 import com.fenoreste.rest.ResponseDTO.BackendOperationResultDTO;
 import com.fenoreste.rest.ResponseDTO.Bank;
@@ -16,7 +15,6 @@ import com.fenoreste.rest.Util.UtilidadesGenerales;
 import com.fenoreste.rest.dao.TercerosDAO;
 import com.github.cliftonlabs.json_simple.JsonObject;
 import java.util.ArrayList;
-import java.util.Date;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;

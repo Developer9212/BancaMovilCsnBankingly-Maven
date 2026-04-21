@@ -429,10 +429,16 @@ public abstract class FacadeAccounts<T> {
         EntityManager em = AbstractFacade.conexion();//emf.createEntityManager()EntityManager em = emf.createEntityManager();EntityManager em = emf.createEntityManager();
         try {
             if (!dateFromFilter.equals("") && !dateToFilter.equals("")) {
-                consulta = " SELECT count(*) "
+                /*consulta = " SELECT count(*) "
                         + "         FROM auxiliares_d"
                         + "         WHERE date(fecha) between '" + dateFromFilter + "'"
                         + "         AND '" + dateToFilter + "' AND replace((to_char(idorigenp,'099999')||to_char(idproducto,'09999')||to_char(idauxiliar,'09999999')),' ','')='" + productBankIdentifier + "'";
+                */
+                consulta = "SELECT count(*) FROM auxiliares_d WHERE fecha >= '"+dateFromFilter+"' AND fecha < '"+dateToFilter+"' AND "
+                        + " idorigenp = substring('"+productBankIdentifier+"' FROM 1 FOR 6)::int AND idproducto = substring('"+productBankIdentifier+"' FROM 7 FOR 5)::int"
+                        + " idauxiliar = substring('"+productBankIdentifier+"' FROM 12 FOR 8)::int";
+                
+                
             } else if (!dateFromFilter.equals("") && dateToFilter.equals("")) {
                 consulta = " SELECT count(*) "
                         + "         FROM auxiliares_d"
@@ -479,3 +485,4 @@ public abstract class FacadeAccounts<T> {
     }
 
 }
+

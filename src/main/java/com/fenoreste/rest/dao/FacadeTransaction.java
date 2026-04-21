@@ -66,6 +66,7 @@ import javax.persistence.Query;
 import org.json.JSONObject;
 
 import java.util.Base64;
+import java.util.Random;
 import javax.persistence.NoResultException;
 
 /**
@@ -131,7 +132,7 @@ public abstract class FacadeTransaction<T> {
         } else if (identificadorTransferencia == 5) {
             //Valido la transferencia y devuelvo el mensaje que se produce                       
             messageBackend = validarTransferenciaCSN(transactionOWN, identificadorTransferencia, SPEIOrden);
-            if (messageBackend.toUpperCase().contains("EXITO")) {                
+            if (messageBackend.toUpperCase().contains("EXITO")) {
                 banderaCSN = true;
                 backendResponse.setBackendMessage(messageBackend);
             } else {
@@ -141,7 +142,7 @@ public abstract class FacadeTransaction<T> {
         }
 
         try {
-            if (backendResponse.getBackendMessage().toUpperCase().contains("EXITO")) {                
+            if (backendResponse.getBackendMessage().toUpperCase().contains("EXITO")) {
                 Transferencia transaction = new Transferencia();
                 //Si la valicadion se realizo de manera corracta preparo una tabla ttabla historial
                 transaction.setTransactionid(new BigDecimal(transactionOWN.getTransactionId()));
@@ -242,6 +243,7 @@ public abstract class FacadeTransaction<T> {
                 tb_spei_cuenta = util2.busquedaTabla(em, "bankingly_banca_movil", "cuenta_spei");
                 Tabla tb_spei_cuenta_comisiones_iva = new Tabla();
                 Double iva_comisiones = 0.0;
+                int idorden = 0;
                 if (identificadorTransferencia == 5) {//tipo de orden SPEI
                     //Busco la cuenta spei en tablas solo capital
                     tb_spei_cuenta = util2.busquedaTabla(em, "bankingly_banca_movil", "cuenta_spei");
@@ -258,9 +260,12 @@ public abstract class FacadeTransaction<T> {
 
                     //Double total_a_enviar = transaction.getAmount() - (Double.parseDouble(tb_spei_cuenta_comisiones.getDato2()) - ( Double.parseDouble(tb_spei_cuenta_comisiones.getDato2()))* 0.16);
                     System.out.println("Total a enviar:" + total_a_enviar);
+                     Random random = new Random();
+                    idorden =  10000000 + random.nextInt(90000000); // entre 10000000 y 99999999 System.out.println("Número aleatorio: " + numero);
 
                     //vamos a generar una claveRastreo que enviaremos en la operacion,servira como referencia y como idordenlocal
                     referencia = SPEIOrden.getClaveRastreo();
+                    System.out.println("LA referencia essssssssssssssssssssssssssssss:" + referencia);
                     //Preparo en temporales los datos para el cargo
                     procesaOrigen.setAuxiliaresPK(aOrigen.getAuxiliaresPK());
                     procesaOrigen.setFecha(fecha_transferencia);
@@ -276,7 +281,7 @@ public abstract class FacadeTransaction<T> {
                     procesaOrigen.setIva(Double.parseDouble(aOrigen.getIva().toString()));
                     procesaOrigen.setTipo_amort(Integer.parseInt(String.valueOf(aOrigen.getTipoamortizacion())));
                     procesaOrigen.setSai_aux("");
-                    procesaOrigen.setIdorden(Integer.parseInt(SPEIOrden.getClaveRastreo()));
+                    procesaOrigen.setIdorden(idorden);
 
                     em.getTransaction().begin();
                     em.persist(procesaOrigen);
@@ -303,7 +308,8 @@ public abstract class FacadeTransaction<T> {
                     procesaDestino.setIva(0.0);
                     procesaDestino.setTipo_amort(0);
                     procesaDestino.setSai_aux("");
-                    procesaDestino.setIdorden(Integer.parseInt(SPEIOrden.getClaveRastreo()));
+                    
+                    procesaDestino.setIdorden(idorden);//Integer.parseInt(SPEIOrden.getClaveRastreo()));
 
                     em.getTransaction().begin();
                     em.persist(procesaDestino);
@@ -327,8 +333,8 @@ public abstract class FacadeTransaction<T> {
                     procesaDestino.setIva(0.0);
                     procesaDestino.setTipo_amort(0);
                     procesaDestino.setSai_aux("");
-                    procesaDestino.setIdorden(Integer.parseInt(SPEIOrden.getClaveRastreo()));
-                    
+                    procesaDestino.setIdorden(idorden);//Integer.parseInt(SPEIOrden.getClaveRastreo()));
+
                     em.getTransaction().begin();
                     em.persist(procesaDestino);
                     em.getTransaction().commit();
@@ -350,7 +356,7 @@ public abstract class FacadeTransaction<T> {
                     procesaDestino.setIva(0.0);
                     procesaDestino.setTipo_amort(0);
                     procesaDestino.setSai_aux("");
-                    procesaDestino.setIdorden(Integer.parseInt(SPEIOrden.getClaveRastreo()));
+                    procesaDestino.setIdorden(idorden);//Integer.parseInt(SPEIOrden.getClaveRastreo()));
                     em.getTransaction().begin();
                     em.persist(procesaDestino);
                     em.getTransaction().commit();
@@ -490,7 +496,7 @@ public abstract class FacadeTransaction<T> {
                                             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
                                             String fechaactivacionDestino = sdf.format(aDestino.getFechaactivacion()).substring(0, 10);
                                             String fechaBase = fechaTr_.substring(0, 10);
-                                            
+
                                             String si_se_puede_aplicar = "select sai_bankingly_limite_adelanto (" + aDestino.getAuxiliaresPK().getIdorigenp() + ","
                                                     + "" + aDestino.getAuxiliaresPK().getIdproducto() + ","
                                                     + "" + aDestino.getAuxiliaresPK().getIdauxiliar() + ","
@@ -498,7 +504,7 @@ public abstract class FacadeTransaction<T> {
                                                     + transaction.getAmount() + ",NULL)";
                                             Query query_se_puede_aplicar = em.createNativeQuery(si_se_puede_aplicar);
                                             Double se_puede_pagar = Double.parseDouble(String.valueOf(query_se_puede_aplicar.getSingleResult()));
-                                            
+
                                             if (!fechaactivacionDestino.replace("-", "/").equals(fechaBase.replace("-", "/"))) {
                                                 if (se_puede_pagar > 0) {
                                                     //Datos a procesar
@@ -520,12 +526,12 @@ public abstract class FacadeTransaction<T> {
                                                         finish = true;
                                                     } else {
                                                         //Si no se aplico el movimiento pero como ya se habia retirado de la TDD entonce se lo devolvemos
-                                                        bandera_deposito_origen =  tarjetaDeDebitoService.depositoTDD(tarjeta_origen, procesaOrigen.getMonto());
+                                                        bandera_deposito_origen = tarjetaDeDebitoService.depositoTDD(tarjeta_origen, procesaOrigen.getMonto());
                                                         backendResponse.setBackendMessage("NO SE PUDO PROCESAR FUNCION EN SAICOOP");
                                                     }
                                                 } else {
                                                     //Si no se aplico el movimiento pero como ya se habia retirado de la TDD entonce se lo devolvemos                                                
-                                                    bandera_deposito_origen =  tarjetaDeDebitoService.depositoTDD(tarjeta_origen, procesaOrigen.getMonto());
+                                                    bandera_deposito_origen = tarjetaDeDebitoService.depositoTDD(tarjeta_origen, procesaOrigen.getMonto());
                                                     backendResponse.setBackendMessage("MONTO ES MENOR A LO QUE SE PERMITE ADELANTAR \n"
                                                             + "ADELANTO PERMITIDO:" + se_puede_pagar + "\n"
                                                             + "PRDUCTO ESQUEMA HIPOTECARIO");
@@ -566,7 +572,7 @@ public abstract class FacadeTransaction<T> {
                                             finish = true;
                                         } else {
                                             //Si no se aplico el movimiento pero como ya se habia retirado de la TDD entonce se lo devolvemos
-                                            bandera_deposito_origen =  tarjetaDeDebitoService.depositoTDD(tarjeta_origen, procesaOrigen.getMonto());
+                                            bandera_deposito_origen = tarjetaDeDebitoService.depositoTDD(tarjeta_origen, procesaOrigen.getMonto());
                                             backendResponse.setBackendMessage("NO SE PUDO PROCESAR FUNCION EN SAICOOP");
                                         }
                                     }
@@ -579,7 +585,7 @@ public abstract class FacadeTransaction<T> {
                         } else {//Solo para pruebas
                             if (identificadorTransferencia == 2) {//Si el destino es una TDD
                                 if (backendResponse.getBackendMessage().contains("TERCERO")) {
-                                    
+
                                     //Busco el folio Destino
                                     tarjeta_destino = new WsSiscoopFoliosTarjetas1(opaD.getIdorigenp(), opaD.getIdproducto(), opaD.getIdauxiliar());
                                     if (tarjeta_destino.getActiva()) {
@@ -599,7 +605,7 @@ public abstract class FacadeTransaction<T> {
                                                 finish = true;
                                             } else {
                                                 backendResponse.setBackendMessage("NO SE PUDIERON PROCESAR LOS MOVIMENTOS EN SAICOOP");
-                                                bandera_retiro =  tarjetaDeDebitoService.retiroTDD(tarjeta_destino, procesaOrigen.getMonto());
+                                                bandera_retiro = tarjetaDeDebitoService.retiroTDD(tarjeta_destino, procesaOrigen.getMonto());
                                             }
 
                                         } else {
@@ -632,7 +638,7 @@ public abstract class FacadeTransaction<T> {
                                                 + transaction.getAmount() + ",NULL)";
                                         Query query_se_puede_aplicar = em.createNativeQuery(si_se_puede_aplicar);
                                         Double se_puede_pagar = Double.parseDouble(String.valueOf(query_se_puede_aplicar.getSingleResult()));
-                                       
+
                                         if (se_puede_pagar > 0) {
                                             System.out.println("Fecha activacion Modificando :" + fechaactivacionDestino.replace("\\/", "-") + " ,FechaBase:" + fechaBase);
                                             if (!fechaactivacionDestino.replace("-", "/").equals(fechaBase.replace("-", "/"))) {
@@ -666,7 +672,7 @@ public abstract class FacadeTransaction<T> {
                                             }
                                         } else {
                                             //Si no se aplico el movimiento pero como ya se habia retirado de la TDD entonce se lo devolvemos                                                
-                                            bandera_deposito_origen =  tarjetaDeDebitoService.depositoTDD(tarjeta_origen, procesaOrigen.getMonto());
+                                            bandera_deposito_origen = tarjetaDeDebitoService.depositoTDD(tarjeta_origen, procesaOrigen.getMonto());
                                             backendResponse.setBackendMessage("MONTO ES MENOR A LO QUE SE PERMITE ADELANTAR \n"
                                                     + "ADELANTO PERMITIDO:" + se_puede_pagar + "\n"
                                                     + "PRDUCTO ESQUEMA HIPOTECARIO");
@@ -704,7 +710,6 @@ public abstract class FacadeTransaction<T> {
 
                         //Realizando cambios el 16/02/2025
                         //Retiro a TDD origen   
-                        System.out.println("::::::::::::::SI pasooooooooooooooooooooo");
                         tarjeta_origen = tarjetaDeDebitoService.buscaTarjetaTDD(opaOrigen.getIdorigenp(), opaOrigen.getIdproducto(), opaOrigen.getIdauxiliar(), em);
                         //new TarjetaDeDebito().buscaTarjetaTDD(opaOrigen.getIdorigenp(), opaOrigen.getIdproducto(), opaOrigen.getIdauxiliar(), em);
                         bandera_retiro = tarjetaDeDebitoService.retiroTDD(tarjeta_origen, procesaOrigen.getMonto());
@@ -715,7 +720,9 @@ public abstract class FacadeTransaction<T> {
                         System.out.println(":::::::::::::::Resultado de retiro a tdd:" + bandera_retiro + " a TDD:" + tarjeta_origen.getIdtarjeta());
                         if (bandera_retiro) {
                             try {
-                                consulta_datos_procesar = "SELECT sai_bankingly_aplica_transaccion('" + fechaTr_.substring(0, 10) + "'," + procesaOrigen.getIdusuario() + ",'" + procesaOrigen.getSesion() + "','" + procesaOrigen.getReferencia() + "')";                                
+
+                                consulta_datos_procesar = "SELECT sai_bankingly_aplica_transaccion('" + fechaTr_.substring(0, 10) + "'," + procesaOrigen.getIdusuario() + ",'" + procesaOrigen.getSesion() + "','" + procesaOrigen.getReferencia() + "')";
+                                System.out.println(" la consulta a procesar es :" + consulta_datos_procesar);
                                 procesa_movimiento = em.createNativeQuery(consulta_datos_procesar);
                                 total_procesados = Integer.parseInt(String.valueOf(procesa_movimiento.getSingleResult()));
                                 System.out.println(":::::::::::Total registros procesados:::::::::::::" + total_procesados + " para tarjeta:" + tarjeta_origen.getIdtarjeta());
@@ -729,7 +736,7 @@ public abstract class FacadeTransaction<T> {
                                 MovimientoSpei movimientoSpei = null;
 
                                 try {
-                                    String sql = "SELECT * FROM bankingly_movimientos_spei WHERE idorden_spei='" + SPEIOrden.getClaveRastreo() + "' AND idusuario=" + procesaOrigen.getIdusuario() + " AND sesion='" + procesaOrigen.getSesion() + "' AND referencia='" + procesaOrigen.getReferencia() + "' LIMIT 1;";
+                                    String sql = "SELECT * FROM bankingly_movimientos_spei WHERE idorden_spei='" + procesaDestino.getIdorden() + "' AND idusuario=" + procesaOrigen.getIdusuario() + " AND sesion='" + procesaOrigen.getSesion() + "' AND referencia='" + procesaOrigen.getReferencia() + "' LIMIT 1;";
                                     System.out.println(":::::::::::Buscando movimiento SPEI:" + sql);
                                     Query query = em.createNativeQuery(sql, MovimientoSpei.class);
                                     movimientoSpei = (MovimientoSpei) query.getSingleResult();
@@ -740,18 +747,25 @@ public abstract class FacadeTransaction<T> {
                                         //Enviamos al orden SPEI
                                         response = metodoEnviarSPEI(SPEIOrden);//En prod descomentar esta linea
                                         System.out.println("::::::::Rsponse orden SPEI::::::::::::::" + response.getId());
+                                        //response.setId(2);//Solo para pruebas
+                                        //response.setError("Para las pruebas");//solo para pruebas
                                         if (String.valueOf(response.getId()).length() > 3) {
                                             movimientoSpei.setIdorden_spei(response.getId());
+                                            em.getTransaction().begin();
+                                            em.persist(movimientoSpei);
+                                            em.getTransaction().commit();
+
+
                                             System.out.println("::::ORDEN ENVIADA CON EXITO para clabe:::::" + SPEIOrden.getCuentaBeneficiario());
                                             mensajeBackendResult = "ORDEN ENVIADA CON EXITO,COSTO DE LA TRANSACCION:" + tota_comision;//+(Double.parseDouble(tb_spei_cuenta_comisiones.getDato2())+(Double.parseDouble(tb_spei_cuenta_comisiones.getDato2())*0.16));
                                             clean = true;
                                         } else {
                                             backendResponse.setBackendMessage(response.getError());
-                                            System.out.println("::::::Sucedio un error en el envio de la operacion spei con ID:::::::"+response.getId());
+                                            System.out.println("::::::Sucedio un error en el envio de la operacion spei con ID:::::::" + response.getId());
                                             //Vamos a depositar lo que ya se retiro de la TDD
                                             bandera_deposito_origen = tarjetaDeDebitoService.depositoTDD(tarjeta_origen, SPEIOrden.getMonto());
-                                            System.out.println(":::Bandera deposito:"+bandera_deposito_origen);
-                                            if (bandera_deposito_origen) {      
+
+                                            if (bandera_deposito_origen) {
                                                 eliminarMovimientoCa(sesionc, referencia);
                                                 //Cargo a cuenta contable spei y abono a producto TDD
                                                 procesaOrigen.setAuxiliaresPK(aOrigen.getAuxiliaresPK());
@@ -764,11 +778,11 @@ public abstract class FacadeTransaction<T> {
                                                 procesaOrigen.setIdsocio(aOrigen.getIdsocio());
                                                 procesaOrigen.setCargoabono(1);
                                                 procesaOrigen.setMonto(transaction.getAmount());
-                                                
 
-                                                procesaDestino.setIdorden(0);//nteger.parseInt(SPEIOrden.getClaveRastreo()));
+                                                procesaDestino.setIdorden(idorden);//nteger.parseInt(SPEIOrden.getClaveRastreo()));
                                                 //procesaOrigen.setIva(Double.parseDouble(aOrigen.getIva().toString()));
                                                 procesaOrigen.setTipo_amort(aOrigen.getTipoamortizacion().intValue());
+                                                procesaOrigen.setSpei_aceptado(true);
 
                                                 em.getTransaction().begin();
                                                 em.persist(procesaOrigen);
@@ -789,10 +803,10 @@ public abstract class FacadeTransaction<T> {
                                                 procesaDestino.setIdgrupo(aOrigen.getIdgrupo());
                                                 procesaDestino.setIdsocio(aOrigen.getIdsocio());
                                                 procesaDestino.setCargoabono(0);
-
+                                                procesaDestino.setSpei_aceptado(true);
                                                 procesaDestino.setIdcuenta(tb_spei_cuenta.getDato1());//el idcuenta para capital
                                                 procesaDestino.setMonto(total_a_enviar);//transaction.getAmount() - Double.parseDouble(tb_spei_cuenta_comisiones.getDato2()) - (Double.parseDouble(tb_spei_cuenta_comisiones.getDato2()) * 0.16));//El total de la transferencia
-                                                procesaDestino.setIdorden(0);//Integer.parseInt(SPEIOrden.getClaveRastreo()));
+                                                procesaDestino.setIdorden(idorden);//Integer.parseInt(SPEIOrden.getClaveRastreo()));
 
                                                 em.getTransaction().begin();
                                                 em.persist(procesaDestino);
@@ -816,7 +830,8 @@ public abstract class FacadeTransaction<T> {
                                                 procesaDestino.setIva(0.0);
                                                 procesaDestino.setTipo_amort(0);
                                                 procesaDestino.setSai_aux("");
-                                                procesaDestino.setIdorden(0);//Integer.parseInt(SPEIOrden.getClaveRastreo()));                                                
+                                                procesaDestino.setSpei_aceptado(true);
+                                                procesaDestino.setIdorden(idorden);//Integer.parseInt(SPEIOrden.getClaveRastreo()));
 
                                                 em.getTransaction().begin();
                                                 em.persist(procesaDestino);
@@ -838,19 +853,23 @@ public abstract class FacadeTransaction<T> {
                                                 procesaDestino.setMonto(iva_comisiones);
                                                 procesaDestino.setIva(0.0);
                                                 procesaDestino.setTipo_amort(0);
+                                                procesaDestino.setSpei_aceptado(true);
                                                 procesaDestino.setSai_aux("");
-                                                procesaDestino.setIdorden(0);//Integer.parseInt(SPEIOrden.getClaveRastreo()));
-                                                
+                                                procesaDestino.setIdorden(idorden);//Integer.parseInt(SPEIOrden.getClaveRastreo()));
+
                                                 em.getTransaction().begin();
                                                 em.persist(procesaDestino);
                                                 em.getTransaction().commit();
 
                                                 consulta_datos_procesar = "SELECT sai_bankingly_aplica_transaccion('" + fechaTr_.substring(0, 10) + "'," + procesaOrigen.getIdusuario() + ",'" + procesaOrigen.getSesion() + "','" + procesaOrigen.getReferencia() + "')";
+
                                                 System.out.println("::::::::::::::::consulta para procesar funcion aplica movs:" + consulta_datos_procesar);
+
                                                 procesa_movimiento = em.createNativeQuery(consulta_datos_procesar);
+
                                                 total_procesados = Integer.parseInt(String.valueOf(procesa_movimiento.getSingleResult()));
                                                 backendResponse.setBackendMessage("ERROR AL PROCESAR MOVIMIENTO");
-                                                System.out.println("::::Total procesados::::"+total_procesados);
+                                                System.out.println("::::Total procesados::::" + total_procesados);
                                             }
 
                                         }
@@ -859,12 +878,10 @@ public abstract class FacadeTransaction<T> {
                                     System.out.println("::::::::::Error al buscar movimiento spei para idorden:" + SPEIOrden.getClaveRastreo() + " con error :" + e.getMessage());
                                     backendResponse.setBackendMessage("ERROR AL PROCESAR MOVIMIENTO");
                                 }
-                                
-                             
 
                             } else {
                                 //Si no se aplico el movimiento pero como ya se habia retirado de la TDD entonce se lo devolvemos
-                                bandera_deposito_origen =  tarjetaDeDebitoService.depositoTDD(tarjeta_origen, transactionOWN.getAmount());
+                                bandera_deposito_origen = tarjetaDeDebitoService.depositoTDD(tarjeta_origen, transactionOWN.getAmount());
                                 backendResponse.setBackendMessage("NO SE PUDO PROCESAR FUNCION EN SAICOOP");
                             }
                         } else {
@@ -945,7 +962,7 @@ public abstract class FacadeTransaction<T> {
                     /*String consulta_termina_transaccion = "SELECT sai_bankingly_termina_transaccion('" + fechaTr_.substring(0, 10) + "'," + procesaOrigen.getIdusuario() + ",'" + procesaOrigen.getSesion() + "','" + procesaOrigen.getReferencia() + "')";
                     Query termina_transaccion = em.createNativeQuery(consulta_termina_transaccion);
                      */
-                    eliminarMovimientoCa(sesionc, referencia);                    
+                    eliminarMovimientoCa(sesionc, referencia);
                     String envio_ok_sms = "";
 
                     if (util2.obtenerOrigen(em) == 30200) {
@@ -1007,7 +1024,7 @@ public abstract class FacadeTransaction<T> {
                     //Para que no se genere error
                     try {
                         //Guardo en una tabla el historial de la operacion realizada(para revision backend)
-                        transaction.setTransactionid(new BigDecimal(procesaOrigen.getReferencia().trim()));
+                        transaction.setTransactionid(new BigDecimal(transactionOWN.getTransactionId()));
                         try {
                             //Obtenemos la poliza mediante la referencia                            
                             Query query_poliza = em.createNativeQuery(sql_poliza, Polizas.class);
@@ -1084,7 +1101,7 @@ public abstract class FacadeTransaction<T> {
         boolean banderaProductosDeposito = false;
         try {
             Auxiliar ctaOrigen = null;
-            boolean bOrigen = false;            
+            boolean bOrigen = false;
             try {
                 Query query = em.createNativeQuery(cuentaOrigen, Auxiliar.class
                 );
@@ -1100,15 +1117,15 @@ public abstract class FacadeTransaction<T> {
             if (bOrigen) {
                 Double saldo = Double.parseDouble(ctaOrigen.getSaldo().toString());
                 if (util2.obtenerOrigen(em) == 30200) {
-                    Tabla tablaProductoTDD =  tarjetaDeDebitoService.productoTddwebservice(em);
+                    Tabla tablaProductoTDD = tarjetaDeDebitoService.productoTddwebservice(em);
                     if (ctaOrigen.getAuxiliaresPK().getIdproducto() == Integer.parseInt(tablaProductoTDD.getDato1())) {
                         //Si es la TDD               
                         WsSiscoopFoliosTarjetasPK1 foliosPK = new WsSiscoopFoliosTarjetasPK1(ctaOrigen.getAuxiliaresPK().getIdorigenp(), ctaOrigen.getAuxiliaresPK().getIdproducto(), ctaOrigen.getAuxiliaresPK().getIdauxiliar());
                         WsSiscoopFoliosTarjetas1 tarjetas = tarjetaDeDebitoService.buscaTarjetaTDD(foliosPK.getIdorigenp(), foliosPK.getIdproducto(), foliosPK.getIdauxiliar(), em);
-                        try {                            
+                        try {
                             BalanceQueryResponseDto saldoTDD = tarjetaDeDebitoService.saldoTDD(tarjetas.getWsSiscoopFoliosTarjetasPK());
                             saldo = saldoTDD.getAvailableAmount();
-                            message = "TDD";                            
+                            message = "TDD";
 
                         } catch (Exception e) {
                             System.out.println("Error al buscar saldo de TDD:" + ctaOrigen.getAuxiliaresPK().getIdproducto());
@@ -1297,13 +1314,13 @@ public abstract class FacadeTransaction<T> {
             if (bOrigen) {
                 Double saldo = Double.parseDouble(ctaOrigen.getSaldo().toString());
                 if (util2.obtenerOrigen(em) == 30200) {
-                    tablaProductoTDD =  tarjetaDeDebitoService.productoTddwebservice(em);
+                    tablaProductoTDD = tarjetaDeDebitoService.productoTddwebservice(em);
                     if (ctaOrigen.getAuxiliaresPK().getIdproducto() == Integer.parseInt(tablaProductoTDD.getDato1())) {
                         WsSiscoopFoliosTarjetasPK1 foliosPK = new WsSiscoopFoliosTarjetasPK1(ctaOrigen.getAuxiliaresPK().getIdorigenp(), ctaOrigen.getAuxiliaresPK().getIdproducto(), ctaOrigen.getAuxiliaresPK().getIdauxiliar());
                         WsSiscoopFoliosTarjetas1 tarjetas = tarjetaDeDebitoService.buscaTarjetaTDD(foliosPK.getIdorigenp(), foliosPK.getIdproducto(), foliosPK.getIdauxiliar(), em);
                         try {
-                            
-                            BalanceQueryResponseDto saldoTDD =  tarjetaDeDebitoService.saldoTDD(tarjetas.getWsSiscoopFoliosTarjetasPK());
+
+                            BalanceQueryResponseDto saldoTDD = tarjetaDeDebitoService.saldoTDD(tarjetas.getWsSiscoopFoliosTarjetasPK());
                             message = "DESDE TDD";
                             saldo = saldoTDD.getAvailableAmount();
                             //saldo = 200.0;
@@ -1480,7 +1497,7 @@ public abstract class FacadeTransaction<T> {
                                                                                                             + " AND idsocio = " + ctaDestino.getIdsocio()
                                                                                                             + " AND idproducto=182 AND estatus in(0,1,2)";
 
-                                                                                                    int total182 = 0;                                                                                                    
+                                                                                                    int total182 = 0;
                                                                                                     try {
                                                                                                         Query query_182 = em.createNativeQuery(busqueda_182);
                                                                                                         total182 = Integer.parseInt(query_182.getSingleResult().toString());//DFDSFD
@@ -1563,7 +1580,7 @@ public abstract class FacadeTransaction<T> {
                                                                                                         + " AND idsocio = " + ctaDestino.getIdsocio()
                                                                                                         + " AND idproducto=182 AND estatus in(0,1,2)";
 
-                                                                                                int total182 = 0;                                                                                                
+                                                                                                int total182 = 0;
                                                                                                 try {
                                                                                                     Query query_182 = em.createNativeQuery(busqueda_182);
                                                                                                     total182 = Integer.parseInt(query_182.getSingleResult().toString());//DFDSFD
@@ -1713,7 +1730,7 @@ public abstract class FacadeTransaction<T> {
             if (bOrigen) {
                 Double saldo = Double.parseDouble(ctaOrigen.getSaldo().toString());
                 if (util2.obtenerOrigen(em) == 30200) {
-                    Tabla tablaProductoTDD =  tarjetaDeDebitoService.productoTddwebservice(em);
+                    Tabla tablaProductoTDD = tarjetaDeDebitoService.productoTddwebservice(em);
                     //Si el pago del prestamo se esta haciendo desde la TDD
                     if (ctaOrigen.getAuxiliaresPK().getIdproducto() == Integer.parseInt(tablaProductoTDD.getDato1())) {
                         WsSiscoopFoliosTarjetasPK1 foliosPK = new WsSiscoopFoliosTarjetasPK1(ctaOrigen.getAuxiliaresPK().getIdorigenp(), ctaOrigen.getAuxiliaresPK().getIdproducto(), ctaOrigen.getAuxiliaresPK().getIdauxiliar());
@@ -1974,7 +1991,7 @@ public abstract class FacadeTransaction<T> {
 
                         if (util2.obtenerOrigen(em) == 30200) {
                             //Buscamos el producto para tarjeta de debito
-                            Tabla tablaProductoTDD =  tarjetaDeDebitoService.productoTddwebservice(em);
+                            Tabla tablaProductoTDD = tarjetaDeDebitoService.productoTddwebservice(em);
                             System.out.println("El producto para Tarjeta de debito es:" + tablaProductoTDD);
 
                             //Si el retiro debe ser de Tarjeta de debito
@@ -1984,9 +2001,9 @@ public abstract class FacadeTransaction<T> {
                                 WsSiscoopFoliosTarjetas1 tarjeta = tarjetaDeDebitoService.buscaTarjetaTDD(foliosPK.getIdorigenp(), foliosPK.getIdproducto(), foliosPK.getIdauxiliar(), em);
                                 try {
                                     //Obtengo el saldo desde ws de el idTarjeta encontrada
-                                    BalanceQueryResponseDto saldo_tarjeta_de_debito =  tarjetaDeDebitoService.saldoTDD(tarjeta.getWsSiscoopFoliosTarjetasPK());
+                                    BalanceQueryResponseDto saldo_tarjeta_de_debito = tarjetaDeDebitoService.saldoTDD(tarjeta.getWsSiscoopFoliosTarjetasPK());
                                     message = "TDD";
-                                    saldo = saldo_tarjeta_de_debito.getAvailableAmount();                                    
+                                    saldo = saldo_tarjeta_de_debito.getAvailableAmount();
                                 } catch (Exception e) {
                                     System.out.println("Error al buscar saldo de TDD:" + folio_origen_.getAuxiliaresPK().getIdproducto());
                                     return message = "ERROR AL CONSUMIR WS TDD Y OBTENER SALDO DEL PRODUCTO";
@@ -2227,10 +2244,10 @@ public abstract class FacadeTransaction<T> {
         if (cancela) {
             try {
                 if (!estado.toUpperCase().contains("LIQUIDA")) {
-                    WsSiscoopFoliosTarjetas1 tarjeta_origen =  tarjetaDeDebitoService.buscaTarjetaTDD(pago.getAuxiliaresPK().getIdorigenp(), pago.getAuxiliaresPK().getIdproducto(), pago.getAuxiliaresPK().getIdauxiliar(), em);
+                    WsSiscoopFoliosTarjetas1 tarjeta_origen = tarjetaDeDebitoService.buscaTarjetaTDD(pago.getAuxiliaresPK().getIdorigenp(), pago.getAuxiliaresPK().getIdproducto(), pago.getAuxiliaresPK().getIdauxiliar(), em);
                     int total_procesados = 0;
                     //Ajustamos el saldo de la TDD origen lo que se ya se retiro                    
-                    boolean bandera_deposito =  tarjetaDeDebitoService.depositoTDD(tarjeta_origen, pago.getMonto());
+                    boolean bandera_deposito = tarjetaDeDebitoService.depositoTDD(tarjeta_origen, pago.getMonto());
                     //boolean bandera_deposito=true;
                     if (bandera_deposito) {
                         try {
@@ -2382,7 +2399,7 @@ public abstract class FacadeTransaction<T> {
                 }
             }
 
-            //System.out.println(":::::::::::::::Resultado busqeuda tercero activo:::::::::::::"+tercero);
+            System.out.println(":::::::::::::::Resultado busqueda tercero activo:::::::::::::"+tercero);
         } catch (Exception e) {
             System.out.println("::::::::Error en validacion tercero activo:::::::::" + e.getMessage());
         } finally {
@@ -2435,16 +2452,16 @@ public abstract class FacadeTransaction<T> {
             WsSiscoopFoliosTarjetas1 tarjeta = null;
             //Buscamos el producto para TDD en tablas 
             Tabla tablaProductoTDD = tarjetaDeDebitoService.productoTddwebservice(em);
-            
+
             //Busco el producto configurado para retiros
             Tabla tabla_retiro = util2.busquedaTabla(em, "bankingly_banca_movil", "producto_retiro");
-            
+
             //Bandera que me sirve para decir si existe o no la tdd
             boolean tddEncontrada = false;
 
             OpaDTO opaOrigen = util.opa(transactionOWN.getDebitProductBankIdentifier());
             AuxiliarPK auxpk = new AuxiliarPK(opaOrigen.getIdorigenp(), opaOrigen.getIdproducto(), opaOrigen.getIdauxiliar());
-            Auxiliar a = em.find(Auxiliar.class,auxpk);
+            Auxiliar a = em.find(Auxiliar.class, auxpk);
             //Si el producto configurado para retiros no es la tdd entra aqui
             if (opaOrigen.getIdproducto() == Integer.parseInt(tabla_retiro.getDato1())) {
                 try {
@@ -2456,7 +2473,9 @@ public abstract class FacadeTransaction<T> {
                             try {
                                 //Buscando la tarjeta de debito 
                                 tarjeta = tarjetaDeDebitoService.buscaTarjetaTDD(opaOrigen.getIdorigenp(), opaOrigen.getIdproducto(), opaOrigen.getIdauxiliar(), em);
-                                tddEncontrada = true;
+                                if (tarjeta != null) {
+                                    tddEncontrada = true;
+                                }
                             } catch (Exception e) {
                                 System.out.println("El folio para TDD no existe");
                             }
@@ -2713,6 +2732,30 @@ public abstract class FacadeTransaction<T> {
         }
 
     }
+    
+    public String claveRastreo(){
+        EntityManager em = AbstractFacade.conexion();
+        String clverastreo="";
+        try {
+            TablaPK tb_pk_empresa = new TablaPK("spei_csn", "empresa");
+            Tabla tb_empresa = em.find(Tabla.class, tb_pk_empresa);
+            String empresa = tb_empresa.getDato1();
+            Date now = new Date();
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy/MM/dd");
+            String fechaActual = sdf.format(now).replace("/", "");
+             Random rnd = new Random();
+            clverastreo = empresa + fechaActual + String.valueOf(rnd.nextInt(500000000 - 4 + 2) + 5);
+            
+        } catch (Exception e) {
+            em.close();
+        } finally {
+            em.close();
+        }
+
+        return clverastreo;
+    
+            
+    }
 
     private static String ruta() {
         String home = System.getProperty("user.home");
@@ -2721,21 +2764,21 @@ public abstract class FacadeTransaction<T> {
         return actualRuta;
     }
 
-   private void eliminarMovimientoCa(String sesion,String referencia){
+    private void eliminarMovimientoCa(String sesion, String referencia) {
         EntityManager em = AbstractFacade.conexion();
         try {
-            System.out.println("::::::Eliminando registros con sesion:"+sesion+" y referencia:"+referencia);
+            System.out.println("::::::Eliminando registros con sesion:" + sesion + " y referencia:" + referencia);
             String sql = "DELETE FROM bankingly_movimientos_ca WHERE sesion =? AND referencia =?";
-            Query query = em.createNativeQuery(sql); 
-            query.setParameter(1, sesion); 
-            query.setParameter(2, referencia); 
+            Query query = em.createNativeQuery(sql);
+            query.setParameter(1, sesion);
+            query.setParameter(2, referencia);
             em.getTransaction().begin();
             int filas = query.executeUpdate();
-            em.getTransaction().commit(); 
-            System.out.println("Filas eliminadas: " + filas);           
-       } catch (Exception e) {
-            System.out.println("::::::::::::Error al eliminar movimientos::::::::"+e.getMessage());
-       }
+            em.getTransaction().commit();
+            System.out.println("Filas eliminadas: " + filas);
+        } catch (Exception e) {
+            System.out.println("::::::::::::Error al eliminar movimientos::::::::" + e.getMessage());
+        }
 
-   } 
- }
+    }
+}

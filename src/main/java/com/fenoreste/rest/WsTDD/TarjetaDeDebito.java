@@ -68,11 +68,23 @@ public class TarjetaDeDebito {
                     + "         AND w.idauxiliar = ?"
                     + "          AND td.fecha_vencimiento > (select distinct fechatrabajo from origenes limit 1)";
             System.out.println("Consulta tarjeta:" + consulta);
+            String consulta2=" SELECT w.* "
+                    + "         FROM ws_siscoop_folios_tarjetas w "
+                    + "         INNER JOIN ws_siscoop_tarjetas td using(idtarjeta)"
+                    + "         WHERE w.idorigenp = "+idorigenp
+                      + "         AND w.idproducto = " + idproducto
+                    + "         AND w.idauxiliar = "+idauxiliar
+                    + "          AND td.fecha_vencimiento > (select distinct fechatrabajo from origenes limit 1)";
+            System.out.println("consulta 2:"+consulta2);
             Query query = em.createNativeQuery(consulta, WsSiscoopFoliosTarjetas1.class);
             query.setParameter(1, idorigenp);
             query.setParameter(2, idproducto);
             query.setParameter(3, idauxiliar);
+            
+            
+            
             wsSiscoopFoliosTarjetas = (WsSiscoopFoliosTarjetas1) query.getSingleResult();
+            
             if (wsSiscoopFoliosTarjetas != null) {
                 wsSiscoopFoliosTarjetas.setActiva(wsSiscoopFoliosTarjetas.getActiva());
                 wsSiscoopFoliosTarjetas.setAsignada(wsSiscoopFoliosTarjetas.getAsignada());
@@ -83,6 +95,7 @@ public class TarjetaDeDebito {
             System.out.println("Error en buscaTarjetaTDD de WsSiscoopFoliosTarjetas: " + e.getMessage());
             return wsSiscoopFoliosTarjetas;
         }
+        
         return wsSiscoopFoliosTarjetas;
     }
 
